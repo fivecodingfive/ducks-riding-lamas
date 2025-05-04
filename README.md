@@ -8,7 +8,9 @@
 
 Clone the repository using the following command:
 
-git clone https://github.com/<your-org>/ducks-riding-lamas.git
+git clone 
+
+https://github.com/fivecodingfive/ducks-riding-lamas.git
 cd ducks-riding-lamas
 
 
