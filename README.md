@@ -19,10 +19,10 @@ Drop the data/ folder—containing variant_0/, variant_1/, and variant_2/—into
 
 Your project structure should then look like this:
 - ducks-riding-lamas/
-- data/
-- greedy.py
-- environment.py
-- ...
+	- data/
+	- greedy.py
+	- environment.py
+	- ...
 
 
 ### 3. Create and Activate the Virtual Environment (inside the repo)
