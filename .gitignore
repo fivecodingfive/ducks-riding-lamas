@@ -1,0 +1,5 @@
+# keep course dataset out of Git
+data/
+__pycache__/
+*.pyc
+venv/
