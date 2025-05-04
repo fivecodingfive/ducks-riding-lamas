@@ -10,19 +10,5 @@ Double checking to see if everything is working properly
 
   ```bash
   python -m venv venv
-  source venv/bin/activate      # Windows: .\venv\Scripts\activate
+  .\venv\Scripts\activate   #I think for Mac that is different
   python -m pip install -r requirements.txt
-
----
-
-## 3 .  Teammate one‑shot setup
-
-They clone and type exactly three commands:
-
-```bash
-git clone <repo‑url>
-cd ducks-riding-lamas
-# ----- only first time -----
-python -m venv venv
-source venv/bin/activate          # Windows: .\venv\Scripts\activate
-python -m pip install -r requirements.txt
