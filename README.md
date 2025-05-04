@@ -8,7 +8,6 @@
 
 Clone the repository using the following command:
 
-```bash
 git clone https://github.com/<your-org>/ducks-riding-lamas.git
 cd ducks-riding-lamas
 
@@ -34,18 +33,13 @@ ducks-riding-lamas/
 ### 3. Create and Activate the Virtual Environment (inside the repo)
 
 Windows
-```bash
 python -m venv venv
 .\venv\Scripts\Activate.ps1
-```bash
 
 MacOS / Linux
-```bash
 python3 -m venv venv
 source venv/bin/activate
-```bash
+
 
 ### 4. Install the exact package versions
-```bash
 python -m pip install -r requirements.txt
-```bash
