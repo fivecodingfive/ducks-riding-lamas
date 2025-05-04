@@ -37,13 +37,15 @@ Windows
 ```bash
 python -m venv venv
 .\venv\Scripts\Activate.ps1
+```bash
 
 MacOS / Linux
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-
+```bash
 
 ### 4. Install the exact package versions
 ```bash
 python -m pip install -r requirements.txt
+```bash
