@@ -1,14 +1,49 @@
-# ducks-riding-lamas
-Coding Lab DRL SS25
-
-Double checking to see if everything is working properly
-
 ## Setup
 
+### Python vesion to be used
 * Python 3.11.x  (tested with 3.11.9)
-* Create a virtual env **inside the repo**:
 
-  ```bash
-  python -m venv venv
-  .\venv\Scripts\activate   #I think for Mac that is different
-  python -m pip install -r requirements.txt
+
+### 1. Clone the Repository
+
+Clone the repository using the following command:
+
+```bash
+git clone https://github.com/<your-org>/ducks-riding-lamas.git
+cd ducks-riding-lamas
+
+
+### 2. Add the Dataset
+
+Copy the dataset from Moodle.
+
+Drop the data/ folder—containing variant_0/, variant_1/, and variant_2/—into the root directory of your local clone.
+
+Your project structure should then look like this:
+
+ducks-riding-lamas/
+├── data/
+│   ├── variant_0/
+│   ├── variant_1/
+│   └── variant_2/
+├── greedy.py
+├── environment.py
+├── ...
+
+
+### 3. Create and Activate the Virtual Environment (inside the repo)
+
+Windows
+```bash
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+
+MacOS / Linux
+```bash
+python3 -m venv venv
+source venv/bin/activate
+
+
+### 4. Install the exact package versions
+```bash
+python -m pip install -r requirements.txt
