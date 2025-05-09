@@ -1,0 +1,20 @@
+{"time":"2025-05-09T20:07:26.9450749+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"C:\\Users\\jonas\\PycharmProjects\\ducks-riding-lamas\\wandb\\run-20250509_200726-35i54kii\\logs\\debug-core.log"}
+{"time":"2025-05-09T20:07:27.9391341+02:00","level":"INFO","msg":"created new stream","id":"35i54kii"}
+{"time":"2025-05-09T20:07:27.9391341+02:00","level":"INFO","msg":"stream: started","id":"35i54kii"}
+{"time":"2025-05-09T20:07:27.9391341+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"35i54kii"}
+{"time":"2025-05-09T20:07:27.9391341+02:00","level":"INFO","msg":"handler: started","stream_id":"35i54kii"}
+{"time":"2025-05-09T20:07:27.9391341+02:00","level":"INFO","msg":"sender: started","stream_id":"35i54kii"}
+{"time":"2025-05-09T20:07:28.152063+02:00","level":"ERROR","msg":"HTTP error","status":403,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-05-09T20:07:28.152063+02:00","level":"ERROR","msg":"sender: upsertRun:","error":"failed to upsert bucket: returned error 403: {\"data\":{\"upsertBucket\":null},\"errors\":[{\"message\":\"permission denied\",\"path\":[\"upsertBucket\"],\"extensions\":{\"code\":\"PERMISSION_ERROR\"}}]}"}
+{"time":"2025-05-09T20:07:29.1544801+02:00","level":"INFO","msg":"stream: closing","id":"35i54kii"}
+{"time":"2025-05-09T20:07:29.3851615+02:00","level":"ERROR","msg":"HTTP error","status":403,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-05-09T20:07:29.3851615+02:00","level":"ERROR","msg":"sender: sendConfig:","error":"returned error 403: {\"data\":{\"upsertBucket\":null},\"errors\":[{\"message\":\"permission denied\",\"path\":[\"upsertBucket\"],\"extensions\":{\"code\":\"PERMISSION_ERROR\"}}]}"}
+{"time":"2025-05-09T20:07:29.4321183+02:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-05-09T20:07:29.4321183+02:00","level":"ERROR","msg":"runfiles: CreateRunFiles returned error: returned error 404: {\"data\":{\"createRunFiles\":null},\"errors\":[{\"message\":\"project five_coding_five/Basic_DQN_test not found during createRunFiles\",\"path\":[\"createRunFiles\"]}]}"}
+{"time":"2025-05-09T20:07:29.689253+02:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-05-09T20:07:29.689253+02:00","level":"ERROR","msg":"runfiles: CreateRunFiles returned error: returned error 404: {\"data\":{\"createRunFiles\":null},\"errors\":[{\"message\":\"project five_coding_five/Basic_DQN_test not found during createRunFiles\",\"path\":[\"createRunFiles\"]}]}"}
+{"time":"2025-05-09T20:07:29.689253+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-05-09T20:07:29.689253+02:00","level":"INFO","msg":"handler: closed","stream_id":"35i54kii"}
+{"time":"2025-05-09T20:07:29.689253+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"35i54kii"}
+{"time":"2025-05-09T20:07:29.689253+02:00","level":"INFO","msg":"sender: closed","stream_id":"35i54kii"}
+{"time":"2025-05-09T20:07:29.6918456+02:00","level":"INFO","msg":"stream: closed","id":"35i54kii"}

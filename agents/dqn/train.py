@@ -19,8 +19,9 @@ What this function does
 def train_dqn(env, config, agent=None):
     # Initialize W&B
     run = wandb.init(
+        name=f"dqn_{env.variant}_{config.get('learning_rate', 'default')}",
         project="Basic_DQN_test",
-        entity="five_coding_five",
+        entity="five_coding_five-student",
         config=config,
         tags=["DQN", f"variant-{env.variant}", "basic"],
         notes="Initial DQN implementation for gridworld"
@@ -59,7 +60,7 @@ def train_dqn(env, config, agent=None):
                 minibatch = random.sample(agent.memory, agent.batch_size)
                 states, actions, rewards, next_states, dones = agent.prepare_batch(minibatch)
                 loss = agent.update_weights(states, actions, rewards, next_states, dones)
-                episode_losses.append(loss.numpy())
+                episode_losses.append(float(loss))
 
             if step % agent.target_model_update_freq == 0:
                 agent.update_target_model()
@@ -73,11 +74,10 @@ def train_dqn(env, config, agent=None):
         # Log metrics at the end of each episode
         avg_loss = np.mean(episode_losses) if episode_losses else None
         wandb.log({
-            "episode": episode,
             "reward": total_reward,
             "epsilon": agent.epsilon,
             "loss": avg_loss,
-            "avg_q": np.mean(q_values) if q_values is not None else None
+            "avg_q": np.mean(q_values) if q_values is not None and len(q_values) > 0 else float('nan'),
         })
 
         agent.decay_epsilon()

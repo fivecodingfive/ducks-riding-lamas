@@ -1,0 +1,15 @@
+{"time":"2025-05-09T20:11:11.0464362+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"C:\\Users\\jonas\\PycharmProjects\\ducks-riding-lamas\\wandb\\run-20250509_201111-a3s6jezb\\logs\\debug-core.log"}
+{"time":"2025-05-09T20:11:11.623277+02:00","level":"INFO","msg":"created new stream","id":"a3s6jezb"}
+{"time":"2025-05-09T20:11:11.623277+02:00","level":"INFO","msg":"stream: started","id":"a3s6jezb"}
+{"time":"2025-05-09T20:11:11.623277+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"a3s6jezb"}
+{"time":"2025-05-09T20:11:11.623277+02:00","level":"INFO","msg":"sender: started","stream_id":"a3s6jezb"}
+{"time":"2025-05-09T20:11:11.623277+02:00","level":"INFO","msg":"handler: started","stream_id":"a3s6jezb"}
+{"time":"2025-05-09T20:11:12.286449+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-05-09T20:11:13.670716+02:00","level":"INFO","msg":"stream: closing","id":"a3s6jezb"}
+{"time":"2025-05-09T20:11:13.670716+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-05-09T20:11:13.670716+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-05-09T20:11:14.7464701+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-05-09T20:11:15.2307578+02:00","level":"INFO","msg":"sender: closed","stream_id":"a3s6jezb"}
+{"time":"2025-05-09T20:11:15.2307578+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"a3s6jezb"}
+{"time":"2025-05-09T20:11:15.2307578+02:00","level":"INFO","msg":"handler: closed","stream_id":"a3s6jezb"}
+{"time":"2025-05-09T20:11:15.2335003+02:00","level":"INFO","msg":"stream: closed","id":"a3s6jezb"}

@@ -1,0 +1,24 @@
+Model: "functional"
+┌─────────────────────────────────┬────────────────────────┬───────────────┐
+│ Layer (type)                    │ Output Shape           │       Param # │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ input_layer (InputLayer)        │ (None, 4)              │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense (Dense)                   │ (None, 64)             │           320 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 64)             │         4,160 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 4)              │           260 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 4,740 (18.52 KB)
+ Trainable params: 4,740 (18.52 KB)
+ Non-trainable params: 0 (0.00 B)
+[1m1/1[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 148ms/step
+Traceback (most recent call last):
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\main.py", line 49, in <module>
+    rewards = train_dqn(env, config)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agents\dqn\train.py", line 63, in train_dqn
+    episode_losses.append(loss.numpy())
+                          ^^^^^^^^^^
+AttributeError: 'numpy.float32' object has no attribute 'numpy'
