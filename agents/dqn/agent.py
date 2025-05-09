@@ -3,6 +3,10 @@ import tensorflow as tf
 from collections import deque
 from agents.dqn.model import build_q_network
 
+
+# AGENT.PY - IMPLEMENTS THE DQN ALGORITHM WITH EXPERIENCE REPLAY, TARGET NETWORK, AND EPSILON-GREEDY ACTIONS.
+
+
 class DQNAgent:
     def __init__(self, state_size, action_size, config):
         self.state_size = state_size

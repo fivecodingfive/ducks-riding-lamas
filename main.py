@@ -2,6 +2,8 @@
 # Gets interesting later, when we have more models and agents
 
 
+# MAIN.PY - THE STARTING POINT THAT SETS UP THE ENVIRONMENT, CONFIGURES THE DQN, AND KICKS OFF TRAINING.
+
 # set seed
 seed = 29
 

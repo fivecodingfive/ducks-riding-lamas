@@ -1,4 +1,6 @@
 
+# MODEL.PY: BUILDS THE NEURAL NETWORK (2 DENSE LAYERS) THAT PREDICTS Q-VALUES FOR ACTIONS.
+
 import tensorflow as tf
 
 def build_q_network(input_shape, output_size):

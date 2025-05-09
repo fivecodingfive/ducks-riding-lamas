@@ -8,6 +8,8 @@
 # if new item appears in a cell into which the agent moves/at which the agent stays in the same time step,
 # it is not picked up (if agent wants to pick it up, it has to stay in the cell in the next time step)
 
+# ENVIRONMENT.PY - HANDLES THE 5X5 GRID WORLD WHERE ITEMS SPAWN AND THE AGENT MOVES/COLLECTS THEM (GAME LOGIC).
+
 import random
 import pandas as pd
 import numpy as np
