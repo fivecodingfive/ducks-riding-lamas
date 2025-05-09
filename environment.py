@@ -10,6 +10,7 @@
 
 import random
 import pandas as pd
+import numpy as np
 from copy import deepcopy
 from itertools import compress
 
@@ -146,6 +147,33 @@ class Environment(object):
     # TODO: implement function that gives the input features for the neural network(s)
     #       based on the current state of the environment
     def get_obs(self):
-        ...
+        obs = []
 
-        return ...
+        # One-hot Grid (25 Felder = 5x5)
+        grid_size = self.vertical_cell_count * self.horizontal_cell_count
+
+        # 1. Agentenposition (One-hot)
+        agent_grid = [0] * grid_size
+        agent_idx = self.agent_loc[0] * self.horizontal_cell_count + self.agent_loc[1]
+        agent_grid[agent_idx] = 1
+        obs.extend(agent_grid)
+
+        # 2. Zielposition (One-hot)
+        target_grid = [0] * grid_size
+        target_idx = self.target_loc[0] * self.horizontal_cell_count + self.target_loc[1]
+        target_grid[target_idx] = 1
+        obs.extend(target_grid)
+
+        # 3. Items (Itempositionen mit Alter codiert)
+        item_grid = [0] * grid_size
+        for loc, time in zip(self.item_locs, self.item_times):
+            idx = loc[0] * self.horizontal_cell_count + loc[1]
+            # Je älter das Item, desto größer der Wert (optional normalisieren)
+            item_grid[idx] = min(1.0, time / self.max_response_time)
+        obs.extend(item_grid)
+
+        # 4. Aktuelle Ladung (skalar)
+        obs.append(self.agent_load / self.agent_capacity)
+
+        return np.array(obs, dtype=np.float32)
+
