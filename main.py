@@ -38,7 +38,7 @@ config = {
     "learning_rate": 0.001,
     "target_model_update_freq": 20,
     "memory_size": 2000,
-    "episodes": 100,
+    "episodes": 500,
     "max_steps": 200
 }
 
@@ -47,5 +47,3 @@ print(f"🚀 Starting DQN training on variant {variant} for {config['episodes']}
 rewards = train_dqn(env, config)
 
 
-# TODO: execute training
-...

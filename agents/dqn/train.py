@@ -40,4 +40,7 @@ def train_dqn(env, config):
 
         print(f"🎓 Episode {episode + 1}/{config['episodes']} | Reward: {total_reward:.1f} | Epsilon: {agent.epsilon:.3f}")
 
+    print("✅ Training complete. Saving model...")
+    agent.model.save_weights(f"models/dqn_variant{env.variant}.weights.h5")
+
     return all_rewards

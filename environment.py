@@ -79,8 +79,7 @@ class Environment(object):
                 self.remaining_training_episodes = deepcopy(self.training_episodes)
             episode = random.choice(self.remaining_training_episodes)
             self.remaining_training_episodes.remove(episode)
-        self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
-                                index_col=0)
+        self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv', index_col=0)
 
         return self.get_obs()
 
