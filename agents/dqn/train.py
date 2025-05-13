@@ -42,6 +42,8 @@ def train_dqn(env, config, agent=None):
         state = env.reset("training").reshape(1, -1)
         total_reward = 0
         episode_losses = []  # To track average loss per episode
+        min_loss = None      # Track minimum loss for early stopping 🔴
+
 
         for step in range(config['max_steps']):
             if np.random.rand() < agent.epsilon:
@@ -61,6 +63,7 @@ def train_dqn(env, config, agent=None):
                 states, actions, rewards, next_states, dones = agent.prepare_batch(minibatch)
                 loss = agent.update_weights(states, actions, rewards, next_states, dones)
                 episode_losses.append(float(loss))
+                min_loss = min(loss, min_loss) if min_loss is not None else loss  # 🔴 Track minimum
 
             if step % agent.target_model_update_freq == 0:
                 agent.update_target_model()
@@ -73,10 +76,18 @@ def train_dqn(env, config, agent=None):
 
         # Log metrics at the end of each episode
         avg_loss = np.mean(episode_losses) if episode_losses else None
+
+        # TODO: Or should "loss" be written here instead of "avg_loss"?
+        if min_loss is not None and min_loss < 0.01:
+            print(f"✅ Overfitting succeeded at episode {episode}! Min loss: {min_loss:.4f}")
+            break
+
+
         wandb.log({
             "reward": total_reward,
             "epsilon": agent.epsilon,
             "loss": avg_loss,
+            "min_loss": min_loss,  # 🔴 New metric
             "avg_q": np.mean(q_values) if q_values is not None and len(q_values) > 0 else float('nan'),
         })
 

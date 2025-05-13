@@ -1,0 +1,41 @@
+Model: "functional"
+┌─────────────────────────────────┬────────────────────────┬───────────────┐
+│ Layer (type)                    │ Output Shape           │       Param # │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ input_layer (InputLayer)        │ (None, 4)              │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense (Dense)                   │ (None, 64)             │           320 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 64)             │         4,160 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 4)              │           260 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 4,740 (18.52 KB)
+ Trainable params: 4,740 (18.52 KB)
+ Non-trainable params: 0 (0.00 B)
+Traceback (most recent call last):
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\main.py", line 63, in <module>
+    _ = train_dqn(env, overfit_config)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agents\dqn\train.py", line 42, in train_dqn
+    state = env.reset("training").reshape(1, -1)
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\environment.py", line 84, in reset
+    self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\pandas\io\parsers\readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\pandas\io\parsers\readers.py", line 620, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\pandas\io\parsers\readers.py", line 1620, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\pandas\io\parsers\readers.py", line 1880, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\pandas\io\common.py", line 873, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: './data/variant_0/episode_data/episode_000.csv'

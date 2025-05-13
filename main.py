@@ -45,9 +45,24 @@ config = {
 }
 
 # --- Train DQN agent ---
-print(f"🚀 Starting DQN training on variant {variant} for {config['episodes']} episodes...")
-rewards = train_dqn(env, config)
+# print(f"🚀 Starting DQN training on variant {variant} for {config['episodes']} episodes...")
+# rewards = train_dqn(env, config)
+
+
+# OVERFITTING TEST
+del config["episodes"]  # Remove original episode count
+overfit_config = {
+    **config,
+    "episodes": 50,  # Short test
+    "epsilon": 0.0,  # Disable exploration
+    "memory_size": 1,  # Single transition memory
+    "batch_size": 1,  # Single sample training
+    "learning_rate": 0.01  # Faster learning for memorization
+}
+print("🔥 Running overfitting test...")
+_ = train_dqn(env, overfit_config)
 
 
 # TODO: execute training
 ...
+

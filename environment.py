@@ -1,3 +1,11 @@
+import random
+
+import numpy as np
+import pandas as pd
+from copy import deepcopy
+from itertools import compress
+
+
 # actions: 0 (nothing), 1 (up), 2 (right), 3 (down), 4 (left)
 
 # positions in grid:
@@ -8,28 +16,48 @@
 # if new item appears in a cell into which the agent moves/at which the agent stays in the same time step,
 # it is not picked up (if agent wants to pick it up, it has to stay in the cell in the next time step)
 
-# ENVIRONMENT.PY - HANDLES THE 5X5 GRID WORLD WHERE ITEMS SPAWN AND THE AGENT MOVES/COLLECTS THEM (GAME LOGIC).
 
-import random
-import pandas as pd
-import numpy as np
-from copy import deepcopy
-from itertools import compress
+# Workflow for an episode
+# 1. NN chooses action based on observation
+# action = agent_nn.predict(obs)  # e.g., action=2 (move right)
+# 2. Execute action in environment
+# next_obs, reward, done = env.step(action)
+# 3. Store experience (for training)
+# memory.append((obs, action, reward, next_obs, done))
+# 4. Update observation
+# obs = next_obs
+
+# 5. Train NN (After some steps/episodes):
+# Sample a batch of past experiences
+# batch = memory.sample_batch()
+# Adjust NN weights to maximize future rewards
+# agent_nn.train(batch)
+
+
 
 
 class Environment(object):
+    # No need for the "(object)" in newer Python versions, but it's a good practice for compatibility
     def __init__(self, variant, data_dir):
+        # "def" is always used to define a function in Python
+        # __init__ is the constructor method
+        # "self" is always explicitly required in the constructor
         self.variant = variant
-        self.vertical_cell_count = 5
-        self.horizontal_cell_count = 5
-        self.vertical_idx_target = 2
-        self.horizontal_idx_target = 0
-        self.target_loc = (self.vertical_idx_target, self.horizontal_idx_target)
-        self.episode_steps = 200
-        self.max_response_time = 15 if self.variant == 2 else 10
-        self.reward = 25 if self.variant == 2 else 15
         self.data_dir = data_dir
 
+        # Define the grid size and target location
+        self.vertical_cell_count = 5                                                # Number of rows (vertical cells)
+        self.horizontal_cell_count = 5                                              # Number of columns (horizontal cells)
+        self.vertical_idx_target = 2                                                # Target row (Y-coordinate)
+        self.horizontal_idx_target = 0                                              # Target column (X-coordinate)
+        self.target_loc = (self.vertical_idx_target, self.horizontal_idx_target)    # Target as (row, col) tuple
+
+        # Episode settings
+        self.episode_steps = 200                                                    # Total steps per episode
+        self.max_response_time = 15 if self.variant == 2 else 10                    # Time limit to pick up items
+        self.reward = 25 if self.variant == 2 else 15                               # Reward value (variant-dependent)
+
+        # Load episode lists from CSV files
         self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
         self.training_episodes = self.training_episodes.training_episodes.tolist()
         self.validation_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/validation_episodes.csv')
@@ -37,14 +65,17 @@ class Environment(object):
         self.test_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/test_episodes.csv')
         self.test_episodes = self.test_episodes.test_episodes.tolist()
 
+        # Track remaining episodes and validation counter
         self.remaining_training_episodes = deepcopy(self.training_episodes)
         self.validation_episode_counter = 0
 
+        # Define how many items the agent can hold
         if self.variant == 0 or self.variant == 2:
             self.agent_capacity = 1
         else:
             self.agent_capacity = 3
 
+        # Define which grid cells can contain items
         if self.variant == 0 or self.variant == 1:
             self.eligible_cells = [(0,0), (0,1), (0,2), (0,3), (0,4),
                                    (1,0), (1,1), (1,2), (1,3), (1,4),
@@ -61,38 +92,52 @@ class Environment(object):
     # initialize a new episode (specify if training, validation, or testing via the mode argument)
     def reset(self, mode):
         modes = ['training', 'validation', 'testing']
+
+        # 1. Validate mode
         if mode not in modes:
             raise ValueError('Invalid mode. Expected one of: %s' % modes)
 
+        # 2. Reset state
         self.step_count = 0
-        self.agent_loc = (self.vertical_idx_target, self.horizontal_idx_target)
-        self.agent_load = 0  # number of items loaded (0 or 1, except for first extension, where it can be 0,1,2,3)
-        self.item_locs = []
-        self.item_times = []
+        self.agent_loc = (self.vertical_idx_target, self.horizontal_idx_target)     # Places agent at target location
+        self.agent_load = 0  # Empties the agent's inventory (no carried items)
+        # Lists tracking active items and their spawn times are initiated empty at the start of each episode
+        self.item_locs = []         # Tracks the locations of items in the grid
+        self.item_times = []        # Tracks how many steps ago each item spawned
 
+        # 3. Select episode based on mode
         if mode == "testing":
+            # Uses the first episode in self.test_episodes (removes it to avoid reuse).
             episode = self.test_episodes[0]
             self.test_episodes.remove(episode)
         elif mode == "validation":
+            # Cycles through self.validation_episodes in order (loops after 100 episodes).
             episode = self.validation_episodes[self.validation_episode_counter]
             self.validation_episode_counter = (self.validation_episode_counter + 1) % 100
         else:
+            # Randomly picks an episode from self.remaining_training_episodes. Refills the pool if empty.
             if not self.remaining_training_episodes:
                 self.remaining_training_episodes = deepcopy(self.training_episodes)
             episode = random.choice(self.remaining_training_episodes)
             self.remaining_training_episodes.remove(episode)
+
+        # 4. Load episode data from CSV file
         self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
                                 index_col=0)
 
+        # 5. Return observation
         return self.get_obs()
+
 
     # take one environment step based on the action act
     def step(self, act):
-        self.step_count += 1
+    # Core function of envrionment: processes the agent's action, updates the environment state, calculates rewards, and checks if the episode is complete
 
-        rew = 0
+        self.step_count += 1        # Tracks how many steps have been taken in the current episode
 
-        # done signal (1 if episode ends, 0 if not)
+        rew = 0                     # Initialize reward tracking
+
+        # Checks if the episode is done when step_count reaches episode_steps
         if self.step_count == self.episode_steps:
             done = 1
         else:
@@ -109,32 +154,34 @@ class Environment(object):
             elif act == 4:  # left
                 new_loc = (self.agent_loc[0], self.agent_loc[1] - 1)
 
+            # If the new location is valid (eligible_cells), updates agent_loc and applies a penalty (rew -= 1 for moving).
             if new_loc in self.eligible_cells:
                 self.agent_loc = new_loc
                 rew += -1
 
         # item pick-up
         if (self.agent_load < self.agent_capacity) and (self.agent_loc in self.item_locs):
-                self.agent_load += 1
-                idx = self.item_locs.index(self.agent_loc)
-                self.item_locs.pop(idx)
-                self.item_times.pop(idx)
-                rew += self.reward / 2
+        # If the agent has capacity (agent_load < agent_capacity) and is on an item (agent_loc in item_locs)
+                self.agent_load += 1                            # Increases the load by 1
+                idx = self.item_locs.index(self.agent_loc)      # Finds the index of the item in item_locs
+                self.item_locs.pop(idx)                         # Removes the item from item_locs at index found before
+                self.item_times.pop(idx)                        # Deletes the timestamp of the picked-up item
+                rew += self.reward / 2                          # Adds half the reward for picking up an item (other half granted at drop-off)
 
         # item drop-off
-        if self.agent_loc == self.target_loc:
-            rew += self.agent_load * self.reward / 2
-            self.agent_load = 0
+        if self.agent_loc == self.target_loc:                   # If the agent is at the target location (target_loc)
+            rew += self.agent_load * self.reward / 2            # Adds the other half of the reward (multiplied by the number of items in versions beyond the basic one)
+            self.agent_load = 0                                 # Resets the agent's load to 0 (all items dropped off)
 
-        # track how long ago items appeared
+        # Increments item_times (tracks how long items have existed).
         self.item_times = [i + 1 for i in self.item_times]
 
-        # remove items for which max response time is reached
+        # Removes expired items (those older than max_response_time).
         mask = [i < self.max_response_time for i in self.item_times]
         self.item_locs = list(compress(self.item_locs, mask))
         self.item_times = list(compress(self.item_times, mask))
 
-        # add items which appear in the current time step
+        # add new items (from CSV data) which appear in the current time step
         new_items = self.data[self.data.step == self.step_count]
         new_items = list(zip(new_items.vertical_idx, new_items.horizontal_idx))
         new_items = [i for i in new_items if i not in self.item_locs]  # not more than one item per cell
@@ -144,10 +191,36 @@ class Environment(object):
         # get new observation
         next_obs = self.get_obs()
 
-        return rew, next_obs, done
+        return (
+            rew,            # Total reward for this step
+            next_obs,       # Updated environment state
+            done            # Whether the episode ended
+        )
 
-    # TODO: implement function that gives the input features for the neural network(s)
-    #       based on the current state of the environment
+
+
+    # TODO: implement function that gives the input features for the neural network(s) based on the current state of the environment
+
+    # The observation is the information you give the agent to make decisions (like video images for a self-driving car).
+    # For your grid environment, the agent needs enough information to:
+            # Navigate: Know where it is and where it can move.
+            # Collect Items: Find items before they expire.
+            # Deliver: Remember where the target location is.
+
+    # Key elements to include:
+            # Agent State: Current position (agent_loc) and load (agent_load).
+            # Item Information: Locations (item_locs) and "urgency" (how long they've been there, derived from item_times).
+            # Target Location: Fixed goal (target_loc).
+            # Grid Boundaries: Where movement is allowed (eligible_cells).
+
+    # What to avoid
+            # Too much data: Don't give the agent every single detail. Just the important stuff.
+            # Redundancy: Don't include fixed info (like eligible_cells) in every observation—the agent learns this over time.
+            # Raw Data: Preprocess timestamps (e.g., normalize by max_response_time).
+
+    # --> The observation should be a compact representation of the environment state, suitable for input to a neural network.
+
+
     def get_obs(self):
         obs = []
 
@@ -178,4 +251,5 @@ class Environment(object):
         obs.append(self.agent_load / self.agent_capacity)
 
         return np.array(obs, dtype=np.float32)
+
 

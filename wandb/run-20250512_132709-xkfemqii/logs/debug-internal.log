@@ -1,0 +1,16 @@
+{"time":"2025-05-12T13:27:09.1685889+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"C:\\Users\\jonas\\PycharmProjects\\ducks-riding-lamas\\wandb\\run-20250512_132709-xkfemqii\\logs\\debug-core.log"}
+{"time":"2025-05-12T13:27:09.8044276+02:00","level":"INFO","msg":"created new stream","id":"xkfemqii"}
+{"time":"2025-05-12T13:27:09.8044276+02:00","level":"INFO","msg":"stream: started","id":"xkfemqii"}
+{"time":"2025-05-12T13:27:09.8044276+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"xkfemqii"}
+{"time":"2025-05-12T13:27:09.8044276+02:00","level":"INFO","msg":"sender: started","stream_id":"xkfemqii"}
+{"time":"2025-05-12T13:27:09.8044276+02:00","level":"INFO","msg":"handler: started","stream_id":"xkfemqii"}
+{"time":"2025-05-12T13:27:10.1567236+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-05-12T13:27:38.1123876+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-05-12T13:27:38.1123876+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-05-12T13:27:38.9255183+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-05-12T13:27:39.1339895+02:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading summary, console lines 237-416","runtime_seconds":0.2067552}],"total_operations":1}}
+{"time":"2025-05-12T13:27:39.5139852+02:00","level":"INFO","msg":"stream: closing","id":"xkfemqii"}
+{"time":"2025-05-12T13:27:39.5139852+02:00","level":"INFO","msg":"handler: closed","stream_id":"xkfemqii"}
+{"time":"2025-05-12T13:27:39.5139852+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"xkfemqii"}
+{"time":"2025-05-12T13:27:39.5139852+02:00","level":"INFO","msg":"sender: closed","stream_id":"xkfemqii"}
+{"time":"2025-05-12T13:27:39.5162941+02:00","level":"INFO","msg":"stream: closed","id":"xkfemqii"}

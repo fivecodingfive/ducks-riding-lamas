@@ -14,6 +14,3 @@ __pycache__/
 
 # Virtual environment directory
 .venv/
-
-# Personal files with comments
-environment_with_comments.py
