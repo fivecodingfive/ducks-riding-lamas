@@ -12,7 +12,8 @@ import random
 import pandas as pd
 from copy import deepcopy
 from itertools import compress
-
+import numpy as np
+import tensorflow as tf
 
 class Environment(object):
     def __init__(self, variant, data_dir):
@@ -26,6 +27,7 @@ class Environment(object):
         self.max_response_time = 15 if self.variant == 2 else 10
         self.reward = 25 if self.variant == 2 else 15
         self.data_dir = data_dir
+        self.state_dim = 0
 
         self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
         self.training_episodes = self.training_episodes.training_episodes.tolist()
@@ -146,6 +148,26 @@ class Environment(object):
     # TODO: implement function that gives the input features for the neural network(s)
     #       based on the current state of the environment
     def get_obs(self):
-        ...
+        obs = []
 
-        return ...
+        # 1~2: agent position (x, y)
+        agent_x, agent_y = self.agent_loc
+        obs.append(float(agent_x))
+        obs.append(float(agent_y))
+
+        # 3~4: relative position to closest item (dx, dy)
+        if self.item_locs:
+            closest_item = min(self.item_locs, key=lambda pos: abs(pos[0] - agent_x) + abs(pos[1] - agent_y))
+            dx = float(closest_item[0] - agent_x)
+            dy = float(closest_item[1] - agent_y)
+        else:
+            dx, dy = 0.0, 0.0  # 沒 item 就設為 0
+
+        obs.append(dx)
+        obs.append(dy)
+
+        # 5: agent load
+        obs.append(float(self.agent_load))
+
+        return tf.convert_to_tensor(obs, dtype=tf.float32)  # shape: (5,)
+
