@@ -1,68 +1,34 @@
-# TODO: parse arguments
-# Gets interesting later, when we have more models and agents
-
-
-# MAIN.PY - THE STARTING POINT THAT SETS UP THE ENVIRONMENT, CONFIGURES THE DQN, AND KICKS OFF TRAINING.
-
-# set seed
-seed = 29
-
 import os
-os.environ['PYTHONHASHSEED'] = str(seed)
-
+import yaml
 import random
-random.seed(seed)
-
 import numpy as np
-np.random.seed(seed)
-
 import tensorflow as tf
-tf.random.set_seed(seed)
-
-
-# initialize environment
 from environment import Environment
-
-# initialize dqn
 from agents.dqn.train import train_dqn
 
-data_dir = './data'
-variant = 0
-env = Environment(variant, data_dir)
+# Configuration parameters
+SEED = 29
+VARIANT = 0
+CODE = 0
+CONFIG_FILE = f"configs/variant{VARIANT}/option{CODE}.yaml"
 
-# --- Define DQN configuration ---
-config = {
-    "gamma": 0.99,
-    "epsilon": 1.0,
-    "epsilon_min": 0.05,
-    "epsilon_decay": 0.995,
-    "batch_size": 32,
-    "learning_rate": 0.001,
-    "target_model_update_freq": 20,
-    "memory_size": 2000,
-    "episodes": 10,
-    "max_steps": 200
-}
-
-# --- Train DQN agent ---
-# print(f"🚀 Starting DQN training on variant {variant} for {config['episodes']} episodes...")
-# rewards = train_dqn(env, config)
+# CONFIG_FILE = f"configs/variant{VARIANT}/option{CODE}.yaml"
 
 
-# OVERFITTING TEST
-del config["episodes"]  # Remove original episode count
-overfit_config = {
-    **config,
-    "episodes": 50,  # Short test
-    "epsilon": 0.0,  # Disable exploration
-    "memory_size": 1,  # Single transition memory
-    "batch_size": 1,  # Single sample training
-    "learning_rate": 0.01  # Faster learning for memorization
-}
-print("🔥 Running overfitting test...")
-_ = train_dqn(env, overfit_config)
+# Set seeds
+os.environ['PYTHONHASHSEED'] = str(SEED)
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
 
 
-# TODO: execute training
-...
+# Load config
+with open(CONFIG_FILE) as f:
+    config = yaml.safe_load(f)
 
+# Initialize environment
+env = Environment(VARIANT, './data')
+
+# Run training
+print(f"🚀 Starting DQN training for variant {VARIANT}, code {CODE}")
+rewards = train_dqn(env, config)

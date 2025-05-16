@@ -4,7 +4,7 @@ from collections import deque
 from agents.dqn.model import build_q_network
 
 
-# AGENT.PY - IMPLEMENTS THE DQN ALGORITHM WITH EXPERIENCE REPLAY, TARGET NETWORK, AND EPSILON-GREEDY ACTIONS.
+# AGENT.PY - Manages the agent’s decision-making, memory, and weight updates.
 
 
 class DQNAgent:
@@ -30,7 +30,7 @@ class DQNAgent:
         self.target_model.set_weights(self.model.get_weights())
 
         # Optimizer
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=config["learning_rate"], clipnorm=1.0)
 
     def select_action(self, state):
         q_values = self.model(state)

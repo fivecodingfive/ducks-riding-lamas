@@ -1,0 +1,10 @@
+gamma: 0.99
+epsilon: 1.0
+epsilon_min: 0.1
+epsilon_decay: 0.9999
+batch_size: 64
+learning_rate: 0.001
+target_model_update_freq: 50
+memory_size: 2000
+episodes: 20
+max_steps: 200

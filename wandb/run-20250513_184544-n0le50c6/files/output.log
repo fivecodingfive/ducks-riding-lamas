@@ -1,0 +1,26 @@
+Traceback (most recent call last):
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\main.py", line 34, in <module>
+    rewards = train_dqn(env, config)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agents\dqn\train.py", line 19, in train_dqn
+    dummy_state = env.reset("training")
+                  ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\environment.py", line 126, in reset
+    self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\pandas\io\parsers\readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\pandas\io\parsers\readers.py", line 620, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\pandas\io\parsers\readers.py", line 1620, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\pandas\io\parsers\readers.py", line 1880, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\pandas\io\common.py", line 873, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: './data/variant_0/episode_data/episode_001.csv'

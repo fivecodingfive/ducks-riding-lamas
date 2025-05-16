@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 from copy import deepcopy
 from itertools import compress
 
@@ -222,6 +223,33 @@ class Environment(object):
 
 
     def get_obs(self):
+
+        obs = []
+
+        # 1~2: agent position (x, y)
+        agent_x, agent_y = self.agent_loc
+        obs.append(float(agent_x))
+        obs.append(float(agent_y))
+
+        # 3~4: relative position to closest item (dx, dy)
+        if self.item_locs:
+            closest_item = min(self.item_locs, key=lambda pos: abs(pos[0] - agent_x) + abs(pos[1] - agent_y))
+            dx = float(closest_item[0] - agent_x)
+            dy = float(closest_item[1] - agent_y)
+        else:
+            dx, dy = 0.0, 0.0  # 沒 item 就設為 0
+
+        obs.append(dx)
+        obs.append(dy)
+
+        # 5: agent load
+        obs.append(float(self.agent_load))
+
+        return tf.convert_to_tensor(obs, dtype=tf.float32)  # shape: (5,)
+
+
+
+        """
         obs = []
 
         # One-hot Grid (25 Felder = 5x5)
@@ -250,6 +278,10 @@ class Environment(object):
         # 4. Aktuelle Ladung (skalar)
         obs.append(self.agent_load / self.agent_capacity)
 
-        return np.array(obs, dtype=np.float32)
+        obs_array = np.array(obs, dtype=np.float32)
+        assert len(obs_array) == 76, \
+            f"Invalid observation size: {len(obs_array)}. Expected 76"
+        return obs_array
+    """
 
 

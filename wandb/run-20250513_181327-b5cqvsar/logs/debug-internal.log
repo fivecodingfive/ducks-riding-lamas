@@ -1,0 +1,15 @@
+{"time":"2025-05-13T18:13:27.730302+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"C:\\Users\\jonas\\PycharmProjects\\ducks-riding-lamas\\wandb\\run-20250513_181327-b5cqvsar\\logs\\debug-core.log"}
+{"time":"2025-05-13T18:13:28.0283447+02:00","level":"INFO","msg":"created new stream","id":"b5cqvsar"}
+{"time":"2025-05-13T18:13:28.0283447+02:00","level":"INFO","msg":"stream: started","id":"b5cqvsar"}
+{"time":"2025-05-13T18:13:28.0283447+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"b5cqvsar"}
+{"time":"2025-05-13T18:13:28.0283447+02:00","level":"INFO","msg":"handler: started","stream_id":"b5cqvsar"}
+{"time":"2025-05-13T18:13:28.0283447+02:00","level":"INFO","msg":"sender: started","stream_id":"b5cqvsar"}
+{"time":"2025-05-13T18:13:28.3420888+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-05-13T18:13:29.5875451+02:00","level":"INFO","msg":"stream: closing","id":"b5cqvsar"}
+{"time":"2025-05-13T18:13:29.5875451+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-05-13T18:13:29.5883032+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-05-13T18:13:30.275476+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-05-13T18:13:30.5163551+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"b5cqvsar"}
+{"time":"2025-05-13T18:13:30.5163551+02:00","level":"INFO","msg":"handler: closed","stream_id":"b5cqvsar"}
+{"time":"2025-05-13T18:13:30.5163551+02:00","level":"INFO","msg":"sender: closed","stream_id":"b5cqvsar"}
+{"time":"2025-05-13T18:13:30.520838+02:00","level":"INFO","msg":"stream: closed","id":"b5cqvsar"}

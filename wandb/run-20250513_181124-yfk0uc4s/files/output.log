@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\main.py", line 32, in <module>
+    rewards = train_dqn(env, config)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agents\dqn\train.py", line 23, in train_dqn
+    from agents.dqn.agent import DQNAgent
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agents\dqn\agent.py", line 4, in <module>
+    from agents.dqn.model import build_q_network
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agents\dqn\model.py", line 14, in <module>
+    model = build_q_network((4,), 4)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agents\dqn\model.py", line 8, in build_q_network
+    tf.keras.layers.Input(shape=(input_shape,)),  # Explicit shape
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\layers\core\input_layer.py", line 209, in Input
+    layer = InputLayer(
+            ^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\layers\core\input_layer.py", line 92, in __init__
+    shape = backend.standardize_shape(shape)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\backend\common\variables.py", line 581, in standardize_shape
+    if not is_int_dtype(type(e)):
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\backend\common\variables.py", line 612, in is_int_dtype
+    dtype = standardize_dtype(dtype)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\backend\common\variables.py", line 553, in standardize_dtype
+    raise ValueError(f"Invalid dtype: {dtype}")
+ValueError: Invalid dtype: tuple

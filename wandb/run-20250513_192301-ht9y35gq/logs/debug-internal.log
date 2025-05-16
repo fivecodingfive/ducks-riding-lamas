@@ -1,0 +1,16 @@
+{"time":"2025-05-13T19:23:01.7545725+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"C:\\Users\\jonas\\PycharmProjects\\ducks-riding-lamas\\wandb\\run-20250513_192301-ht9y35gq\\logs\\debug-core.log"}
+{"time":"2025-05-13T19:23:02.0482628+02:00","level":"INFO","msg":"created new stream","id":"ht9y35gq"}
+{"time":"2025-05-13T19:23:02.0482628+02:00","level":"INFO","msg":"stream: started","id":"ht9y35gq"}
+{"time":"2025-05-13T19:23:02.0488407+02:00","level":"INFO","msg":"sender: started","stream_id":"ht9y35gq"}
+{"time":"2025-05-13T19:23:02.0482628+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"ht9y35gq"}
+{"time":"2025-05-13T19:23:02.0482628+02:00","level":"INFO","msg":"handler: started","stream_id":"ht9y35gq"}
+{"time":"2025-05-13T19:23:02.3055725+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-05-13T19:27:38.7696731+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-05-13T19:27:38.7696731+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-05-13T19:27:39.7796993+02:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading output.log","runtime_seconds":0.557686,"progress":"284.0KB/284.0KB"}],"total_operations":1}}
+{"time":"2025-05-13T19:27:40.0063863+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-05-13T19:27:40.3216618+02:00","level":"INFO","msg":"stream: closing","id":"ht9y35gq"}
+{"time":"2025-05-13T19:27:40.3216618+02:00","level":"INFO","msg":"handler: closed","stream_id":"ht9y35gq"}
+{"time":"2025-05-13T19:27:40.3216618+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"ht9y35gq"}
+{"time":"2025-05-13T19:27:40.3216618+02:00","level":"INFO","msg":"sender: closed","stream_id":"ht9y35gq"}
+{"time":"2025-05-13T19:27:40.3244154+02:00","level":"INFO","msg":"stream: closed","id":"ht9y35gq"}
