@@ -37,10 +37,7 @@ np.random.seed(seed)
 
 import tensorflow as tf
 tf.random.set_seed(seed)
-print("Physical GPUs:", tf.config.list_physical_devices("GPU"))
 
-from tensorflow.keras import mixed_precision
-mixed_precision.set_global_policy('mixed_float16')
 
 # initialize environment
 from environment import Environment
@@ -72,9 +69,3 @@ match mode:
                                model_path=model_path)
         else:
             print("No model param to validate")
-
-import time
-start = time.time()
-for _ in range(100):
-    dqn_agent.train_iterate()
-print("Zeit für 100 Trainingsschritte:", time.time() - start, "Sekunden")

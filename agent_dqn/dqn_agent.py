@@ -8,7 +8,7 @@ from .replay_buffer import ReplayBuffer
 class DQNAgent:
     def __init__(self, state_dim=11, action_dim=5, learning_rate=0.001,
                  gamma=0.99, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.9999,
-                 buffer_size=10000, batch_size=256):
+                 buffer_size=10000, batch_size=64):
         ## Check the state_dim in get_obs
         self.state_dim = state_dim
         self.action_dim = action_dim
@@ -38,18 +38,11 @@ class DQNAgent:
     def remember(self, state, action, reward, next_state, done):
         self.replay_buffer.add(state, action, reward, next_state, done)
 
-    """def train_iterate(self) -> None:
+    def train_iterate(self) -> None:
         if len(self.replay_buffer) < self.batch_size:
             return
 
         states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
-
-        states = tf.convert_to_tensor(states, dtype=tf.float32)
-        next_states = tf.convert_to_tensor(next_states, dtype=tf.float32)
-        actions = tf.convert_to_tensor(actions, dtype=tf.int32)
-        rewards = tf.convert_to_tensor(rewards, dtype=tf.float32)
-        dones = tf.convert_to_tensor(dones, dtype=tf.float32)
-
 
         next_q = self.target_network(next_states)
         target_q = rewards + (1 - dones) * self.gamma * np.amax(next_q.numpy(), axis=1)
@@ -63,38 +56,7 @@ class DQNAgent:
         self.optimizer.apply_gradients(zip(grads, self.q_network.trainable_variables))
 
         # Epsilon decay
-        self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)"""
-
-    @tf.function(jit_compile=True)  # Beschleunigt das Training massiv
-    def train_iterate(self):
-        if len(self.replay_buffer) < self.batch_size:
-            return
-
-        # 1. Sample aus ReplayBuffer und konvertieren
-        states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
-        states      = tf.convert_to_tensor(states, dtype=tf.float32)
-        next_states = tf.convert_to_tensor(next_states, dtype=tf.float32)
-        actions     = tf.convert_to_tensor(actions, dtype=tf.int32)
-        rewards     = tf.convert_to_tensor(rewards, dtype=tf.float32)
-        dones       = tf.convert_to_tensor(dones, dtype=tf.float32)
-
-        # 2. Target-Q-Werte berechnen (komplett in TensorFlow!)
-        next_q   = self.target_network(next_states)
-        max_next = tf.reduce_max(next_q, axis=1)
-        target_q = rewards + (1. - dones) * self.gamma * max_next
-
-        # 3. Q-Network trainieren
-        with tf.GradientTape() as tape:
-            q_values = self.q_network(states)
-            q_pred = tf.reduce_sum(q_values * tf.one_hot(actions, self.action_dim), axis=1)
-            loss = self.loss_fn(target_q, q_pred)
-
-        grads = tape.gradient(loss, self.q_network.trainable_variables)
-        self.optimizer.apply_gradients(zip(grads, self.q_network.trainable_variables))
-
-        # 4. Epsilon-Decay
-        self.epsilon = tf.maximum(self.epsilon * self.epsilon_decay, self.epsilon_min)
-
+        self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
     
     def save_model(self, avg_reward, base_dir='models'):
         """
@@ -143,7 +105,7 @@ class DQNAgent:
             total_reward = 0
             done = False
 
-            """while not done:
+            while not done:
                 action = self.act(state)
                 reward, next_obs, done = env.step(action)
                 next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
@@ -152,25 +114,6 @@ class DQNAgent:
                 self.train_iterate()
                 state = next_state
                 total_reward += reward
-
-            step = 0  # Lokale Schrittvariable für diese Episode"""
-            step = 0
-            # trainiere nur alle 5 Schritte
-            while not done:
-                action = self.act(state)
-                reward, next_obs, done = env.step(action)
-                next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
-
-                self.remember(state, action, reward, next_state, done)
-
-                # trainiere nur alle 5 Schritte
-                if step % 10 == 0:
-                    self.train_iterate()
-
-                state = next_state
-                total_reward += reward
-                step += 1
-
 
             reward_log.append(total_reward)
 
