@@ -148,7 +148,44 @@ class Environment(object):
     # TODO: implement function that gives the input features for the neural network(s)
     #       based on the current state of the environment
 
+
+    # IDEEN
+        # Early termination of episode
+        # Dont walk to closest item always - better:
+            # Smallest distance sum of agent - item - target
+            # Dont run to item if the item cannot be reached in time
+        # Another idea:
+            # Include the top 3 closest items (6 elements for dx/dy + time left for each).
+            # Add time left for the closest item to the current input (1 extra element).
+
     def get_obs(self):
+        obs = []
+
+        # 1~3: Agent's position (x, y) and load
+        agent_x, agent_y = self.agent_loc
+        obs.append(float(agent_x))
+        obs.append(float(agent_y))
+        obs.append(float(self.agent_load))
+
+        # 4~28: Grid cell times (25 cells in row-major order)
+        for row in range(5):
+            for col in range(5):
+                cell = (row, col)
+                if cell in self.item_locs:
+                    idx = self.item_locs.index(cell)
+                    time = self.item_times[idx]
+                    remaining_time = float(self.max_response_time - time)  # Correct
+                    obs.append(remaining_time)
+                else:
+                    obs.append(0.0)
+
+        return tf.convert_to_tensor(obs, dtype=tf.float32)  # Shape: (28,)
+
+
+
+
+    # get_obs from 16.05
+    """def get_obs(self):
         obs = []
 
         # 1~3: Agent state (x, y, load)
@@ -187,31 +224,5 @@ class Environment(object):
         # 9: Number of active items
         obs.append(float(len(self.item_locs)))
 
-        return tf.convert_to_tensor(obs, dtype=tf.float32)  # Shape: (9,)
+        return tf.convert_to_tensor(obs, dtype=tf.float32)  # Shape: (9,)"""
 
-"""
-    def get_obs(self):
-        obs = []
-
-        # 1~2: agent position (x, y)
-        agent_x, agent_y = self.agent_loc
-        obs.append(float(agent_x))
-        obs.append(float(agent_y))
-
-        # 3~4: relative position to closest item (dx, dy)
-
-        if self.item_locs:
-            closest_item = min(self.item_locs, key=lambda pos: abs(pos[0] - agent_x) + abs(pos[1] - agent_y))
-            dx = float(closest_item[0] - agent_x)
-            dy = float(closest_item[1] - agent_y)
-        else:
-            dx, dy = 0.0, 0.0  # 沒 item 就設為 0
-
-        obs.append(dx)
-        obs.append(dy)
-
-        # 5: agent load
-        obs.append(float(self.agent_load))
-
-        return tf.convert_to_tensor(obs, dtype=tf.float32)  # shape: (5,)
-"""

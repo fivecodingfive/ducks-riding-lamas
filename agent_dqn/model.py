@@ -6,6 +6,9 @@ def build_q_network(input_dim, output_dim):
         layers.Input(shape=(input_dim,)),
         layers.Dense(64, activation='relu'),
         layers.Dense(64, activation='relu'),
-        layers.Dense(output_dim)
+        layers.Dense(output_dim) # Why is there no (linear) activation in the output vector?
+
+
+
     ])
     return model
