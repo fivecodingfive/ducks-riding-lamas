@@ -38,6 +38,10 @@ np.random.seed(seed)
 import tensorflow as tf
 tf.random.set_seed(seed)
 
+from tensorflow.keras import mixed_precision
+mixed_precision.set_global_policy('mixed_float16')
+
+
 
 # initialize environment
 from environment import Environment

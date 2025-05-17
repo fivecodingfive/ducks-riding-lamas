@@ -38,7 +38,37 @@ class DQNAgent:
     def remember(self, state, action, reward, next_state, done):
         self.replay_buffer.add(state, action, reward, next_state, done)
 
-    def train_iterate(self) -> None:
+    @tf.function(jit_compile=True)   # ❶ XLA beschleunigt Dense-Netze ordentlich
+    def train_iterate(self):
+        if len(self.replay_buffer) < self.batch_size:
+            return
+    # ...rest of your code...
+
+        # --- Sample & konvertieren -------------------------------------------
+        s, a, r, s2, d = self.replay_buffer.sample(self.batch_size)
+        s  = tf.convert_to_tensor(s,  dtype=tf.float32)
+        s2 = tf.convert_to_tensor(s2, dtype=tf.float32)
+        a  = tf.convert_to_tensor(a,  dtype=tf.int32)
+        r  = tf.convert_to_tensor(r,  dtype=tf.float32)
+        d  = tf.convert_to_tensor(d,  dtype=tf.float32)
+
+        # --- Q-Berechnungen 100 % GPU ----------------------------------------
+        next_q   = self.target_network(s2)
+        max_next = tf.reduce_max(next_q, axis=1)                 # tf statt np
+        target_q = r + (1. - d) * self.gamma * max_next
+
+        with tf.GradientTape() as tape:
+            q_vals = self.q_network(s)
+            q_pred = tf.reduce_sum(q_vals *
+                                tf.one_hot(a, self.action_dim), axis=1)
+            loss = self.loss_fn(target_q, q_pred)
+
+        grads = tape.gradient(loss, self.q_network.trainable_variables)
+        self.optimizer.apply_gradients(zip(grads, self.q_network.trainable_variables))
+        self.epsilon = tf.maximum(self.epsilon*self.epsilon_decay,
+                                self.epsilon_min)
+
+    """def train_iterate(self) -> None:
         if len(self.replay_buffer) < self.batch_size:
             return
 
@@ -56,7 +86,7 @@ class DQNAgent:
         self.optimizer.apply_gradients(zip(grads, self.q_network.trainable_variables))
 
         # Epsilon decay
-        self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
+        self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)"""
     
     def save_model(self, avg_reward, base_dir='models'):
         """
