@@ -6,7 +6,7 @@ from .replay_buffer import ReplayBuffer
 
 
 class DQNAgent:
-    def __init__(self, state_dim=28, action_dim=5, learning_rate=0.001,
+    def __init__(self, state_dim=4, action_dim=5, learning_rate=0.001,
                  gamma=0.99, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.9999,
                  buffer_size=10000, batch_size=64):
         ## Check the state_dim in get_obs

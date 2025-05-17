@@ -159,73 +159,55 @@ class Environment(object):
             # Add time left for the closest item to the current input (1 extra element).
 
 
+    # IDEE
+    # + append agent load as vector element
+    # if time remaning sufficient to reach item --> calculate shotest path from agent - item - target and append only the total distance as element in vector
+    # do that for the top three items and thus append 3 elements to the vector
 
+    # IDEE II
+    # + append agent load AND agent location as vector element
+    # if time remaning sufficient to reach item --> calculate shotest path from agent - item - target and append only the total distance as element in vector
+    # do that for the top three items and thus append 3 elements to the vector
+
+
+
+    # get_obs from 17.05 5.50pm
     def get_obs(self):
         obs = []
 
-        # Agent's current state: x, y, load
-        agent_x, agent_y = self.agent_loc
-        obs.append(float(agent_x))
-        obs.append(float(agent_y))
+        # Agent's current load
         obs.append(float(self.agent_load))
 
-        # Target's relative position (dx, dy)
-        target_dx = self.target_loc[0] - agent_x
-        target_dy = self.target_loc[1] - agent_y
-        obs.append(float(target_dx))
-        obs.append(float(target_dy))
+        # Calculate valid items with sufficient time
+        agent_x, agent_y = self.agent_loc
+        valid_distances = []
 
-        # Number of active items
-        num_items = len(self.item_locs)
-        obs.append(float(num_items))
-
-        # Collect item information
-        items_info = []
         for loc, time in zip(self.item_locs, self.item_times):
-            dx = loc[0] - agent_x
-            dy = loc[1] - agent_y
+            # Calculate distances
+            distance_agent_to_item = abs(loc[0] - agent_x) + abs(loc[1] - agent_y)
             time_remaining = self.max_response_time - time
-            distance_to_target = (abs(loc[0] - self.target_loc[0]) +
-                                  abs(loc[1] - self.target_loc[1]))
-            items_info.append((time_remaining, (dx, dy, time_remaining, distance_to_target)))
 
-        # Sort items by time_remaining (ascending), then by Manhattan distance to agent
-        items_info.sort(key=lambda x: (x[0], abs(x[1][0]) + abs(x[1][1])))
+            # Check if agent can reach item before expiration
+            if time_remaining >= distance_agent_to_item:
+                # Calculate total path distance: agent -> item -> target
+                distance_item_to_target = abs(loc[0] - self.target_loc[0]) + abs(loc[1] - self.target_loc[1])
+                total_distance = distance_agent_to_item + distance_item_to_target
+                valid_distances.append(total_distance)
 
-        # Select top 3 items, pad with zeros if fewer than 3
-        top_items = items_info[:3]
-        for _ in range(3):
-            if top_items:
-                _, item_features = top_items.pop(0)
-                obs.extend(item_features)
-            else:
-                obs.extend([0.0, 0.0, 0.0, 0.0])
+        # Sort by total distance (shortest first)
+        valid_distances.sort()
+
+        # Take top 3 distances and pad if necessary
+        top_distances = valid_distances[:3]
+        while len(top_distances) < 3:
+            top_distances.append(0.0)  # Use 0.0 for unavailable items
+
+        obs.extend(top_distances)
 
         return tf.convert_to_tensor(obs, dtype=tf.float32)
+        # Shape: (4,)
 
-    # GET_OBS WITH 28 element vector
-    """def get_obs(self):
-        obs = []
 
-        # 1~3: Agent's position (x, y) and load
-        agent_x, agent_y = self.agent_loc
-        obs.append(float(agent_x))
-        obs.append(float(agent_y))
-        obs.append(float(self.agent_load))
-
-        # 4~28: Grid cell times (25 cells in row-major order)
-        for row in range(5):
-            for col in range(5):
-                cell = (row, col)
-                if cell in self.item_locs:
-                    idx = self.item_locs.index(cell)
-                    time = self.item_times[idx]
-                    remaining_time = float(self.max_response_time - time)  # Correct
-                    obs.append(remaining_time)
-                else:
-                    obs.append(0.0)
-
-        return tf.convert_to_tensor(obs, dtype=tf.float32)  # Shape: (28,)"""
 
 
 
