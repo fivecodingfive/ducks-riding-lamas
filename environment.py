@@ -175,37 +175,40 @@ class Environment(object):
     def get_obs(self):
         obs = []
 
-        # Agent's current load
-        obs.append(float(self.agent_load))
-
-        # Calculate valid items with sufficient time
+        # Agent state + target position (essential for delivery)
         agent_x, agent_y = self.agent_loc
-        valid_distances = []
+        obs.extend([
+            float(agent_x),  # Agent vertical position
+            float(agent_y),  # Agent horizontal position
+            float(self.agent_load),
+            float(self.target_loc[0]),  # Target vertical
+            float(self.target_loc[1])  # Target horizontal
+        ])
 
+        # Track items with their coordinates and total distance
+        feasible_items = []
         for loc, time in zip(self.item_locs, self.item_times):
-            # Calculate distances
-            distance_agent_to_item = abs(loc[0] - agent_x) + abs(loc[1] - agent_y)
-            time_remaining = self.max_response_time - time
+            # Calculate critical metrics
+            dist_to_item = abs(agent_x - loc[0]) + abs(agent_y - loc[1])
+            time_left = self.max_response_time - time
 
-            # Check if agent can reach item before expiration
-            if time_remaining >= distance_agent_to_item:
-                # Calculate total path distance: agent -> item -> target
-                distance_item_to_target = abs(loc[0] - self.target_loc[0]) + abs(loc[1] - self.target_loc[1])
-                total_distance = distance_agent_to_item + distance_item_to_target
-                valid_distances.append(total_distance)
+            if time_left >= dist_to_item:  # Can reach before expiration
+                total_dist = dist_to_item + abs(loc[0] - self.target_loc[0]) + abs(loc[1] - self.target_loc[1])
+                feasible_items.append((total_dist, loc))
 
-        # Sort by total distance (shortest first)
-        valid_distances.sort()
+        # Sort by priority: closest total delivery path first
+        feasible_items.sort(key=lambda x: x[0])
 
-        # Take top 3 distances and pad if necessary
-        top_distances = valid_distances[:3]
-        while len(top_distances) < 3:
-            top_distances.append(0.0)  # Use 0.0 for unavailable items
-
-        obs.extend(top_distances)
+        # Add coordinates of top 3 items (relative to agent)
+        for i in range(3):
+            if i < len(feasible_items):
+                _, loc = feasible_items[i]
+                obs.append(float(loc[0] - agent_x))  # Δ vertical
+                obs.append(float(loc[1] - agent_y))  # Δ horizontal
+            else:
+                obs.extend([0.0, 0.0])  # Padding
 
         return tf.convert_to_tensor(obs, dtype=tf.float32)
-        # Shape: (4,)
 
 
 
