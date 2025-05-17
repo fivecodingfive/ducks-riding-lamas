@@ -1,0 +1,31 @@
+{
+  "os": "Windows-10-10.0.26100-SP0",
+  "python": "CPython 3.11.9",
+  "startedAt": "2025-05-16T09:32:51.819956Z",
+  "program": "C:\\Users\\jonas\\PycharmProjects\\ducks-riding-lamas\\main.py",
+  "codePath": "main.py",
+  "git": {
+    "remote": "https://github.com/fivecodingfive/ducks-riding-lamas.git",
+    "commit": "325c4dee39ea3e0569624bf1f1268f3a6aa46d2d"
+  },
+  "email": "jonas05.coding@gmail.com",
+  "root": "C:\\Users\\jonas\\PycharmProjects\\ducks-riding-lamas",
+  "host": "JCL",
+  "executable": "C:\\Users\\jonas\\PycharmProjects\\ducks-riding-lamas\\venv\\Scripts\\python.exe",
+  "codePathLocal": "main.py",
+  "cpu_count": 4,
+  "cpu_count_logical": 8,
+  "disk": {
+    "/": {
+      "total": "510674333696",
+      "used": "270964580352"
+    }
+  },
+  "memory": {
+    "total": "16969424896"
+  },
+  "cpu": {
+    "count": 4,
+    "countLogical": 8
+  }
+}

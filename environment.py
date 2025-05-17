@@ -147,6 +147,49 @@ class Environment(object):
 
     # TODO: implement function that gives the input features for the neural network(s)
     #       based on the current state of the environment
+
+    def get_obs(self):
+        obs = []
+
+        # 1~3: Agent state (x, y, load)
+        agent_x, agent_y = self.agent_loc
+        obs.extend([
+            float(agent_x),
+            float(agent_y),
+            float(self.agent_load)
+        ])
+
+        # 4~5: Relative position to target
+        target_x, target_y = self.target_loc  # Use instance variable
+        obs.extend([
+            float(target_x - agent_x),
+            float(target_y - agent_y)
+        ])
+
+        # 6~8: Closest item info (dx, dy, time_left)
+        if self.item_locs:
+            # Find closest item using Manhattan distance
+            closest_item = min(self.item_locs,
+                               key=lambda pos: abs(pos[0] - agent_x) + abs(pos[1] - agent_y))
+
+            # Get its index to find corresponding time
+            idx = self.item_locs.index(closest_item)
+            item_time = self.item_times[idx]
+
+            obs.extend([
+                float(closest_item[0] - agent_x),
+                float(closest_item[1] - agent_y),
+                float(self.max_response_time - item_time - 1)  # Time remaining
+            ])
+        else:
+            obs.extend([0.0, 0.0, 0.0])
+
+        # 9: Number of active items
+        obs.append(float(len(self.item_locs)))
+
+        return tf.convert_to_tensor(obs, dtype=tf.float32)  # Shape: (9,)
+
+"""
     def get_obs(self):
         obs = []
 
@@ -156,6 +199,7 @@ class Environment(object):
         obs.append(float(agent_y))
 
         # 3~4: relative position to closest item (dx, dy)
+
         if self.item_locs:
             closest_item = min(self.item_locs, key=lambda pos: abs(pos[0] - agent_x) + abs(pos[1] - agent_y))
             dx = float(closest_item[0] - agent_x)
@@ -170,4 +214,4 @@ class Environment(object):
         obs.append(float(self.agent_load))
 
         return tf.convert_to_tensor(obs, dtype=tf.float32)  # shape: (5,)
-
+"""
