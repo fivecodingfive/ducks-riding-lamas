@@ -4,11 +4,12 @@ import tensorflow as tf
 from .model import build_q_network
 from .replay_buffer import ReplayBuffer
 
+STATE_DIM = 9
 
 class DQNAgent:
-    def __init__(self, state_dim=9, action_dim=5, learning_rate=0.001,
+    def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001,
                  gamma=0.99, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.9999,
-                 buffer_size=10000, batch_size=64):
+                 buffer_size=5000, batch_size=256):
         ## Check the state_dim in get_obs
         self.state_dim = state_dim
         self.action_dim = action_dim
@@ -38,34 +39,28 @@ class DQNAgent:
     def remember(self, state, action, reward, next_state, done):
         self.replay_buffer.add(state, action, reward, next_state, done)
 
-    @tf.function(jit_compile=True)   # ❶ XLA beschleunigt Dense-Netze ordentlich
-    def train_iterate(self):
-        if len(self.replay_buffer) < self.batch_size:
-            return
-
-        # --- Sample & convert -------------------------------------------
-        s, a, r, s2, d = self.replay_buffer.sample(self.batch_size)
-        s  = tf.convert_to_tensor(s,  dtype=tf.float32)
-        s2 = tf.convert_to_tensor(s2, dtype=tf.float32)
-        a  = tf.convert_to_tensor(a,  dtype=tf.int32)
-        r  = tf.convert_to_tensor(r,  dtype=tf.float32)
-        d  = tf.convert_to_tensor(d,  dtype=tf.float32)
-
-        # --- Q-Calculation 100 % GPU ----------------------------------------
+    @tf.function(
+        input_signature=[
+            tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
+            tf.TensorSpec(shape=[None], dtype=tf.int32),
+            tf.TensorSpec(shape=[None], dtype=tf.float32),
+            tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
+            tf.TensorSpec(shape=[None], dtype=tf.float32),
+        ],
+        jit_compile=True
+    )
+    def train_iterate(self, s, a, r, s2, d):
         next_q   = self.target_network(s2)
-        max_next = tf.reduce_max(next_q, axis=1)                 # tf statt np
-        target_q = r + (1. - d) * self.gamma * max_next
+        max_next = tf.reduce_max(next_q, axis=1)
+        target_q = r + (1 - d) * tf.constant(self.gamma) * max_next
 
         with tf.GradientTape() as tape:
             q_vals = self.q_network(s)
-            q_pred = tf.reduce_sum(q_vals *
-                                tf.one_hot(a, self.action_dim), axis=1)
+            q_pred = tf.reduce_sum(q_vals * tf.one_hot(a, self.action_dim), axis=1)
             loss = self.loss_fn(target_q, q_pred)
 
         grads = tape.gradient(loss, self.q_network.trainable_variables)
         self.optimizer.apply_gradients(zip(grads, self.q_network.trainable_variables))
-        self.epsilon = tf.maximum(self.epsilon*self.epsilon_decay,
-                                self.epsilon_min)
 
     
     def save_model(self, avg_reward, base_dir='models'):
@@ -111,25 +106,42 @@ class DQNAgent:
 
         for episode in range(1, episodes + 1):
             obs = env.reset(mode=mode)
-            #state = obs.numpy() if hasattr(obs, "numpy") else obs
             state = obs
             total_reward = 0
             done = False
 
+            step_count = 0
             while not done:
                 action = self.act(state)
                 reward, next_obs, done = env.step(action)
-                #next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
                 next_state = next_obs
-
                 self.remember(state, action, reward, next_state, done)
-                self.train_iterate()
+                step_count += 1
+
+                if len(self.replay_buffer) >= self.batch_size and step_count % 4 == 0:
+                    s, a, r, s2, d = self.replay_buffer.sample(self.batch_size)
+                    self.train_iterate(s, a, r, s2, d)
+                    
                 self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
 
                 state = next_state
                 total_reward += reward
 
+
+            # while not done:
+            #     action = self.act(state)
+            #     reward, next_obs, done = env.step(action)
+            #     next_state = next_obs
+            #     self.remember(state, action, reward, next_state, done)
+            #     self.train_iterate()
+            #     # eps decay
+            #     self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
+                
+            #     state = next_state
+            #     total_reward += reward
+
             reward_log.append(total_reward)
+            
 
             if episode % target_update_freq == 0:
                 self.update_target_network()
