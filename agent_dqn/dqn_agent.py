@@ -6,7 +6,7 @@ from .replay_buffer import ReplayBuffer
 
 
 class DQNAgent:
-    def __init__(self, state_dim=11, action_dim=5, learning_rate=0.001,
+    def __init__(self, state_dim=9, action_dim=5, learning_rate=0.001,
                  gamma=0.99, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.9999,
                  buffer_size=10000, batch_size=64):
         ## Check the state_dim in get_obs
@@ -42,9 +42,8 @@ class DQNAgent:
     def train_iterate(self):
         if len(self.replay_buffer) < self.batch_size:
             return
-    # ...rest of your code...
 
-        # --- Sample & konvertieren -------------------------------------------
+        # --- Sample & convert -------------------------------------------
         s, a, r, s2, d = self.replay_buffer.sample(self.batch_size)
         s  = tf.convert_to_tensor(s,  dtype=tf.float32)
         s2 = tf.convert_to_tensor(s2, dtype=tf.float32)
@@ -52,7 +51,7 @@ class DQNAgent:
         r  = tf.convert_to_tensor(r,  dtype=tf.float32)
         d  = tf.convert_to_tensor(d,  dtype=tf.float32)
 
-        # --- Q-Berechnungen 100 % GPU ----------------------------------------
+        # --- Q-Calculation 100 % GPU ----------------------------------------
         next_q   = self.target_network(s2)
         max_next = tf.reduce_max(next_q, axis=1)                 # tf statt np
         target_q = r + (1. - d) * self.gamma * max_next
@@ -68,25 +67,6 @@ class DQNAgent:
         self.epsilon = tf.maximum(self.epsilon*self.epsilon_decay,
                                 self.epsilon_min)
 
-    """def train_iterate(self) -> None:
-        if len(self.replay_buffer) < self.batch_size:
-            return
-
-        states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
-
-        next_q = self.target_network(next_states)
-        target_q = rewards + (1 - dones) * self.gamma * np.amax(next_q.numpy(), axis=1)
-
-        with tf.GradientTape() as tape:
-            q_values = self.q_network(states)
-            q_pred = tf.reduce_sum(q_values * tf.one_hot(actions, self.action_dim), axis=1)
-            loss = self.loss_fn(target_q, q_pred)
-
-        grads = tape.gradient(loss, self.q_network.trainable_variables)
-        self.optimizer.apply_gradients(zip(grads, self.q_network.trainable_variables))
-
-        # Epsilon decay
-        self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)"""
     
     def save_model(self, avg_reward, base_dir='models'):
         """
@@ -131,17 +111,21 @@ class DQNAgent:
 
         for episode in range(1, episodes + 1):
             obs = env.reset(mode=mode)
-            state = obs.numpy() if hasattr(obs, "numpy") else obs
+            #state = obs.numpy() if hasattr(obs, "numpy") else obs
+            state = obs
             total_reward = 0
             done = False
 
             while not done:
                 action = self.act(state)
                 reward, next_obs, done = env.step(action)
-                next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
+                #next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
+                next_state = next_obs
 
                 self.remember(state, action, reward, next_state, done)
                 self.train_iterate()
+                self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
+
                 state = next_state
                 total_reward += reward
 

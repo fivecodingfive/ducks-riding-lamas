@@ -172,7 +172,7 @@ class Environment(object):
 
 
     # get_obs from 17.05 5.50pm
-    def get_obs(self):
+    """def get_obs(self):
         obs = []
 
         # Agent state + target position (essential for delivery)
@@ -208,7 +208,7 @@ class Environment(object):
             else:
                 obs.extend([0.0, 0.0])  # Padding
 
-        return tf.convert_to_tensor(obs, dtype=tf.float32)
+        return tf.convert_to_tensor(obs, dtype=tf.float32)"""
 
 
 
@@ -216,7 +216,7 @@ class Environment(object):
 
 
     # get_obs from 16.05
-    """def get_obs(self):
+    def get_obs(self):
         obs = []
 
         # 1~3: Agent state (x, y, load)
@@ -255,5 +255,5 @@ class Environment(object):
         # 9: Number of active items
         obs.append(float(len(self.item_locs)))
 
-        return tf.convert_to_tensor(obs, dtype=tf.float32)  # Shape: (9,)"""
+        return tf.convert_to_tensor(obs, dtype=tf.float32)  # Shape: (9,)
 
