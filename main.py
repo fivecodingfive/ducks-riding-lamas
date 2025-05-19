@@ -15,7 +15,7 @@ parser.add_argument('--episodes', type=int, default=200,
 parser.add_argument('--seed', type=int, default=42,
                     help="Random seed for reproducibility")
 
-parser.add_argument('--mode', type=str, default='training', choices=['training', 'parallel-training', 'validation', 'testing'],
+parser.add_argument('--mode', type=str, default='training', choices=['training', 'parallel-training', 'parallel-training-ray', 'validation', 'testing'],
                     help="Run mode for environment")
 
 parser.add_argument('--modelpath', type=str,
@@ -73,6 +73,15 @@ match mode:
         dqn_agent.parallel_train(vec_env=vec_env,
                                 episodes=args.episodes,
                                 target_update_freq=5)
+    case 'parallel-training-ray':
+        # Für Ray: übergib kwargs als dict!
+        env_kwargs = dict(variant=args.variant, data_dir=args.data_dir)
+        dqn_agent.parallel_train_ray(
+            n_envs=10,
+            episodes=args.episodes,
+            target_update_freq=5,
+            env_kwargs=env_kwargs
+        )
     case 'validation':
         if model_path:
             dqn_agent.validate(env=env,

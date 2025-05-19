@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import tensorflow as tf
+import ray
 from .model import build_q_network
 from .replay_buffer import ReplayBuffer
 
@@ -9,7 +10,7 @@ STATE_DIM = 9
 class DQNAgent:
     def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001,
                  gamma=0.99, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.9999,
-                 buffer_size=10000, batch_size=1024):
+                 buffer_size=50000, batch_size=1024):
         ## Check the state_dim in get_obs
         self.state_dim = state_dim
         self.action_dim = action_dim
@@ -254,6 +255,9 @@ class DQNAgent:
                 if hasattr(rewards, "numpy"): rewards = rewards.numpy()
                 if hasattr(dones, "numpy"): dones = dones.numpy()
 
+                for i, d in enumerate(dones):
+                    if d:
+                        next_states[i] = vec_env.envs[i].reset(mode="training")
                 # Sammle Rewards nur für Envs, die noch laufen
                 total_rewards += rewards * (~done_flags)
                 # Setze Envs, die jetzt fertig sind, als "done"
@@ -308,4 +312,89 @@ class DQNAgent:
             df.to_csv(log_file, index=False)
             print(f"[Log] Reward log saved to {log_file}")
 
+        return self.save_model(overall_avg)
+
+
+        # ray training
+
+    def parallel_train_ray(self, n_envs=2, episodes=200, target_update_freq=5, log_file=None, env_kwargs=None):
+        """
+        Paralleles Training mit Ray.
+        Args:
+            n_envs: Anzahl paralleler Envs.
+            episodes: Episodenanzahl pro Env.
+            target_update_freq: Häufigkeit des Target-Network-Updates.
+            log_file: Optional: Log-Datei für Rewards.
+            env_kwargs: Dict mit Variant/Data-Dir/etc.
+        """
+        from ray_env_worker import EnvWorker
+
+        ray.init(ignore_reinit_error=True)
+
+        env_kwargs = env_kwargs or {}
+        workers = [EnvWorker.remote(env_kwargs) for _ in range(n_envs)]
+
+        # Reset alle Envs (zu Beginn)
+        states = ray.get([w.reset.remote(mode="training") for w in workers])
+        states = [tf.convert_to_tensor(s) if not isinstance(s, tf.Tensor) else s for s in states]
+        states = tf.stack(states)
+
+        reward_log = []
+        total_rewards = [0 for _ in range(n_envs)]
+        done_counts = [0 for _ in range(n_envs)]
+
+        global_step = 0
+
+        while max(done_counts) < episodes:
+            actions = self.act_batch(states)
+            # Schritte in allen Envs parallel ausführen
+            futures = [w.step.remote(int(a)) for w, a in zip(workers, actions)]
+            results = ray.get(futures) # Liste von (reward, next_state, done)
+
+            rewards, next_states, dones = zip(*results)
+            rewards = tf.convert_to_tensor(rewards, dtype=tf.float32)
+            dones = tf.convert_to_tensor(dones, dtype=tf.float32)
+            next_states = [tf.convert_to_tensor(s) if not isinstance(s, tf.Tensor) else s for s in next_states]
+            next_states = tf.stack(next_states)
+
+            # Replay Buffer befüllen
+            self.remember_batch(states, actions, rewards, next_states, dones)
+
+            # Training
+            if len(self.replay_buffer) >= self.batch_size and global_step % 4 == 0:
+                s, a, r, s2, d = self.replay_buffer.sample(self.batch_size)
+                self.train_iterate(s, a, r, s2, d)
+
+            self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
+
+            # Episoden-Fortschritt updaten
+            for i in range(n_envs):
+                total_rewards[i] += float(rewards[i])
+                if dones[i]:
+                    done_counts[i] += 1
+                    reward_log.append(total_rewards[i])
+                    total_rewards[i] = 0
+
+            if global_step % target_update_freq == 0:
+                self.update_target_network()
+                if reward_log:
+                    recent_avg = np.mean(reward_log[-10:]) if len(reward_log) >= 10 else np.mean(reward_log)
+                    print(f"[Ray][Step {global_step}] Recent avg reward: {recent_avg:.2f} | Epsilon: {self.epsilon:.3f}")
+
+            states = next_states
+            global_step += 1
+
+        overall_avg = np.mean(reward_log)
+        print(f"\n[Ray Parallel Training Done] Overall Avg Reward: {overall_avg:.2f}")
+
+        if log_file:
+            import pandas as pd
+            df = pd.DataFrame({
+                'episode': list(range(1, len(reward_log)+1)),
+                'reward': reward_log
+            })
+            df.to_csv(log_file, index=False)
+            print(f"[Log] Reward log saved to {log_file}")
+
+        ray.shutdown()
         return self.save_model(overall_avg)
