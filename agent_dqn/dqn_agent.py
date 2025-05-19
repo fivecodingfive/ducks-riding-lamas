@@ -367,22 +367,36 @@ class DQNAgent:
 
             self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
 
-            # Episoden-Fortschritt updaten
+
+            new_rewards_this_step = []
             for i in range(n_envs):
                 total_rewards[i] += float(rewards[i])
                 if dones[i]:
                     done_counts[i] += 1
                     reward_log.append(total_rewards[i])
+                    new_rewards_this_step.append(total_rewards[i])  # <<<< collect new finished episode rewards
                     total_rewards[i] = 0
+
+            # <<<< NEW: Print avg reward after every finished episode in this step
+            if new_rewards_this_step:
+                print(f"[Parallel][Episode {len(reward_log)}/{n_envs*episodes}] "
+                    f"Avg reward: {np.mean(new_rewards_this_step):.2f} "
+                    f"| Epsilon: {self.epsilon:.3f}")
+            # Episoden-Fortschritt updaten
+
 
             if global_step % target_update_freq == 0:
                 self.update_target_network()
                 if reward_log:
                     recent_avg = np.mean(reward_log[-10:]) if len(reward_log) >= 10 else np.mean(reward_log)
-                    print(f"[Ray][Step {global_step}] Recent avg reward: {recent_avg:.2f} | Epsilon: {self.epsilon:.3f}")
+                    #print(f"[Ray][Step {global_step}] Recent avg reward: {recent_avg:.2f} | Epsilon: {self.epsilon:.3f}")
 
             states = next_states
             global_step += 1
+
+            
+
+                
 
         overall_avg = np.mean(reward_log)
         print(f"\n[Ray Parallel Training Done] Overall Avg Reward: {overall_avg:.2f}")

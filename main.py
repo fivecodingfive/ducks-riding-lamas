@@ -77,7 +77,7 @@ match mode:
         # Für Ray: übergib kwargs als dict!
         env_kwargs = dict(variant=args.variant, data_dir=args.data_dir)
         dqn_agent.parallel_train_ray(
-            n_envs=10,
+            n_envs=2,
             episodes=args.episodes,
             target_update_freq=5,
             env_kwargs=env_kwargs
