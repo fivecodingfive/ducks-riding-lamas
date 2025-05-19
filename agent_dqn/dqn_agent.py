@@ -49,6 +49,7 @@ class DQNAgent:
         ],
         jit_compile=True
     )
+
     def train_iterate(self, s, a, r, s2, d):
         next_q   = self.target_network(s2)
         max_next = tf.reduce_max(next_q, axis=1)
