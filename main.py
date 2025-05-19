@@ -15,7 +15,7 @@ parser.add_argument('--episodes', type=int, default=200,
 parser.add_argument('--seed', type=int, default=42,
                     help="Random seed for reproducibility")
 
-parser.add_argument('--mode', type=str, default='training', choices=['training', 'validation', 'testing'],
+parser.add_argument('--mode', type=str, default='training', choices=['training', 'parallel-training', 'validation', 'testing'],
                     help="Run mode for environment")
 
 parser.add_argument('--modelpath', type=str,
@@ -46,7 +46,7 @@ mixed_precision.set_global_policy('mixed_float16')
 # initialize environment
 from environment import Environment
 
-data_dir = './data'         # specify relative path to data directory (e.g., './data', not './data/variant_0')
+data_dir = args.data_dir         # specify relative path to data directory (e.g., './data', not './data/variant_0')
 variant = args.variant      # specify problem variant (0 for base variant, 1 for first extension, 2 for second extension)
 episodes = args.episodes    # specify episodes
 mode = args.mode            # specify mode of agent with different dataset (training, validation, test)
@@ -67,6 +67,12 @@ match mode:
                                     episodes=episodes,
                                     mode=mode, 
                                     target_update_freq=5)
+    case 'parallel-training':
+        from vec_env import VectorizedEnv
+        vec_env = VectorizedEnv(n_envs=10, variant=args.variant, data_dir=args.data_dir)
+        dqn_agent.parallel_train(vec_env=vec_env,
+                                episodes=args.episodes,
+                                target_update_freq=5)
     case 'validation':
         if model_path:
             dqn_agent.validate(env=env,

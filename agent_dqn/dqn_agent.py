@@ -9,7 +9,7 @@ STATE_DIM = 9
 class DQNAgent:
     def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001,
                  gamma=0.99, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.9999,
-                 buffer_size=5000, batch_size=256):
+                 buffer_size=10000, batch_size=1024):
         ## Check the state_dim in get_obs
         self.state_dim = state_dim
         self.action_dim = action_dim
@@ -127,19 +127,6 @@ class DQNAgent:
                 state = next_state
                 total_reward += reward
 
-
-            # while not done:
-            #     action = self.act(state)
-            #     reward, next_obs, done = env.step(action)
-            #     next_state = next_obs
-            #     self.remember(state, action, reward, next_state, done)
-            #     self.train_iterate()
-            #     # eps decay
-            #     self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
-                
-            #     state = next_state
-            #     total_reward += reward
-
             reward_log.append(total_reward)
             
 
@@ -216,3 +203,109 @@ class DQNAgent:
 
         avg_reward = sum(reward_log) / len(reward_log)
         print(f"\n[Validation Done] Avg Reward: {avg_reward:.2f} | Model: {os.path.basename(model_path)}")
+
+
+
+    # for parallel training
+
+
+    def act_batch(self, states):
+        # states: Tensor (n_envs, state_dim)
+        # Rückgabe: ndarray (n_envs,)
+        if np.random.rand() < self.epsilon:
+            return np.random.randint(self.action_dim, size=states.shape[0])
+        q_vals = self.q_network(states)  # (n_envs, action_dim)
+        return tf.argmax(q_vals, axis=1).numpy()  # (n_envs,)
+
+    def remember_batch(self, states, actions, rewards, next_states, dones):
+        # alles als batch eintragen
+        for s, a, r, s2, d in zip(states, actions, rewards, next_states, dones):
+            self.replay_buffer.add(s.numpy() if hasattr(s, "numpy") else s,
+                                int(a), float(r),
+                                s2.numpy() if hasattr(s2, "numpy") else s2,
+                                float(d))
+
+    def parallel_train(self, vec_env, episodes=int, target_update_freq=int, log_file=None):
+        """
+        Paralleles Training mit vektorisierter Umgebung.
+        Args:
+            vec_env: VectorizedEnv-Instanz
+            episodes: Episodenanzahl (pro Env)
+            target_update_freq: Häufigkeit des Target-Network-Updates (in globalen Schritten)
+            log_file: Optional: Log-Datei für Rewards
+        """
+        n_envs = vec_env.n_envs
+        reward_log = []
+        global_step = 0 # training step counter over all envs and episodes
+        max_steps_per_episode = getattr(vec_env.envs[0], "episode_steps", 200)
+
+        for episode in range(1, episodes + 1):
+            states = vec_env.reset(mode="training")        # (n_envs, state_dim)
+            total_rewards = np.zeros(n_envs)
+            done_flags = np.zeros(n_envs, dtype=bool)
+            step_in_episode = 0
+
+            while not np.all(done_flags) and step_in_episode < max_steps_per_episode:
+                actions = self.act_batch(states)
+                rewards, next_states, dones = vec_env.step(actions)
+                # "dones" gibt an, ob einzelne Env fertig ist
+
+                # Rewards und Dones: ggf. auf numpy casten
+                if hasattr(rewards, "numpy"): rewards = rewards.numpy()
+                if hasattr(dones, "numpy"): dones = dones.numpy()
+
+                # Sammle Rewards nur für Envs, die noch laufen
+                total_rewards += rewards * (~done_flags)
+                # Setze Envs, die jetzt fertig sind, als "done"
+                done_flags = np.logical_or(done_flags, dones.astype(bool))
+
+                # ReplayBuffer befüllen
+                self.remember_batch(states, actions, rewards, next_states, dones)
+
+                # Training alle 4 globalen Schritte
+                if len(self.replay_buffer) >= self.batch_size and global_step % 4 == 0:
+                    s, a, r, s2, d = self.replay_buffer.sample(self.batch_size)
+                    self.train_iterate(s, a, r, s2, d)
+
+                # Epsilon-Decay pro Schritt
+                self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
+
+                # Target-Net-Update
+                if global_step % target_update_freq == 0:
+                    self.update_target_network()
+                    recent_avg = np.mean(reward_log[-10:]) if len(reward_log) >= 10 else 0.0
+                    #print(f"[Parallel][Step {global_step}] Recent avg reward: {recent_avg:.2f} | Epsilon: {self.epsilon:.3f}")
+
+                states = next_states
+                global_step += 1
+                step_in_episode += 1
+
+                # print(f"\n[Step {global_step}]")
+                # print("Actions:", actions)
+                # print("Rewards:", rewards)
+                # print("Dones:", dones)
+                # print("Done Flags:", done_flags)
+                # print("States[0]:", states[0])         # erster Env-State
+                # print("States[-1]:", states[-1])       # letzter Env-State
+
+
+            # Episoden-Reward loggen (Mittelwert aller Envs)
+            episode_avg = np.mean(total_rewards)
+            reward_log.append(episode_avg)
+
+            if episode % 5 == 0:
+                print(f"[Parallel][Episode {episode}/{episodes}] Avg reward: {episode_avg:.2f} | Epsilon: {self.epsilon:.3f}")
+
+        overall_avg = np.mean(reward_log)
+        print(f"\n[Parallel Training Done] Overall Avg Reward: {overall_avg:.2f}")
+
+        if log_file:
+            import pandas as pd
+            df = pd.DataFrame({
+                'episode': list(range(1, episodes + 1)),
+                'reward': reward_log
+            })
+            df.to_csv(log_file, index=False)
+            print(f"[Log] Reward log saved to {log_file}")
+
+        return self.save_model(overall_avg)

@@ -4,8 +4,9 @@ from tensorflow.keras import layers, models
 def build_q_network(input_dim, output_dim):
     model = models.Sequential([
         layers.Input(shape=(input_dim,)),
-        layers.Dense(64, activation='relu'),
-        layers.Dense(64, activation='relu'),
+        layers.Dense(256, activation='relu'),
+        layers.Dense(256, activation='relu'),
+        layers.Dense(128, activation='relu'),
         layers.Dense(output_dim, dtype='float32') # Why is there no (linear) activation in the output vector?
 
 
