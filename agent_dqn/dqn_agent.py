@@ -399,9 +399,6 @@ class DQNAgent:
             states = next_states
             global_step += 1
 
-            
-
-                
 
         overall_avg = np.mean(reward_log)
         print(f"\n[Ray Parallel Training Done] Overall Avg Reward: {overall_avg:.2f}")
