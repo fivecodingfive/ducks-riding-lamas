@@ -147,21 +147,100 @@ class Environment(object):
 
     # TODO: implement function that gives the input features for the neural network(s)
     #       based on the current state of the environment
+    # def get_obs(self):
+    #     obs = []
+
+    #     # 1~2: agent position (x, y)
+    #     agent_x, agent_y = self.agent_loc
+    #     obs.append(float(agent_x))
+    #     obs.append(float(agent_y))
+
+    #     # 3~4: relative position to closest item (dx, dy)
+    #     if self.item_locs:
+    #         closest_item = min(self.item_locs, key=lambda pos: abs(pos[0] - agent_x) + abs(pos[1] - agent_y))
+    #         dx = float(closest_item[0] - agent_x)
+    #         dy = float(closest_item[1] - agent_y)
+    #     else:
+    #         dx, dy = 0.0, 0.0  # 沒 item 就設為 0
+
+    #     obs.append(dx)
+    #     obs.append(dy)
+
+    #     # 5: agent load
+    #     obs.append(float(self.agent_load))
+
+    #     return tf.convert_to_tensor(obs, dtype=tf.float32)  # shape: (5,)
+    
+    # def get_obs(self):
+    #     obs = []
+
+    #     # 1~2: agent position (x, y)
+    #     agent_x, agent_y = self.agent_loc
+    #     obs.append(float(agent_x))
+    #     obs.append(float(agent_y))
+
+    #     # 3~4: relative position to closest item (dx, dy)
+    #     # record the item only if the time left is enough to reach it
+    #     best_item = None
+    #     dx, dy = 0.0, 0.0
+        
+    #     if self.item_locs:
+    #         min_step = float('inf')
+    #         for i, item in enumerate(self.item_locs):
+    #             item_x, item_y = item
+    #             time = self.item_times[i]
+    #             step_left = abs(agent_x - item_x)+abs(agent_y -item_y)
+    #             time_left = abs(self.max_response_time - time)
+                
+    #             if time_left < step_left:
+    #                 continue
+                
+    #             if step_left < min_step:
+    #                 min_step = step_left
+    #                 best_item = item
+    #         if best_item:
+    #             dx = float(best_item[0] - agent_x)
+    #             dy = float(best_item[1] - agent_y)
+
+    #     obs.append(dx)
+    #     obs.append(dy)
+
+    #     # 5: agent load
+    #     obs.append(float(self.agent_load))
+
+    #     return tf.convert_to_tensor(obs, dtype=tf.float32)  # shape: (5,)
+    
     def get_obs(self):
         obs = []
 
-        # 1~2: agent position (x, y)
+        # 1~2: agent position
         agent_x, agent_y = self.agent_loc
         obs.append(float(agent_x))
         obs.append(float(agent_y))
 
-        # 3~4: relative position to closest item (dx, dy)
-        if self.item_locs:
-            closest_item = min(self.item_locs, key=lambda pos: abs(pos[0] - agent_x) + abs(pos[1] - agent_y))
-            dx = float(closest_item[0] - agent_x)
-            dy = float(closest_item[1] - agent_y)
+        # 3~4: relative position to either the closest reachable item or target
+        dx, dy = 0.0, 0.0
+        target_x, target_y = self.target_loc
+
+        if self.agent_load:
+            # go to target w loaded item
+            dx = float(target_x - agent_x)
+            dy = float(target_y - agent_y)
         else:
-            dx, dy = 0.0, 0.0  # 沒 item 就設為 0
+            # haven't picked the item yet, go to closest item
+            if self.item_locs:
+                min_step = float('inf')
+                for i, item in enumerate(self.item_locs):
+                    item_x, item_y = item
+                    time = self.item_times[i]
+
+                    step_needed = abs(agent_x - item_x) + abs(agent_y - item_y)
+                    time_left = self.max_response_time - time
+
+                    if time_left >= step_needed and step_needed < min_step:
+                        min_step = step_needed
+                        dx = float(item_x - agent_x)
+                        dy = float(item_y - agent_y)
 
         obs.append(dx)
         obs.append(dy)
