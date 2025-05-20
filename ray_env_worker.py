@@ -14,5 +14,6 @@ class EnvWorker:
     def step(self, action):
         r, next_state, done = self.env.step(int(action))
         if done:
-            next_state = self.env.reset(self.current_mode)
+            next_state = self.reset(self.current_mode)  # Full reset
+            r = 0  # Discard terminal rewardd
         return r, next_state, done

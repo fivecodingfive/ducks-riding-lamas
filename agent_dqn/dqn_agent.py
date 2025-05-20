@@ -6,26 +6,29 @@ from .model import build_q_network
 from .replay_buffer import ReplayBuffer
 
 STATE_DIM = 9
+N_ENVS = 8
+
 
 class DQNAgent:
-    def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001,
+    def __init__(self, state_dim=STATE_DIM, action_dim=5, n_envs=N_ENVS, learning_rate=0.001,
                  gamma=0.99, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.9999,
-                 buffer_size=50000, batch_size=1024):
+                 buffer_size=20000, batch_size=1024):
         ## Check the state_dim in get_obs
+        self.n_envs = n_envs
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.gamma = gamma
         self.epsilon = epsilon
         self.epsilon_min = epsilon_min
-        self.epsilon_decay = epsilon_decay
-        self.batch_size = batch_size
+        self.epsilon_decay = epsilon_decay ** (1/n_envs)
+        self.batch_size = batch_size* n_envs
 
         self.q_network = build_q_network(state_dim, action_dim)
         self.target_network = build_q_network(state_dim, action_dim)
         self.optimizer = tf.keras.optimizers.Adam(learning_rate)
         self.loss_fn = tf.keras.losses.MeanSquaredError()
 
-        self.replay_buffer = ReplayBuffer(buffer_size)
+        self.replay_buffer = ReplayBuffer(buffer_size * n_envs)
         self.update_target_network()
 
     def update_target_network(self):
@@ -317,7 +320,7 @@ class DQNAgent:
 
         # ray training
 
-    def parallel_train_ray(self, n_envs=2, episodes=200, target_update_freq=5, log_file=None, env_kwargs=None):
+    def parallel_train_ray(self, n_envs=8, episodes=200, target_update_freq=5, log_file=None, env_kwargs=None):
         """
         Paralleles Training mit Ray.
         Args:
@@ -345,7 +348,9 @@ class DQNAgent:
 
         global_step = 0
 
-        while max(done_counts) < episodes:
+        total_done = 0
+        while total_done < n_envs * episodes:
+        # while min(done_counts) < episodes:
             actions = self.act_batch(states)
             # Schritte in allen Envs parallel ausführen
             futures = [w.step.remote(int(a)) for w, a in zip(workers, actions)]

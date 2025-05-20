@@ -59,8 +59,11 @@ env = Environment(variant=variant, data_dir=data_dir)
 # agent = TabularQAgent()
 # agent.train(env=env, mode=mode, episodes=episodes)
 
-from agent_dqn.dqn_agent import DQNAgent
-dqn_agent = DQNAgent()
+
+from agent_dqn.dqn_agent import N_ENVS, DQNAgent
+
+dqn_agent = DQNAgent(n_envs=N_ENVS)
+
 match mode:
     case 'training':
         model_path = dqn_agent.train(env=env,
@@ -74,15 +77,18 @@ match mode:
                                 episodes=args.episodes,
                                 target_update_freq=5)
     case 'parallel-training-ray':
+        n_envs = N_ENVS  # z.B. 8
+        dqn_agent = DQNAgent(n_envs=n_envs)
         # Für Ray: übergib kwargs als dict!
         env_kwargs = dict(variant=args.variant, data_dir=args.data_dir)
         dqn_agent.parallel_train_ray(
-            n_envs=2,
+            n_envs=n_envs,
             episodes=args.episodes,
-            target_update_freq=5,
+            target_update_freq=max(5 // n_envs, 1),
             env_kwargs=env_kwargs
         )
     case 'validation':
+        dqn_agent = DQNAgent(n_envs=1)
         if model_path:
             dqn_agent.validate(env=env,
                                model_path=model_path)
