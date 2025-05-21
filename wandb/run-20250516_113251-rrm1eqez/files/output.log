@@ -1,0 +1,156 @@
+Model: "sequential"
+┌─────────────────────────────────┬────────────────────────┬───────────────┐
+│ Layer (type)                    │ Output Shape           │       Param # │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense (Dense)                   │ (None, 64)             │           384 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 64)             │         4,160 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 5)              │           325 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 4,869 (19.02 KB)
+ Trainable params: 4,869 (19.02 KB)
+ Non-trainable params: 0 (0.00 B)
+Episode 1/20 | Reward: -78.0 | Epsilon: 0.367 | Loss: 0.472
+Episode 2/20 | Reward: 7.5 | Epsilon: 0.135 | Loss: 1.787
+Episode 3/20 | Reward: -10.5 | Epsilon: 0.100 | Loss: 4.434
+Episode 4/20 | Reward: -18.5 | Epsilon: 0.100 | Loss: 8.793
+Episode 5/20 | Reward: -20.5 | Epsilon: 0.100 | Loss: 16.785
+Episode 6/20 | Reward: -20.5 | Epsilon: 0.100 | Loss: 43.342
+Episode 7/20 | Reward: -6.5 | Epsilon: 0.100 | Loss: 37.992
+Episode 8/20 | Reward: -6.5 | Epsilon: 0.100 | Loss: 36.850
+Episode 9/20 | Reward: -20.0 | Epsilon: 0.100 | Loss: 48.668
+Episode 10/20 | Reward: -6.5 | Epsilon: 0.100 | Loss: 57.421
+Episode 11/20 | Reward: -25.0 | Epsilon: 0.100 | Loss: 49.202
+Episode 12/20 | Reward: -22.5 | Epsilon: 0.100 | Loss: 42.930
+Episode 13/20 | Reward: -17.5 | Epsilon: 0.100 | Loss: 32.075
+Episode 14/20 | Reward: -10.5 | Epsilon: 0.100 | Loss: 41.583
+Episode 15/20 | Reward: -17.0 | Epsilon: 0.100 | Loss: 18.598
+Episode 16/20 | Reward: -16.5 | Epsilon: 0.100 | Loss: 13.418
+Traceback (most recent call last):
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\main.py", line 34, in <module>
+    rewards = train_dqn(env, config)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agents\dqn\train.py", line 33, in train_dqn
+    total_reward, steps, avg_loss, avg_q = trainer.run_episode()
+                                           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agents\dqn\trainer.py", line 24, in run_episode
+    q_values = self.agent.model.predict(state[np.newaxis], verbose=0)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 117, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\backend\tensorflow\trainer.py", line 499, in predict
+    epoch_iterator = TFEpochIterator(
+                     ^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\backend\tensorflow\trainer.py", line 720, in __init__
+    dataset = self.data_adapter.get_tf_dataset()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\trainers\data_adapters\array_data_adapter.py", line 140, in get_tf_dataset
+    indices_dataset = indices_dataset.map(permutation).prefetch(1)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\data\ops\dataset_ops.py", line 2341, in map
+    return map_op._map_v2(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\data\ops\map_op.py", line 43, in _map_v2
+    return _MapDataset(
+           ^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\data\ops\map_op.py", line 157, in __init__
+    self._map_func = structured_function.StructuredFunctionWrapper(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\data\ops\structured_function.py", line 265, in __init__
+    self._function = fn_factory()
+                     ^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\eager\polymorphic_function\polymorphic_function.py", line 1256, in get_concrete_function
+    concrete = self._get_concrete_function_garbage_collected(*args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\eager\polymorphic_function\polymorphic_function.py", line 1226, in _get_concrete_function_garbage_collected
+    self._initialize(args, kwargs, add_initializers_to=initializers)
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\eager\polymorphic_function\polymorphic_function.py", line 696, in _initialize
+    self._concrete_variable_creation_fn = tracing_compilation.trace_function(
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\eager\polymorphic_function\tracing_compilation.py", line 178, in trace_function
+    concrete_function = _maybe_define_function(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\eager\polymorphic_function\tracing_compilation.py", line 283, in _maybe_define_function
+    concrete_function = _create_concrete_function(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\eager\polymorphic_function\tracing_compilation.py", line 310, in _create_concrete_function
+    traced_func_graph = func_graph_module.func_graph_from_py_func(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\func_graph.py", line 1060, in func_graph_from_py_func
+    func_outputs = python_func(*func_args, **func_kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\eager\polymorphic_function\polymorphic_function.py", line 599, in wrapped_fn
+    out = weak_wrapped_fn().__wrapped__(*args, **kwds)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\data\ops\structured_function.py", line 231, in wrapped_fn
+    ret = wrapper_helper(*args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\data\ops\structured_function.py", line 161, in wrapper_helper
+    ret = autograph.tf_convert(self._func, ag_ctx)(*nested_args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\autograph\impl\api.py", line 690, in wrapper
+    return converted_call(f, args, kwargs, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\autograph\impl\api.py", line 377, in converted_call
+    return _call_unconverted(f, args, kwargs, options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\autograph\impl\api.py", line 459, in _call_unconverted
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\trainers\data_adapters\array_data_adapter.py", line 130, in permutation
+    indices = tf.range(num_samples, dtype=tf.int64)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\dispatch.py", line 1260, in op_dispatch_handler
+    return dispatch_target(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\ops\math_ops.py", line 2043, in range
+    limit = ops.convert_to_tensor(limit, dtype=dtype, name="limit")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\profiler\trace.py", line 183, in wrapped
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\ops.py", line 736, in convert_to_tensor
+    return tensor_conversion_registry.convert(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\tensor_conversion_registry.py", line 234, in convert
+    ret = conversion_func(value, dtype=dtype, name=name, as_ref=as_ref)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\constant_tensor_conversion.py", line 29, in _constant_tensor_conversion_function
+    return constant_op.constant(v, dtype=dtype, name=name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\ops\weak_tensor_ops.py", line 142, in wrapper
+    return op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\constant_op.py", line 276, in constant
+    return _constant_impl(value, dtype, shape, name, verify_shape=False,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\constant_op.py", line 291, in _constant_impl
+    const_tensor = ops._create_graph_constant(  # pylint: disable=protected-access
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\ops.py", line 289, in _create_graph_constant
+    const_tensor = g._create_op_internal(  # pylint: disable=protected-access
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\func_graph.py", line 614, in _create_op_internal
+    return super()._create_op_internal(  # pylint: disable=protected-access
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\ops.py", line 2705, in _create_op_internal
+    ret = Operation.from_node_def(
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\ops.py", line 1200, in from_node_def
+    c_op = _create_c_op(g, node_def, inputs, control_input_ops, op_def=op_def)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\ops.py", line 1066, in _create_c_op
+    c_op, tf_stack.extract_stack(stacklevel=3)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\tf_stack.py", line 162, in extract_stack
+    return _tf_stack.extract_stack(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

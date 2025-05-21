@@ -1,0 +1,49 @@
+Model: "sequential"
+┌─────────────────────────────────┬────────────────────────┬───────────────┐
+│ Layer (type)                    │ Output Shape           │       Param # │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense (Dense)                   │ (None, 64)             │           384 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 64)             │         4,160 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 5)              │           325 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 4,869 (19.02 KB)
+ Trainable params: 4,869 (19.02 KB)
+ Non-trainable params: 0 (0.00 B)
+Episode 1/5 | Reward: -78.0 | Epsilon: 0.367 | Loss: 0.472
+Episode 2/5 | Reward: 7.5 | Epsilon: 0.135 | Loss: 1.787
+Episode 3/5 | Reward: -10.5 | Epsilon: 0.100 | Loss: 4.434
+Episode 4/5 | Reward: -18.5 | Epsilon: 0.100 | Loss: 8.793
+Traceback (most recent call last):
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\main.py", line 34, in <module>
+    rewards = train_dqn(env, config)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agents\dqn\train.py", line 33, in train_dqn
+    total_reward, steps, avg_loss, avg_q = trainer.run_episode()
+                                           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agents\dqn\trainer.py", line 24, in run_episode
+    q_values = self.agent.model.predict(state[np.newaxis], verbose=0)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 117, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\backend\tensorflow\trainer.py", line 557, in predict
+    for step, iterator in epoch_iterator:
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\backend\tensorflow\trainer.py", line 734, in __next__
+    return next(self._epoch_iterator)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\keras\src\trainers\epoch_iterator.py", line 102, in _enumerate_iterator
+    self._current_iterator = iter(self._get_iterator())
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\data\ops\dataset_ops.py", line 501, in __iter__
+    return iterator_ops.OwnedIterator(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\data\ops\iterator_ops.py", line 709, in __init__
+    self._create_iterator(dataset)
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\data\ops\iterator_ops.py", line 748, in _create_iterator
+    gen_dataset_ops.make_iterator(ds_variant, self._iterator_resource)
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\ops\gen_dataset_ops.py", line 3478, in make_iterator
+    _result = pywrap_tfe.TFE_Py_FastPathExecute(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

@@ -215,8 +215,11 @@ class Environment(object):
 
         # 1~2: agent position
         agent_x, agent_y = self.agent_loc
-        obs.append(float(agent_x))
-        obs.append(float(agent_y))
+        obs.extend([
+            float(agent_x),
+            float(agent_y),
+            float(self.agent_load)
+        ])
 
         # 3~4: relative position to either the closest reachable item or target
         dx, dy = 0.0, 0.0
@@ -242,11 +245,8 @@ class Environment(object):
                         dx = float(item_x - agent_x)
                         dy = float(item_y - agent_y)
 
-        obs.append(dx)
-        obs.append(dy)
+        # 9: Number of active items
+        obs.append(float(len(self.item_locs)))
 
-        # 5: agent load
-        obs.append(float(self.agent_load))
-
-        return tf.convert_to_tensor(obs, dtype=tf.float32)  # shape: (5,)
+        return tf.convert_to_tensor(obs, dtype=tf.float32)  # Shape: (9,)
 
