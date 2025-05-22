@@ -4,31 +4,41 @@ import tensorflow as tf
 from collections import deque
 
 class ReplayBuffer:
-    def __init__(self, capacity):
-        self.buffer = deque(maxlen=capacity)
+    def __init__(self, capacity, state_shape):
+        self.capacity = capacity
+        self.state_shape = state_shape
+        self.pos = tf.Variable(0, dtype=tf.int32, trainable=False)
+        self.size = tf.Variable(0, dtype=tf.int32, trainable=False)
+
+        self.states = tf.Variable(tf.zeros([capacity, *state_shape], dtype=tf.float32), trainable=False)
+        self.actions = tf.Variable(tf.zeros([capacity], dtype=tf.int32), trainable=False)
+        self.rewards = tf.Variable(tf.zeros([capacity], dtype=tf.float32), trainable=False)
+        self.next_states = tf.Variable(tf.zeros([capacity, *state_shape], dtype=tf.float32), trainable=False)
+        self.dones = tf.Variable(tf.zeros([capacity], dtype=tf.float32), trainable=False)
 
     def add(self, state, action, reward, next_state, done):
-        # Convert all components to tensors
-        state_tensor = tf.convert_to_tensor(state, dtype=tf.float32)
-        action_tensor = tf.convert_to_tensor(action, dtype=tf.int32)
-        reward_tensor = tf.convert_to_tensor(reward, dtype=tf.float32)
-        next_state_tensor = tf.convert_to_tensor(next_state, dtype=tf.float32)
-        done_tensor = tf.convert_to_tensor(done, dtype=tf.float32)
-        self.buffer.append((state_tensor, action_tensor, reward_tensor, next_state_tensor, done_tensor))
+        self.states[self.pos].assign(state)
+        self.actions[self.pos].assign(action)
+        self.rewards[self.pos].assign(reward)
+        self.next_states[self.pos].assign(next_state)
+        self.dones[self.pos].assign(done)
+
+        self.pos.assign((self.pos + 1) % self.capacity)
+        self.size.assign(tf.minimum(self.size + 1, self.capacity))
 
     def sample(self, batch_size):
-        batch = random.sample(self.buffer, batch_size)
-        states, actions, rewards, next_states, dones = zip(*batch)
+        indices = tf.random.shuffle(tf.range(self.size))[:batch_size]
+
         return (
-            tf.stack(states),       # Shape: (batch_size, state_dim)
-            tf.squeeze(tf.stack(actions)),  # Shape: (batch_size,)
-            tf.squeeze(tf.stack(rewards)),  # Shape: (batch_size,)
-            tf.stack(next_states),   # Shape: (batch_size, state_dim)
-            tf.squeeze(tf.stack(dones))     # Shape: (batch_size,)
+            tf.gather(self.states, indices),
+            tf.gather(self.actions, indices),
+            tf.gather(self.rewards, indices),
+            tf.gather(self.next_states, indices),
+            tf.gather(self.dones, indices),
         )
 
     def __len__(self):
-        return len(self.buffer)
+        return int(self.size.numpy())
 
 class PrioritizedReplayBuffer:
     def __init__(self, capacity, state_shape, alpha=0.6, epsilon=1e-5):
@@ -65,6 +75,7 @@ class PrioritizedReplayBuffer:
 
         indices = tf.random.categorical(tf.math.log([probs]), batch_size)
         indices = tf.squeeze(indices, axis=0)
+        indices = tf.cast(indices, dtype=tf.int32)
 
         sampled_probs = tf.gather(probs, indices)
         total = tf.cast(self.size, tf.float32)
@@ -82,10 +93,14 @@ class PrioritizedReplayBuffer:
         )
 
     def update_priorities(self, indices, td_errors):
-        td_errors = tf.abs(td_errors) + self.epsilon
-        for i in range(tf.shape(indices)[0]):
-            idx = indices[i]
-            self.priorities[idx].assign(td_errors[i])
+        indices = tf.expand_dims(indices, axis=1)  # [64] → [64,1]
+        updates = tf.abs(td_errors) + self.epsilon  # shape: [64]
+
+        # Create updated tensor (new_priorities)
+        new_priorities = tf.tensor_scatter_nd_update(self.priorities, indices, updates)
+
+        # assign back to variable
+        self.priorities.assign(new_priorities)
 
     def __len__(self):
         return self.size

@@ -5,9 +5,10 @@ from .model import build_q_network
 from .replay_buffer import ReplayBuffer, PrioritizedReplayBuffer
 from datetime import datetime
 
+STATE_DIM = 5
 
 class DQNAgent:
-    def __init__(self, state_dim=5, action_dim=5, learning_rate=0.001,
+    def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001,
                  gamma=0.99, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.995,
                  buffer_size=10000, batch_size=64,
                  prioritized_replay=True, alpha=0.6, beta=0.4):
@@ -28,18 +29,19 @@ class DQNAgent:
         
         ## ReplayBuffer
         if prioritized_replay:
-            self.replay_buffer = PrioritizedReplayBuffer(buffer_size, alpha=alpha)
+            print("Using prioritized replay buffer...")
+            self.replay_buffer = PrioritizedReplayBuffer(capacity=buffer_size, state_shape=(state_dim,), alpha=alpha)
             self.use_per = True
             self.beta = beta
         else:
-            self.replay_buffer = ReplayBuffer(buffer_size)
+            self.replay_buffer = ReplayBuffer(capacity=buffer_size, state_shape=(state_dim,))
             self.use_per = False
         
         ## Logger
-        log_dir = "logs/dqn/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-        self.summary_writer = tf.summary.create_file_writer(log_dir)
-        self.train_step = 0
-            
+        # log_dir = "logs/dqn/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+        # self.summary_writer = tf.summary.create_file_writer(log_dir)
+        # self.train_step = 0
+        
         self.update_target_network()
 
     def update_target_network(self):
@@ -54,41 +56,29 @@ class DQNAgent:
     def remember(self, state, action, reward, next_state, done):
         self.replay_buffer.add(state, action, reward, next_state, done)
 
-    def train_iterate(self) -> None:
-        # if len(self.replay_buffer) < self.batch_size:
-        #     return
-
-        # states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
-
-        # next_q = self.target_network(next_states)
-        # target_q = rewards + (1 - dones) * self.gamma * np.amax(next_q.numpy(), axis=1)
-
-        # with tf.GradientTape() as tape:
-        #     q_values = self.q_network(states)
-        #     q_pred = tf.reduce_sum(q_values * tf.one_hot(actions, self.action_dim), axis=1)
-        #     loss = self.loss_fn(target_q, q_pred)
-
-        # grads = tape.gradient(loss, self.q_network.trainable_variables)
-        # self.optimizer.apply_gradients(zip(grads, self.q_network.trainable_variables))
-        if len(self.replay_buffer.buffer) < self.batch_size:
-            return
-
-        if self.use_per:
-            states, actions, rewards, next_states, dones, indices, weights = self.replay_buffer.sample(self.batch_size, beta=self.beta)
-        else:
-            states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
-            weights = np.ones(self.batch_size)
-            indices = None
-
+    @tf.function(
+        input_signature=[
+            tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
+            tf.TensorSpec(shape=[None], dtype=tf.int32),
+            tf.TensorSpec(shape=[None], dtype=tf.float32),
+            tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
+            tf.TensorSpec(shape=[None], dtype=tf.float32),
+            tf.TensorSpec(shape=[None], dtype=tf.int32),
+            tf.TensorSpec(shape=[None], dtype=tf.float32)
+        ],
+        jit_compile=True
+    )
+    
+    def train_iterate(self, states, actions, rewards, next_states, dones, indices, weights) -> None:
         next_q = self.target_network(next_states)
-        targets = rewards + (1 - dones) * self.gamma * np.amax(next_q.numpy(), axis=1)
+        targets = rewards + (1 - dones) * self.gamma * tf.reduce_max(next_q, axis=1)
 
         with tf.GradientTape() as tape:
             q_values = self.q_network(states)
             q_pred = tf.reduce_sum(q_values * tf.one_hot(actions, self.action_dim), axis=1)
 
-            targets = tf.convert_to_tensor(targets, dtype=tf.float32)
-            weights = tf.convert_to_tensor(weights, dtype=tf.float32)
+            # targets = tf.convert_to_tensor(targets, dtype=tf.float32)
+            # weights = tf.convert_to_tensor(weights, dtype=tf.float32)
 
             td_errors = targets - q_pred
             loss = tf.reduce_mean(weights * tf.square(td_errors))
@@ -99,13 +89,6 @@ class DQNAgent:
         # Update priority
         if self.use_per:
             self.replay_buffer.update_priorities(indices, td_errors)
-            
-        # Epsilon decay
-        self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
-        
-        # Log training data
-        self.log_training_step(loss, td_errors, q_pred)
-
     
     def train(self, env, episodes=int, mode=str, target_update_freq=int, log_file=None) -> None:
         """
@@ -131,7 +114,18 @@ class DQNAgent:
                 next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
 
                 self.remember(state, action, reward, next_state, done)
-                self.train_iterate()
+                # Use prioritized replay buffer if stated
+                if self.use_per:
+                    states, actions, rewards, next_states, dones, indices, weights = self.replay_buffer.sample(self.batch_size, beta=self.beta)
+                else:
+                    states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
+                    weights = tf.ones(self.batch_size, dtype=tf.float32)
+                    indices = tf.ones(self.batch_size, dtype=tf.int32)
+                
+                if len(self.replay_buffer) >= self.batch_size:
+                    self.train_iterate(states, actions, rewards, next_states, dones, indices, weights)
+                    self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
+                
                 state = next_state
                 total_reward += reward
 
@@ -157,7 +151,7 @@ class DQNAgent:
         
         return self.save_model(overall_avg)
     
-    def validate(self, env, model_path, episodes=100, mode='validation'):
+    def validate(self, env, model_path=str, episodes=100, mode='validation'):
         """Validate the model parameter with the given path.(No exploring)
 
         Args:
@@ -238,10 +232,10 @@ class DQNAgent:
         
         return full_path
     
-    def log_training_step(self, loss, td_errors, q_pred):
-        with self.summary_writer.as_default():
-            tf.summary.scalar("loss", loss, step=self.train_step)
-            tf.summary.scalar("td_error_mean", tf.reduce_mean(tf.abs(td_errors)), step=self.train_step)
-            tf.summary.scalar("td_error_max", tf.reduce_max(tf.abs(td_errors)), step=self.train_step)
-            tf.summary.scalar("q_value_mean", tf.reduce_mean(q_pred), step=self.train_step)
-        self.train_step += 1
+    # def log_training_step(self, loss, td_errors, q_pred):
+    #     with self.summary_writer.as_default():
+    #         tf.summary.scalar("loss", loss, step=self.train_step)
+    #         tf.summary.scalar("td_error_mean", tf.reduce_mean(tf.abs(td_errors)), step=self.train_step)
+    #         tf.summary.scalar("td_error_max", tf.reduce_max(tf.abs(td_errors)), step=self.train_step)
+    #         tf.summary.scalar("q_value_mean", tf.reduce_mean(q_pred), step=self.train_step)
+    #     self.train_step += 1
