@@ -1,18 +1,20 @@
 import os
 import numpy as np
 import tensorflow as tf
-from .model import build_q_network
+import matplotlib.pyplot as plt
+from .model import build_q_network, build_cnn_q_network
 from .replay_buffer import ReplayBuffer, PrioritizedReplayBuffer
-from datetime import datetime
+from .visualizer import GridVisualizer
 
-STATE_DIM = 5
+
+STATE_DIM = (5,)
+# STATE_DIM = (5,5,2)
 
 class DQNAgent:
     def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001,
                  gamma=0.99, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.995,
                  buffer_size=10000, batch_size=64,
-                 prioritized_replay=True, alpha=0.6, beta=0.4):
-        ## Check the state_dim in get_obs
+                 prioritized_replay=False, alpha=0.6, beta=0.4):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.gamma = gamma
@@ -22,25 +24,31 @@ class DQNAgent:
         self.batch_size = batch_size
         
         ## Q-network
-        self.q_network = build_q_network(state_dim, action_dim)
-        self.target_network = build_q_network(state_dim, action_dim)
+        self.q_network = build_q_network(*state_dim, action_dim)
+        self.target_network = build_q_network(*state_dim, action_dim)
+        # self.q_network = build_cnn_q_network(state_dim, action_dim)
+        # self.target_network = build_cnn_q_network(state_dim, action_dim)
         self.optimizer = tf.keras.optimizers.Adam(learning_rate)
-        self.loss_fn = tf.keras.losses.MeanSquaredError()
+        # self.loss_fn = tf.keras.losses.MeanSquaredError()
         
         ## ReplayBuffer
         if prioritized_replay:
             print("Using prioritized replay buffer...")
-            self.replay_buffer = PrioritizedReplayBuffer(capacity=buffer_size, state_shape=(state_dim,), alpha=alpha)
+            self.replay_buffer = PrioritizedReplayBuffer(capacity=buffer_size, state_shape=state_dim, alpha=alpha)
             self.use_per = True
             self.beta = beta
         else:
-            self.replay_buffer = ReplayBuffer(capacity=buffer_size, state_shape=(state_dim,))
+            self.replay_buffer = ReplayBuffer(capacity=buffer_size, state_shape=state_dim)
             self.use_per = False
         
         ## Logger
         # log_dir = "logs/dqn/" + datetime.now().strftime("%Y%m%d-%H%M%S")
         # self.summary_writer = tf.summary.create_file_writer(log_dir)
         # self.train_step = 0
+        self.q_log = {
+            'avg_q': [],
+            'max_q': []
+        }
         
         self.update_target_network()
 
@@ -58,10 +66,10 @@ class DQNAgent:
 
     @tf.function(
         input_signature=[
-            tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
+            tf.TensorSpec(shape=[None, *STATE_DIM], dtype=tf.float32),
             tf.TensorSpec(shape=[None], dtype=tf.int32),
             tf.TensorSpec(shape=[None], dtype=tf.float32),
-            tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
+            tf.TensorSpec(shape=[None, *STATE_DIM], dtype=tf.float32),
             tf.TensorSpec(shape=[None], dtype=tf.float32),
             tf.TensorSpec(shape=[None], dtype=tf.int32),
             tf.TensorSpec(shape=[None], dtype=tf.float32)
@@ -76,9 +84,9 @@ class DQNAgent:
         with tf.GradientTape() as tape:
             q_values = self.q_network(states)
             q_pred = tf.reduce_sum(q_values * tf.one_hot(actions, self.action_dim), axis=1)
-
-            # targets = tf.convert_to_tensor(targets, dtype=tf.float32)
-            # weights = tf.convert_to_tensor(weights, dtype=tf.float32)
+            
+            q_mean = tf.reduce_mean(q_values)
+            q_max = tf.reduce_max(q_values)
 
             td_errors = targets - q_pred
             loss = tf.reduce_mean(weights * tf.square(td_errors))
@@ -89,6 +97,7 @@ class DQNAgent:
         # Update priority
         if self.use_per:
             self.replay_buffer.update_priorities(indices, td_errors)
+        return q_mean, q_max
     
     def train(self, env, episodes=int, mode=str, target_update_freq=int, log_file=None) -> None:
         """
@@ -107,14 +116,17 @@ class DQNAgent:
             state = obs.numpy() if hasattr(obs, "numpy") else obs
             total_reward = 0
             done = False
-
+            visualizer = GridVisualizer() if episode % 50==49 else None
+            
             while not done:
                 action = self.act(state)
                 reward, next_obs, done = env.step(action)
                 next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
-
                 self.remember(state, action, reward, next_state, done)
-                # Use prioritized replay buffer if stated
+                state = next_state
+                total_reward += reward
+                
+                # Sampling from replay buffer
                 if self.use_per:
                     states, actions, rewards, next_states, dones, indices, weights = self.replay_buffer.sample(self.batch_size, beta=self.beta)
                 else:
@@ -123,12 +135,20 @@ class DQNAgent:
                     indices = tf.ones(self.batch_size, dtype=tf.int32)
                 
                 if len(self.replay_buffer) >= self.batch_size:
-                    self.train_iterate(states, actions, rewards, next_states, dones, indices, weights)
+                    q_mean, q_max = self.train_iterate(states, actions, rewards, next_states, dones, indices, weights)
                     self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
+                    
+                    self.q_log['avg_q'].append(q_mean.numpy())
+                    self.q_log['max_q'].append(q_max.numpy())
                 
-                state = next_state
-                total_reward += reward
-
+                # Visualizer update
+                if visualizer is not None:
+                    agent, target, items = env.get_loc()
+                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, reward=total_reward)
+                
+            if visualizer is not None:    
+                visualizer.close()
+                
             reward_log.append(total_reward)
 
             if episode % target_update_freq == 0:
@@ -139,6 +159,14 @@ class DQNAgent:
                 
         overall_avg = sum(reward_log) / len(reward_log)
         print(f"\n[Training Done] Overall Avg Reward: {overall_avg:.2f}")
+        plt.plot(self.q_log['avg_q'], label="Avg Q-value")
+        plt.plot(self.q_log['max_q'], label="Max Q-value", alpha=0.6)
+        plt.xlabel("Training steps")
+        plt.ylabel("Q-value")
+        plt.title("Q-value Convergence")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
         
         # if log_file:
         #     import pandas as pd
@@ -178,25 +206,36 @@ class DQNAgent:
         # validate
         reward_log = []
         total_reward = 0
-
+            
         for episode in range(episodes):
             obs = env.reset(mode=mode)
             state = obs.numpy() if hasattr(obs, "numpy") else obs
             done = False
             total_reward = 0
-
+            
+            # Visualizer
+            visualizer = GridVisualizer() if episode % 50==49 else None
+            
             while not done:
                 action = self.act(state)
                 reward, next_obs, done = env.step(action)
                 next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
                 state = next_state
                 total_reward += reward
+                
+                # Visualizer update
+                if visualizer is not None:
+                    agent, target, items = env.get_loc()
+                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, reward=total_reward)
 
+            if visualizer is not None:
+                visualizer.close()
+                
             reward_log.append(total_reward)
             
             if episode % 5 == 0:
                 recent_avg = sum(reward_log[-5:]) / 5
-                print(f"[Validating][Episode {episode}/{episodes}] Avg reward: {recent_avg:.2f} | Epsilon: {self.epsilon:.3f}")
+                print(f"[Validating][Episode {episode}/{episodes}] Avg reward: {recent_avg:.2f}")
 
         self.epsilon = original_epsilon  # return to training exploring rate
 

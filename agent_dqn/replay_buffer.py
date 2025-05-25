@@ -1,7 +1,4 @@
-import random
-import numpy as np
 import tensorflow as tf
-from collections import deque
 
 class ReplayBuffer:
     def __init__(self, capacity, state_shape):
