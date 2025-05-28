@@ -1,0 +1,264 @@
+import os
+import numpy as np
+import tensorflow as tf
+from .model import build_cnn_network
+from .model import build_mlp_network
+from .model import build_combine_network
+from .model import InputSplitter  # 👈 needed to deserialize the model
+from .replay_buffer import ReplayBuffer, PrioritizedReplayBuffer
+from datetime import datetime
+from config import args
+if args.network == 'cnn':
+    STATE_DIM = 100
+elif args.network == 'mlp':
+    STATE_DIM = 10
+elif args.network == 'combine':
+    STATE_DIM = 108
+
+
+class DQNAgent:
+    def __init__(self, action_dim=5, learning_rate=0.001,
+                 gamma=0.99, epsilon=1.0, epsilon_min=0.05, epsilon_decay=0.995,
+                 buffer_size=10000, batch_size=64,
+                 prioritized_replay=True, alpha=0.6, beta=0.4,
+                 network_type=args.network):
+        ## Check the state_dim in get_obs
+        self.state_dim = STATE_DIM
+        self.action_dim = action_dim
+        self.gamma = gamma
+        self.epsilon = epsilon
+        self.epsilon_min = epsilon_min
+        self.epsilon_decay = epsilon_decay
+        self.batch_size = batch_size
+        
+        ## Q-network
+        if  network_type == 'cnn':
+            print("Using CNN ...")
+            self.q_network = build_cnn_network(self.state_dim, action_dim)
+            self.target_network = build_cnn_network(self.state_dim, action_dim)
+        elif network_type == 'mlp':
+            print("Using MLP...")
+            self.q_network = build_mlp_network(self.state_dim, action_dim)
+            self.target_network = build_mlp_network(self.state_dim, action_dim)
+        elif network_type == 'combine':
+            print("Using COMBINATION...")
+            self.q_network = build_combine_network(self.state_dim, action_dim)
+            self.target_network = build_combine_network(self.state_dim, action_dim)
+        
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate)
+        self.loss_fn = tf.keras.losses.MeanSquaredError()
+        
+        ## ReplayBuffer
+        if prioritized_replay:
+            print("Using prioritized replay buffer...")
+            self.replay_buffer = PrioritizedReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,), alpha=alpha)
+            self.use_per = True
+            self.beta = beta
+        else:
+            self.replay_buffer = ReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,))
+            self.use_per = False
+        
+        ## Logger
+        # log_dir = "logs/dqn/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+        # self.summary_writer = tf.summary.create_file_writer(log_dir)
+        # self.train_step = 0
+        
+        self.update_target_network()
+
+    def update_target_network(self):
+        self.target_network.set_weights(self.q_network.get_weights())
+
+    def act(self, state):
+        if np.random.rand() < self.epsilon:
+            return np.random.randint(self.action_dim)
+        q_values = self.q_network(tf.convert_to_tensor([state], dtype=tf.float32))
+        return int(tf.argmax(q_values[0]))
+
+    def remember(self, state, action, reward, next_state, done):
+        self.replay_buffer.add(state, action, reward, next_state, done)
+
+    @tf.function(
+        input_signature=[
+            tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
+            tf.TensorSpec(shape=[None], dtype=tf.int32),
+            tf.TensorSpec(shape=[None], dtype=tf.float32),
+            tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
+            tf.TensorSpec(shape=[None], dtype=tf.float32),
+            tf.TensorSpec(shape=[None], dtype=tf.int32),
+            tf.TensorSpec(shape=[None], dtype=tf.float32)
+        ],
+        jit_compile=True
+    )
+    
+    def train_iterate(self, states, actions, rewards, next_states, dones, indices, weights) -> None:
+        next_q = self.target_network(next_states)
+        targets = rewards + (1 - dones) * self.gamma * tf.reduce_max(next_q, axis=1)
+
+        with tf.GradientTape() as tape:
+            q_values = self.q_network(states)
+            q_pred = tf.reduce_sum(q_values * tf.one_hot(actions, self.action_dim), axis=1)
+
+            # targets = tf.convert_to_tensor(targets, dtype=tf.float32)
+            # weights = tf.convert_to_tensor(weights, dtype=tf.float32)
+
+            td_errors = targets - q_pred
+            loss = tf.reduce_mean(weights * tf.square(td_errors))
+
+        grads = tape.gradient(loss, self.q_network.trainable_variables)
+        self.optimizer.apply_gradients(zip(grads, self.q_network.trainable_variables))
+
+        # Update priority
+        if self.use_per:
+            self.replay_buffer.update_priorities(indices, td_errors)
+    
+    def train(self, env, episodes=int, mode=str, target_update_freq=int, log_file=None) -> None:
+        """
+        Training process of the DQN agent and produce the log file of the training reward log if file path is given.
+
+        Args:
+            episodes (int, optional): episode number. Defaults to int.
+            mode (str, optional): [training, validation, testing] Defaults to 'training'
+            target_update_freq (int, optional): update frequency of target Q-network.
+            log_file (str, optional): path to log file. 
+        """
+        reward_log = []
+
+        for episode in range(1, episodes + 1):
+            obs = env.reset(mode=mode)
+            
+
+            state = obs.numpy() if hasattr(obs, "numpy") else obs
+            total_reward = 0
+            done = False
+
+            while not done:
+                action = self.act(state)
+                reward, next_obs, done = env.step(action)
+                next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
+
+                self.remember(state, action, reward, next_state, done)
+                # Use prioritized replay buffer if stated
+                if self.use_per:
+                    states, actions, rewards, next_states, dones, indices, weights = self.replay_buffer.sample(self.batch_size, beta=self.beta)
+                else:
+                    states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
+                    weights = tf.ones(self.batch_size, dtype=tf.float32)
+                    indices = tf.ones(self.batch_size, dtype=tf.int32)
+                
+                if len(self.replay_buffer) >= self.batch_size:
+                    self.train_iterate(states, actions, rewards, next_states, dones, indices, weights)
+                    self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
+                
+                state = next_state
+                total_reward += reward
+
+            reward_log.append(total_reward)
+
+            if episode % target_update_freq == 0:
+                self.update_target_network()
+                # print the avg reward of each target network update
+                recent_avg = sum(reward_log[-target_update_freq:]) / target_update_freq
+                print(f"[Training][Episode {episode}/{episodes}] Avg reward: {recent_avg:.2f} | Epsilon: {self.epsilon:.3f}")
+                
+        overall_avg = sum(reward_log) / len(reward_log)
+        print(f"\n[Training Done] Overall Avg Reward: {overall_avg:.2f}")
+        
+        # if log_file:
+        #     import pandas as pd
+        #     df = pd.DataFrame({
+        #         'episode': list(range(1, episodes + 1)),
+        #         'reward': reward_log
+        #     })
+        #     df.to_csv(log_file, index=False)
+        #     print(f"[Log] Reward log saved to {log_file}")
+        
+        return self.save_model(overall_avg)
+    
+    def validate(self, env, model_path=str, episodes=100, mode='validation'):
+        """Validate the model parameter with the given path.(No exploring)
+
+        Args:
+            env (Environment): _description_
+            model_path (str): _description_
+            episodes (int): _description_. Defaults to 100.
+            mode (str): _description_. Defaults to 'validation'.
+
+        Returns:
+            None
+        """
+        # examine if the model exist
+        if not os.path.exists(model_path):
+            print(f"Model file not found: {model_path}")
+            return None
+
+        # load model
+        print(f"Loading model from: {model_path}")
+        self.q_network = tf.keras.models.load_model(model_path)
+        
+        original_epsilon = self.epsilon
+        self.epsilon = 0.0  # no exploring when validating model
+
+        # validate
+        reward_log = []
+        total_reward = 0
+
+        for episode in range(episodes):
+            obs = env.reset(mode=mode)
+            state = obs.numpy() if hasattr(obs, "numpy") else obs
+            done = False
+            total_reward = 0
+
+            while not done:
+                action = self.act(state)
+                reward, next_obs, done = env.step(action)
+                next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
+                state = next_state
+                total_reward += reward
+
+            reward_log.append(total_reward)
+            
+            if episode % 5 == 0:
+                recent_avg = sum(reward_log[-5:]) / 5
+                print(f"[Validating][Episode {episode}/{episodes}] Avg reward: {recent_avg:.2f} | Epsilon: {self.epsilon:.3f}")
+
+        self.epsilon = original_epsilon  # return to training exploring rate
+
+        avg_reward = sum(reward_log) / len(reward_log)
+        print(f"\n[Validation Done] Avg Reward: {avg_reward:.2f} | Model: {os.path.basename(model_path)}")
+        
+    def save_model(self, avg_reward, base_dir='models'):
+        """
+        Saving the trained parameter to a .h file starts with 'model' and ends with average reward value.
+
+        Args:
+            avg_reward (_type_): average reward in training section
+            base_dir (str, optional): _description_. Defaults to 'models'.
+
+        Returns:
+            _type_: _description_
+        """
+        os.makedirs(base_dir, exist_ok=True)
+
+        existing = [f for f in os.listdir(base_dir) if f.startswith("model_") and f.endswith(".keras")]
+
+        index = len(existing)
+        file_name = f"model_{index}_reward{avg_reward:.2f}.keras"
+        full_path = os.path.join(base_dir, file_name)
+
+        while os.path.exists(full_path):
+            index += 1
+            file_name = f"model_{index}_reward{avg_reward:.2f}.keras"
+            full_path = os.path.join(base_dir, file_name)
+
+        self.q_network.save(full_path)
+        print(f"Model saved: {file_name} in {full_path}")
+        
+        return full_path
+    
+    # def log_training_step(self, loss, td_errors, q_pred):
+    #     with self.summary_writer.as_default():
+    #         tf.summary.scalar("loss", loss, step=self.train_step)
+    #         tf.summary.scalar("td_error_mean", tf.reduce_mean(tf.abs(td_errors)), step=self.train_step)
+    #         tf.summary.scalar("td_error_max", tf.reduce_max(tf.abs(td_errors)), step=self.train_step)
+    #         tf.summary.scalar("q_value_mean", tf.reduce_mean(q_pred), step=self.train_step)
+    #     self.train_step += 1
