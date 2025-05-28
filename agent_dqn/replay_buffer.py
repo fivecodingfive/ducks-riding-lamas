@@ -38,12 +38,15 @@ class ReplayBuffer:
         return int(self.size.numpy())
 
 class PrioritizedReplayBuffer:
-    def __init__(self, capacity, state_shape, alpha=0.6, epsilon=1e-5):
+    def __init__(self, capacity, state_shape, alpha=0.6, beta=0.4, epsilon=1e-5):
         self.capacity = capacity
         self.alpha = alpha
+        self.beta = beta
+        self.beta0 = beta
         self.epsilon = epsilon
         self.pos = 0
         self.size = 0
+        self.steps = 0
 
         self.states = tf.Variable(tf.zeros([capacity, *state_shape], dtype=tf.float32), trainable=False)
         self.actions = tf.Variable(tf.zeros([capacity], dtype=tf.int32), trainable=False)
@@ -64,8 +67,12 @@ class PrioritizedReplayBuffer:
 
         self.pos = (self.pos + 1) % self.capacity
         self.size = min(self.size + 1, self.capacity)
+        self.steps += 1
+        
+        total_steps = 800000 #80000 steps for 400 episodes
+        self.beta = min(self.beta + (1 - self.beta0)*(self.steps/total_steps), 1)
 
-    def sample(self, batch_size, beta=0.4):
+    def sample(self, batch_size):
         valid_priorities = self.priorities[:self.size]
         probs = tf.pow(valid_priorities + self.epsilon, self.alpha)
         probs /= tf.reduce_sum(probs)
@@ -76,7 +83,7 @@ class PrioritizedReplayBuffer:
 
         sampled_probs = tf.gather(probs, indices)
         total = tf.cast(self.size, tf.float32)
-        weights = tf.pow(total * sampled_probs, -beta)
+        weights = tf.pow(total * sampled_probs, -self.beta)
         weights /= tf.reduce_max(weights)
 
         return (

@@ -34,7 +34,7 @@ class GridVisualizer:
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
         self.step += 1
-        plt.pause(0.2)
+        plt.pause(0.1)
 
     def close(self):
         plt.ioff()

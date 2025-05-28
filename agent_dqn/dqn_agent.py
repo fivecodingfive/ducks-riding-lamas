@@ -9,12 +9,13 @@ from .visualizer import GridVisualizer
 
 STATE_DIM = (5,)
 # STATE_DIM = (5,5,2)
+PLOT_INTERVAL = 200
 
 class DQNAgent:
     def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001,
                  gamma=0.99, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.995,
                  buffer_size=10000, batch_size=64,
-                 prioritized_replay=False, alpha=0.6, beta=0.4):
+                 prioritized_replay=True, alpha=0.6, beta=0.4):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.gamma = gamma
@@ -22,32 +23,31 @@ class DQNAgent:
         self.epsilon_min = epsilon_min
         self.epsilon_decay = epsilon_decay
         self.batch_size = batch_size
+        self.buffer_size = buffer_size
+        self.learning_rate = learning_rate
         
         ## Q-network
         self.q_network = build_q_network(*state_dim, action_dim)
         self.target_network = build_q_network(*state_dim, action_dim)
-        # self.q_network = build_cnn_q_network(state_dim, action_dim)
-        # self.target_network = build_cnn_q_network(state_dim, action_dim)
         self.optimizer = tf.keras.optimizers.Adam(learning_rate)
         # self.loss_fn = tf.keras.losses.MeanSquaredError()
         
         ## ReplayBuffer
         if prioritized_replay:
             print("Using prioritized replay buffer...")
-            self.replay_buffer = PrioritizedReplayBuffer(capacity=buffer_size, state_shape=state_dim, alpha=alpha)
+            self.replay_buffer = PrioritizedReplayBuffer(capacity=buffer_size, state_shape=state_dim, alpha=alpha, beta=beta)
             self.use_per = True
             self.beta = beta
         else:
             self.replay_buffer = ReplayBuffer(capacity=buffer_size, state_shape=state_dim)
             self.use_per = False
         
-        ## Logger
-        # log_dir = "logs/dqn/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-        # self.summary_writer = tf.summary.create_file_writer(log_dir)
-        # self.train_step = 0
         self.q_log = {
             'avg_q': [],
             'max_q': []
+        }
+        self.loss_log = {
+            'loss':[]
         }
         
         self.update_target_network()
@@ -78,8 +78,13 @@ class DQNAgent:
     )
     
     def train_iterate(self, states, actions, rewards, next_states, dones, indices, weights) -> None:
-        next_q = self.target_network(next_states)
-        targets = rewards + (1 - dones) * self.gamma * tf.reduce_max(next_q, axis=1)
+        next_action = tf.argmax(self.q_network(next_states), axis=1)
+        next_action = tf.cast(next_action, tf.int32)     # make dtypes match
+        
+        batch_idx   = tf.range(tf.shape(next_states)[0], dtype=tf.int32)
+        idx_pairs   = tf.stack([batch_idx, next_action], axis=1)
+        next_q_target  = tf.gather_nd(self.target_network(next_states), idx_pairs)
+        targets = rewards + (1-dones) * self.gamma * next_q_target
 
         with tf.GradientTape() as tape:
             q_values = self.q_network(states)
@@ -89,6 +94,8 @@ class DQNAgent:
             q_max = tf.reduce_max(q_values)
 
             td_errors = targets - q_pred
+            clip_val = 25
+            td_errors = tf.clip_by_value(td_errors, clip_value_min=-clip_val, clip_value_max=clip_val)
             loss = tf.reduce_mean(weights * tf.square(td_errors))
 
         grads = tape.gradient(loss, self.q_network.trainable_variables)
@@ -97,9 +104,9 @@ class DQNAgent:
         # Update priority
         if self.use_per:
             self.replay_buffer.update_priorities(indices, td_errors)
-        return q_mean, q_max
+        return q_mean, q_max, loss
     
-    def train(self, env, episodes=int, mode=str, target_update_freq=int, log_file=None) -> None:
+    def train(self, env, episodes=int, mode=str, target_update_freq=int) -> None:
         """
         Training process of the DQN agent and produce the log file of the training reward log if file path is given.
 
@@ -110,36 +117,52 @@ class DQNAgent:
             log_file (str, optional): path to log file. 
         """
         reward_log = []
+        # step = 0
+        # total_steps = episodes*200
+        
 
         for episode in range(1, episodes + 1):
             obs = env.reset(mode=mode)
             state = obs.numpy() if hasattr(obs, "numpy") else obs
             total_reward = 0
             done = False
-            visualizer = GridVisualizer() if episode % 50==49 else None
+            visualizer = GridVisualizer() if episode % PLOT_INTERVAL==(PLOT_INTERVAL-1) else None
             
             while not done:
                 action = self.act(state)
                 reward, next_obs, done = env.step(action)
                 next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
                 self.remember(state, action, reward, next_state, done)
+                
                 state = next_state
                 total_reward += reward
                 
                 # Sampling from replay buffer
                 if self.use_per:
-                    states, actions, rewards, next_states, dones, indices, weights = self.replay_buffer.sample(self.batch_size, beta=self.beta)
+                    states, actions, rewards, next_states, dones, indices, weights = self.replay_buffer.sample(self.batch_size)
                 else:
                     states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
                     weights = tf.ones(self.batch_size, dtype=tf.float32)
                     indices = tf.ones(self.batch_size, dtype=tf.int32)
                 
                 if len(self.replay_buffer) >= self.batch_size:
-                    q_mean, q_max = self.train_iterate(states, actions, rewards, next_states, dones, indices, weights)
+                    q_mean, q_max, loss = self.train_iterate(states, actions, rewards, next_states, dones, indices, weights)
+                    # Soft update in target network
+                    # tau = 0.005
+                    # for w, w_t in zip(self.q_network.weights, self.target_network.weights):
+                    #     w_t.assign((1 - tau) * w_t + tau * w)
+                        
                     self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
+                    
+                    ## Decaying learning rate
+                    # progress = step / total_steps
+                    # new_lr = self.learning_rate * (1 - progress) + 1e-5 * progress
+                    # self.optimizer.learning_rate.assign(new_lr)
+                    # step += 1
                     
                     self.q_log['avg_q'].append(q_mean.numpy())
                     self.q_log['max_q'].append(q_max.numpy())
+                    self.loss_log['loss'].append(loss.numpy())
                 
                 # Visualizer update
                 if visualizer is not None:
@@ -158,24 +181,24 @@ class DQNAgent:
                 print(f"[Training][Episode {episode}/{episodes}] Avg reward: {recent_avg:.2f} | Epsilon: {self.epsilon:.3f}")
                 
         overall_avg = sum(reward_log) / len(reward_log)
+        last_avg = sum(reward_log[-50:]) / 50
         print(f"\n[Training Done] Overall Avg Reward: {overall_avg:.2f}")
         plt.plot(self.q_log['avg_q'], label="Avg Q-value")
         plt.plot(self.q_log['max_q'], label="Max Q-value", alpha=0.6)
         plt.xlabel("Training steps")
         plt.ylabel("Q-value")
-        plt.title("Q-value Convergence")
+        plt.title(f"Q-value Convergence \n Last 50 Avg Reward={last_avg:.2f}")
         plt.legend()
         plt.grid(True)
         plt.show()
         
-        # if log_file:
-        #     import pandas as pd
-        #     df = pd.DataFrame({
-        #         'episode': list(range(1, episodes + 1)),
-        #         'reward': reward_log
-        #     })
-        #     df.to_csv(log_file, index=False)
-        #     print(f"[Log] Reward log saved to {log_file}")
+        plt.plot(self.loss_log['loss'], label="Weighted Loss")
+        plt.xlabel("Training steps")
+        plt.ylabel("Loss")
+        plt.title(f"Loss")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
         
         return self.save_model(overall_avg)
     
@@ -214,7 +237,7 @@ class DQNAgent:
             total_reward = 0
             
             # Visualizer
-            visualizer = GridVisualizer() if episode % 50==49 else None
+            visualizer = GridVisualizer() if episode%PLOT_INTERVAL==(PLOT_INTERVAL-1) else None
             
             while not done:
                 action = self.act(state)
@@ -236,8 +259,8 @@ class DQNAgent:
             if episode % 5 == 0:
                 recent_avg = sum(reward_log[-5:]) / 5
                 print(f"[Validating][Episode {episode}/{episodes}] Avg reward: {recent_avg:.2f}")
-
-        self.epsilon = original_epsilon  # return to training exploring rate
+                
+        self.epsilon = original_epsilon
 
         avg_reward = sum(reward_log) / len(reward_log)
         print(f"\n[Validation Done] Avg Reward: {avg_reward:.2f} | Model: {os.path.basename(model_path)}")
@@ -270,11 +293,3 @@ class DQNAgent:
         print(f"Model saved: {file_name} in {full_path}")
         
         return full_path
-    
-    # def log_training_step(self, loss, td_errors, q_pred):
-    #     with self.summary_writer.as_default():
-    #         tf.summary.scalar("loss", loss, step=self.train_step)
-    #         tf.summary.scalar("td_error_mean", tf.reduce_mean(tf.abs(td_errors)), step=self.train_step)
-    #         tf.summary.scalar("td_error_max", tf.reduce_max(tf.abs(td_errors)), step=self.train_step)
-    #         tf.summary.scalar("q_value_mean", tf.reduce_mean(q_pred), step=self.train_step)
-    #     self.train_step += 1
