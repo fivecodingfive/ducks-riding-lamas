@@ -1,27 +1,5 @@
 # TODO: parse arguments
-import argparse
-
-parser = argparse.ArgumentParser(description="Train Tabular Q-learning Agent on GridWorld")
-
-parser.add_argument('--variant', type=int, default=0, choices=[0, 1, 2],
-                    help="Environment variant: 0 (base), 1 (extension 1), 2 (extension 2)")
-
-parser.add_argument('--data_dir', type=str, default='./data',
-                    help="Path to the data directory (e.g., ./data)")
-
-parser.add_argument('--episodes', type=int, default=200,
-                    help="Number of training episodes")
-
-parser.add_argument('--seed', type=int, default=42,
-                    help="Random seed for reproducibility")
-
-parser.add_argument('--mode', type=str, default='training', choices=['training', 'validation', 'testing'],
-                    help="Run mode for environment")
-
-parser.add_argument('--modelpath', type=str,
-                    help="Path to model parameters")
-
-args = parser.parse_args()
+from config import args
 
 # set seed
 seed = args.seed # TODO: set seed to allow for reproducibility of results
@@ -42,12 +20,14 @@ tf.random.set_seed(seed)
 # initialize environment
 from environment import Environment
 
+NETWORK_TYPE = args.network
 data_dir = './data'         # specify relative path to data directory (e.g., './data', not './data/variant_0')
 variant = args.variant      # specify problem variant (0 for base variant, 1 for first extension, 2 for second extension)
 episodes = args.episodes    # specify episodes
 mode = args.mode            # specify mode of agent with different dataset (training, validation, test)
 model_path = args.modelpath # specify path to model parameters in ../models folder
 env = Environment(variant=variant, data_dir=data_dir)
+
 
 
 # TODO: execute training
