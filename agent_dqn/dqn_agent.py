@@ -2,20 +2,29 @@ import os
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from .model import build_q_network, build_cnn_q_network
-from .replay_buffer import ReplayBuffer, PrioritizedReplayBuffer
+from .model import build_cnn_network, build_mlp_network, build_combine_network
+from .model import InputSplitter  # 👈 needed to deserialize the model
 from .visualizer import GridVisualizer
+from .replay_buffer import ReplayBuffer, PrioritizedReplayBuffer
+from datetime import datetime
+from config import args
 
+if args.network == 'cnn':
+    STATE_DIM = 100
+elif args.network == 'mlp':
+    STATE_DIM = 10
+elif args.network == 'combine':
+    STATE_DIM = 108
 
-STATE_DIM = (5,)
-# STATE_DIM = (5,5,2)
-PLOT_INTERVAL = 200
+PLOT_INTERVAL = 100
 
 class DQNAgent:
     def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001,
                  gamma=0.99, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.995,
                  buffer_size=10000, batch_size=64,
-                 prioritized_replay=True, alpha=0.6, beta=0.4):
+                 prioritized_replay=True, alpha=0.6, beta=0.4,
+                 network_type=args.network):
+        ## Check the state_dim in get_obs
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.gamma = gamma
@@ -25,23 +34,38 @@ class DQNAgent:
         self.batch_size = batch_size
         self.buffer_size = buffer_size
         self.learning_rate = learning_rate
-        
+
         ## Q-network
-        self.q_network = build_q_network(*state_dim, action_dim)
-        self.target_network = build_q_network(*state_dim, action_dim)
+        if  network_type == 'cnn':
+            print("Using CNN ...")
+            self.q_network = build_cnn_network(self.state_dim, action_dim)
+            self.target_network = build_cnn_network(self.state_dim, action_dim)
+        elif network_type == 'mlp':
+            print("Using MLP...")
+            self.q_network = build_mlp_network(self.state_dim, action_dim)
+            self.target_network = build_mlp_network(self.state_dim, action_dim)
+        elif network_type == 'combine':
+            print("Using COMBINATION...")
+            self.q_network = build_combine_network(self.state_dim, action_dim)
+            self.target_network = build_combine_network(self.state_dim, action_dim)
+        
         self.optimizer = tf.keras.optimizers.Adam(learning_rate)
-        # self.loss_fn = tf.keras.losses.MeanSquaredError()
+        self.loss_fn = tf.keras.losses.MeanSquaredError()
         
         ## ReplayBuffer
         if prioritized_replay:
             print("Using prioritized replay buffer...")
-            self.replay_buffer = PrioritizedReplayBuffer(capacity=buffer_size, state_shape=state_dim, alpha=alpha, beta=beta)
+            self.replay_buffer = PrioritizedReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,), alpha=alpha)
             self.use_per = True
             self.beta = beta
         else:
-            self.replay_buffer = ReplayBuffer(capacity=buffer_size, state_shape=state_dim)
+            self.replay_buffer = ReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,))
             self.use_per = False
         
+        ## Logger
+        # log_dir = "logs/dqn/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+        # self.summary_writer = tf.summary.create_file_writer(log_dir)
+        # self.train_step = 0
         self.q_log = {
             'avg_q': [],
             'max_q': []
@@ -66,10 +90,10 @@ class DQNAgent:
 
     @tf.function(
         input_signature=[
-            tf.TensorSpec(shape=[None, *STATE_DIM], dtype=tf.float32),
+            tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
             tf.TensorSpec(shape=[None], dtype=tf.int32),
             tf.TensorSpec(shape=[None], dtype=tf.float32),
-            tf.TensorSpec(shape=[None, *STATE_DIM], dtype=tf.float32),
+            tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
             tf.TensorSpec(shape=[None], dtype=tf.float32),
             tf.TensorSpec(shape=[None], dtype=tf.int32),
             tf.TensorSpec(shape=[None], dtype=tf.float32)
@@ -293,3 +317,11 @@ class DQNAgent:
         print(f"Model saved: {file_name} in {full_path}")
         
         return full_path
+    
+    # def log_training_step(self, loss, td_errors, q_pred):
+    #     with self.summary_writer.as_default():
+    #         tf.summary.scalar("loss", loss, step=self.train_step)
+    #         tf.summary.scalar("td_error_mean", tf.reduce_mean(tf.abs(td_errors)), step=self.train_step)
+    #         tf.summary.scalar("td_error_max", tf.reduce_max(tf.abs(td_errors)), step=self.train_step)
+    #         tf.summary.scalar("q_value_mean", tf.reduce_mean(q_pred), step=self.train_step)
+    #     self.train_step += 1
