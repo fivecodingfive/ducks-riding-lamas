@@ -246,7 +246,7 @@ class DQNAgent:
         # load model
         print(f"Loading model from: {model_path}")
         self.q_network = tf.keras.models.load_model(model_path)
-        self.update_target_network()
+        #self.update_target_network()
         original_epsilon = self.epsilon
         self.epsilon = 0.0  # no exploring when validating model
 
