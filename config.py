@@ -23,4 +23,7 @@ parser.add_argument('--modelpath', type=str,
 parser.add_argument('--network', type=str, default='combine', choices=['mlp', 'cnn', 'combine'],
                     help="Type of neural network to use")
 
+parser.add_argument('--algorithm', type=str, default='dqn', choices=['dqn', 'ppo', 'a2c'],
+                    help="Which RL algorithm to use (default: dqn)")                    
+
 args = parser.parse_args()
