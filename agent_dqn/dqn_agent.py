@@ -23,6 +23,10 @@ class DQNAgent:
                  prioritized_replay=True, alpha=0.6, beta=0.4,
                  network_type=args.network):
         ## Check the state_dim in get_obs
+        self.learning_rate = learning_rate
+        self.alpha = alpha         # if used in PER
+        self.beta = beta           # already stored
+        self.buffer_size = buffer_size  # for logging
         self.state_dim = STATE_DIM
         self.action_dim = action_dim
         self.gamma = gamma
