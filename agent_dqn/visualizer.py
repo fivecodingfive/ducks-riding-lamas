@@ -1,4 +1,6 @@
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Qt5Agg')  
+import matplotlib.pyplot as plt 
 import numpy as np
 
 class GridVisualizer:
