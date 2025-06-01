@@ -8,6 +8,7 @@ from .visualizer import GridVisualizer
 from .replay_buffer import ReplayBuffer, PrioritizedReplayBuffer
 from datetime import datetime
 from config import args
+import wandb 
 
 if args.network == 'cnn':
     STATE_DIM = 100
@@ -37,6 +38,7 @@ class DQNAgent:
         self.alpha = alpha
         self.beta = beta
         self.network_type = network_type
+        self.global_step = 0
 
         ## Q-network
         if  network_type == 'cnn':
@@ -131,6 +133,8 @@ class DQNAgent:
         # Update priority
         if self.use_per:
             self.replay_buffer.update_priorities(indices, td_errors)
+        
+        
         return q_mean, q_max, loss
     
     def train(self, env, episodes=int, mode=str, target_update_freq=int) -> None:
@@ -163,6 +167,8 @@ class DQNAgent:
                 
                 state = next_state
                 total_reward += reward
+
+                self.global_step += 1
                 
                 # Sampling from replay buffer
                 if self.use_per:
@@ -187,10 +193,28 @@ class DQNAgent:
                     # self.optimizer.learning_rate.assign(new_lr)
                     # step += 1
                     
-                    self.q_log['avg_q'].append(q_mean.numpy())
-                    self.q_log['max_q'].append(q_max.numpy())
-                    self.loss_log['loss'].append(loss.numpy())
+                    avg_q = q_mean.numpy()
+                    max_q = q_max.numpy()
+                    loss_val = loss.numpy()
+
+                    self.q_log['avg_q'].append(avg_q)
+                    self.q_log['max_q'].append(max_q)
+                    self.loss_log['loss'].append(loss_val)
+
+
+                    if wandb.run:
+                        wandb.log(
+                        {
+                            "train/avg_q":   avg_q,       # ✅ Python float
+                            "train/max_q":   max_q,       # ✅ Python float
+                            "train/loss":    loss_val,    # ✅ Python float
+                            "train/epsilon": self.epsilon,
+                        },
+                        step=self.global_step,
+                        commit=False
+                        )
                 
+
                 # Visualizer update
                 if visualizer is not None:
                     agent, target, items = env.get_loc()
@@ -198,6 +222,15 @@ class DQNAgent:
                 
             if visualizer is not None:    
                 visualizer.close()
+
+            if wandb.run:
+                wandb.log(
+                {
+                    "episode/reward": total_reward,
+                    "episode":        episode,
+                },
+                step=self.global_step   # keeps charts aligned
+            )    
                 
             reward_log.append(total_reward)
 
@@ -210,6 +243,8 @@ class DQNAgent:
         overall_avg = sum(reward_log) / len(reward_log)
         last_avg = sum(reward_log[-50:]) / 50
         print(f"\n[Training Done] Overall Avg Reward: {overall_avg:.2f}")
+        
+        
         plt.plot(self.q_log['avg_q'], label="Avg Q-value")
         plt.plot(self.q_log['max_q'], label="Max Q-value", alpha=0.6)
         plt.xlabel("Training steps")
@@ -226,6 +261,7 @@ class DQNAgent:
         plt.legend()
         plt.grid(True)
         plt.show()
+
         
         return self.save_model(overall_avg)
     
