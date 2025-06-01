@@ -11,7 +11,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=8G
 #SBATCH --time=02:00:00
-#SBATCH --array=0 #-11                          # Run 12 sweep variants (adjust as needed)
+#SBATCH --array=0-11                          # Run 12 sweep variants (adjust as needed)
 
 # Load environment
 module load slurm_setup
@@ -29,5 +29,5 @@ echo ">>> Starting sweep run with SLURM_ARRAY_TASK_ID=$SLURM_ARRAY_TASK_ID"
 python -u main.py \
     --mode training \
     --variant 0 \
-    --episodes 10 #400 \
+    --episodes 400 \
     --sweep_id $SLURM_ARRAY_TASK_ID
