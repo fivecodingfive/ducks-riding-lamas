@@ -17,7 +17,7 @@ import tensorflow as tf
 tf.random.set_seed(seed)
 
 print(">>> [Checkpoint] Script started", flush=True)
-print(f"Args: variant={variant}, episodes={episodes}, mode={mode}, network={NETWORK_TYPE}", flush=True)
+
 
 
 import wandb
@@ -33,7 +33,8 @@ variant = args.variant      # specify problem variant (0 for base variant, 1 for
 episodes = args.episodes    # specify episodes
 mode = args.mode            # specify mode of agent with different dataset (training, validation, test)
 model_path = args.modelpath # specify path to model parameters in ../models folder
-env = Environment(variant=variant, data_dir=data_dir)
+
+print(f"Args: variant={variant}, episodes={episodes}, mode={mode}, network={NETWORK_TYPE}", flush=True)
 
 print(">>> [Checkpoint] Creating environment", flush=True)
 env = Environment(variant=variant, data_dir=data_dir)
