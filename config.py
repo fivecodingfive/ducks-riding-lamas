@@ -26,4 +26,7 @@ parser.add_argument('--network', type=str, default='combine', choices=['mlp', 'c
 parser.add_argument('--algorithm', type=str, default='dqn', choices=['dqn', 'ppo', 'a2c'],
                     help="Type of algorithm to use")
 
+parser.add_argument('--sweep_id', type=int, default=None,
+                    help="Optional sweep index from SLURM")                    
+
 args = parser.parse_args()

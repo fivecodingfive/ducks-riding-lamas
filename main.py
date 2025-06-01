@@ -27,7 +27,8 @@ batch_sizes    = [64, 128]         # 2 values
 eps_decays     = [0.995, 0.98, 0.95]  # 3 values
 grid = list(itertools.product(learning_rates, batch_sizes, eps_decays))
 
-task_id = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))   # 0 when you run locally
+task_id = (args.sweep_id if args.sweep_id is not None
+           else int(os.environ.get("SLURM_ARRAY_TASK_ID", 0)))  # 0 when you run locally
 lr, bs, eps_decay = grid[task_id]
 
 print(f">>> [Sweep] lr={lr}, batch={bs}, eps_decay={eps_decay}", flush=True)
