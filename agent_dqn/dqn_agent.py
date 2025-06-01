@@ -34,6 +34,9 @@ class DQNAgent:
         self.batch_size = batch_size
         self.buffer_size = buffer_size
         self.learning_rate = learning_rate
+        self.alpha = alpha
+        self.beta = beta
+        self.network_type = network_type
 
         ## Q-network
         if  network_type == 'cnn':
