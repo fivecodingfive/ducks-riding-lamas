@@ -1,3 +1,4 @@
+import os
 import matplotlib
 
 # Set backend depending on environment
