@@ -101,7 +101,8 @@ wandb.init(
         f"seed{args.seed}"
     ],
     save_code=True,
-    dir=os.getenv("WANDB_DIR", "./wandb"),    # respect WANDB_DIR if set
+    mode="online",
+    dir="./wandb",
     # Change when setting things up for the cluster
 )
 

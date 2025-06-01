@@ -1,7 +1,9 @@
 # TODO: parse arguments
 from config import args
+from config import args
 
 # set seed
+seed = args.seed # TODO: set seed to allow for reproducibility of results
 seed = args.seed # TODO: set seed to allow for reproducibility of results
 
 import os
@@ -101,7 +103,8 @@ wandb.init(
         f"seed{args.seed}"
     ],
     save_code=True,
-    dir=os.getenv("WANDB_DIR", "./wandb"),    # respect WANDB_DIR if set
+    mode="online",
+    dir="./wandb",
     # Change when setting things up for the cluster
 )
 

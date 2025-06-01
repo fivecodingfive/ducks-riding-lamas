@@ -1,7 +1,13 @@
 import os
+
+# decide backend FIRST
+if os.environ.get("MPLBACKEND") == "Agg":
+    import matplotlib
+    matplotlib.use("Agg")        # head-less
+
+import matplotlib.pyplot as plt  # safe to import now
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
 from .model import build_cnn_network, build_mlp_network, build_combine_network
 from .model import InputSplitter  # 👈 needed to deserialize the model
 from .visualizer import GridVisualizer
@@ -252,7 +258,16 @@ class DQNAgent:
         plt.title(f"Q-value Convergence \n Last 50 Avg Reward={last_avg:.2f}")
         plt.legend()
         plt.grid(True)
-        plt.show()
+        plots_dir = os.getenv("PLOTS_DIR", "plots")
+        os.makedirs(plots_dir, exist_ok=True)
+
+        if os.environ.get("MPLBACKEND") == "Agg":
+            # cluster run – save and close
+            plt.savefig(os.path.join(plots_dir, f"qvals_{self.global_step}.png"))
+            plt.close()
+        else:
+            # local run – interactive
+            plt.show()
         
         plt.plot(self.loss_log['loss'], label="Weighted Loss")
         plt.xlabel("Training steps")
@@ -260,7 +275,16 @@ class DQNAgent:
         plt.title(f"Loss")
         plt.legend()
         plt.grid(True)
-        plt.show()
+        plots_dir = os.getenv("PLOTS_DIR", "plots")
+        os.makedirs(plots_dir, exist_ok=True)
+
+        if os.environ.get("MPLBACKEND") == "Agg":
+            # cluster run – save and close
+            plt.savefig(os.path.join(plots_dir, f"loss_{self.global_step}.png"))
+            plt.close()
+        else:
+            # local run – interactive
+            plt.show()
 
         
         return self.save_model(overall_avg)
@@ -300,7 +324,9 @@ class DQNAgent:
             total_reward = 0
             
             # Visualizer
-            visualizer = GridVisualizer() if episode%PLOT_INTERVAL==(PLOT_INTERVAL-1) else None
+            visualizer = None
+            if os.environ.get("MPLBACKEND") != "Agg" and episode % PLOT_INTERVAL == PLOT_INTERVAL - 1:
+                visualizer = GridVisualizer()
             
             while not done:
                 action = self.act(state)

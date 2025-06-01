@@ -1,0 +1,5 @@
+[Training][Episode 5/10] Avg reward: -10.80 | Epsilon: 0.100
+[Training][Episode 10/10] Avg reward: -2.90 | Epsilon: 0.100
+
+[Training Done] Overall Avg Reward: -6.85
+Model saved: model_7_reward-6.85.keras in models\model_7_reward-6.85.keras
