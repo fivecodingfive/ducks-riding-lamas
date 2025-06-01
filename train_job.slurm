@@ -20,7 +20,7 @@ export MPLBACKEND=Agg
 export WANDB_MODE=offline
 export WANDB_DIR=$SCRATCH/wandb
 
-python main.py \
+python -u main.py \
     --mode training \
     --variant 0 \
-    --episodes 200
+    --episodes 5

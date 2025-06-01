@@ -16,10 +16,6 @@ np.random.seed(seed)
 import tensorflow as tf
 tf.random.set_seed(seed)
 
-print(">>> [Checkpoint] Script started", flush=True)
-print(f"Args: variant={variant}, episodes={episodes}, mode={mode}, network={NETWORK_TYPE}", flush=True)
-
-
 import wandb
 from datetime import datetime
 
@@ -35,17 +31,11 @@ mode = args.mode            # specify mode of agent with different dataset (trai
 model_path = args.modelpath # specify path to model parameters in ../models folder
 env = Environment(variant=variant, data_dir=data_dir)
 
-print(">>> [Checkpoint] Creating environment", flush=True)
-env = Environment(variant=variant, data_dir=data_dir)
-print(">>> [Checkpoint] Environment created", flush=True)
-
 
 target_update_freq = 5  # Or read from args/config later if you wish
 
 from agent_dqn.dqn_agent import DQNAgent
-print(">>> [Checkpoint] Creating agent", flush=True)
 dqn_agent = DQNAgent()
-print(">>> [Checkpoint] Agent created", flush=True)
 
 
 
@@ -96,33 +86,29 @@ organized_config = {
     }
 }
 
-print(">>> [Checkpoint] Initializing W&B", flush=True)
-
-try:
-    wandb.init(
-        entity="ducks-riding-llamas", 
-        project="ride-those-llamas",
-        name=f"{args.algorithm}_variant{args.variant}_{datetime.now():%B}{datetime.now().day}",
-        group=f"variant{str(args.variant)}_algorithm{str(args.algorithm)}",
-        config=organized_config,
-        tags=[
-            f"variant{args.variant}", 
-            f"network{args.network}",
-            "replay buffer: prioritized" if dqn_agent.use_per else "replay buffer: uniform",
-            "cuda" if tf.config.list_physical_devices('GPU') else "cpu",
-            f"seed{args.seed}"
-        ],
-        save_code=True,
-        dir=os.getenv("WANDB_DIR", "./wandb")
-    )
-except Exception as e:
-    print(f"[W&B ERROR] Could not initialize W&B: {e}", flush=True)
-    os.environ["WANDB_MODE"] = "disabled"
+wandb.init(
+    entity="ducks-riding-llamas", 
+    project="ride-those-llamas",
+    name = f"{args.algorithm}_variant{args.variant}_{datetime.now():%B}{datetime.now().day}",
+    group = f"variant{str(args.variant)}_algorithm{str(args.algorithm)}",
+    config=organized_config,
+    tags=
+    [
+        f"variant{args.variant}", 
+        f"network{args.network}",
+        "replay buffer: prioritized" if dqn_agent.use_per else "replay buffer: uniform",
+        "cuda" if tf.config.list_physical_devices('GPU') else "cpu",
+        f"seed{args.seed}"
+    ],
+    save_code=True,
+    dir=os.getenv("WANDB_DIR", "./wandb"),    # respect WANDB_DIR if set
+    # Change when setting things up for the cluster
+)
 
 
 
 
-print(">>> [Checkpoint] Entering mode switch", flush=True)
+
 
 match mode:
     case 'training':
