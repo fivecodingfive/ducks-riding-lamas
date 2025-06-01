@@ -31,3 +31,5 @@ python -u main.py \
     --variant 0 \
     --episodes 400 \
     --sweep_id $SLURM_ARRAY_TASK_ID
+
+# Just a test
