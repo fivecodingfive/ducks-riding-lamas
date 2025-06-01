@@ -1,9 +1,7 @@
 # TODO: parse arguments
 from config import args
-from config import args
 
 # set seed
-seed = args.seed # TODO: set seed to allow for reproducibility of results
 seed = args.seed # TODO: set seed to allow for reproducibility of results
 
 import os

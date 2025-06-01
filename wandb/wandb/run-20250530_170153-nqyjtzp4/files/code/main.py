@@ -1,9 +1,7 @@
 # TODO: parse arguments
 from config import args
-from config import args
 
 # set seed
-seed = args.seed # TODO: set seed to allow for reproducibility of results
 seed = args.seed # TODO: set seed to allow for reproducibility of results
 
 import os
@@ -91,14 +89,15 @@ organized_config = {
 wandb.init(
     entity="ducks-riding-llamas", 
     project="ride-those-llamas",
-    name = f"{args.algorithm}_variant{args.variant}_{datetime.now():%B}{datetime.now().day}",
-    group = f"variant{str(args.variant)}_algorithm{str(args.algorithm)}",
+    name=f"{args.network}_variant{args.variant}_{datetime.now():%Y%m%d-%H%M%S}",
+    group = f"variant{args.variant}_{args.algorithm}",
     config=organized_config,
     tags=
     [
+        str(args.variant), 
         f"variant{args.variant}", 
-        f"network{args.network}",
-        "replay buffer: prioritized" if dqn_agent.use_per else "replay buffer: uniform",
+        args.network,
+        "prioritized RB" if dqn_agent.use_per else "uniform RB",
         "cuda" if tf.config.list_physical_devices('GPU') else "cpu",
         f"seed{args.seed}"
     ],

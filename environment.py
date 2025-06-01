@@ -15,7 +15,14 @@ from itertools import compress
 import numpy as np
 import tensorflow as tf
 from config import args
+import numpy as np
+import tensorflow as tf
+from config import args
 
+_df = pd.read_csv("item_spawn_counts.csv", index_col=0)
+_counts = _df.to_numpy(dtype=np.float32)
+spawn_distribution = _counts / _counts.sum()
+network_type = args.network
 _df = pd.read_csv("item_spawn_counts.csv", index_col=0)
 _counts = _df.to_numpy(dtype=np.float32)
 spawn_distribution = _counts / _counts.sum()
@@ -33,6 +40,7 @@ class Environment(object):
         self.max_response_time = 15 if self.variant == 2 else 10
         self.reward = 25 if self.variant == 2 else 15
         self.data_dir = data_dir
+        self.state_dim = 0
         self.state_dim = 0
 
         self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
@@ -153,6 +161,13 @@ class Environment(object):
 
     # TODO: implement function that gives the input features for the neural network(s)
     #       based on the current state of the environment
+
+    def distance(self, loc):
+        # distance from agent to target
+        dist = abs(self.agent_loc[0] - loc[0]) + abs(self.agent_loc[1] - loc[1])
+        return dist
+
+
 
     def distance(self, loc):
         # distance from agent to target
