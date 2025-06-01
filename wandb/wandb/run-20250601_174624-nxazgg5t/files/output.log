@@ -1,0 +1,6 @@
+>>> [Checkpoint] Entering mode switch
+>>> [Agent] Entered train()
+>>> [Agent] Episodes: 3, Mode: training, Update freq: 5
+
+[Training Done] Overall Avg Reward: -26.50
+Model saved: model_9_reward-26.50.keras in models\model_9_reward-26.50.keras

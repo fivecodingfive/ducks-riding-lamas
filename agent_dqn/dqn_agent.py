@@ -144,6 +144,8 @@ class DQNAgent:
         return q_mean, q_max, loss
     
     def train(self, env, episodes=int, mode=str, target_update_freq=int) -> None:
+        print(">>> [Agent] Entered train()", flush=True)
+        print(f">>> [Agent] Episodes: {episodes}, Mode: {mode}, Update freq: {target_update_freq}", flush=True)
         """
         Training process of the DQN agent and produce the log file of the training reward log if file path is given.
 
