@@ -1,6 +1,13 @@
 import matplotlib
-matplotlib.use('Qt5Agg')  
-import matplotlib.pyplot as plt 
+
+# Set backend depending on environment
+if os.environ.get("MPLBACKEND") == "Agg":
+    matplotlib.use("Agg")        # For LRZ / headless
+else:
+    matplotlib.use("Qt5Agg")     # For local interactive use
+
+import matplotlib.pyplot as plt
+
 import numpy as np
 
 class GridVisualizer:
