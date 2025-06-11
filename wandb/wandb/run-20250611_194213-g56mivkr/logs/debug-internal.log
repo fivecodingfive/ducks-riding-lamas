@@ -1,0 +1,16 @@
+{"time":"2025-06-11T19:42:13.4724108+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"wandb\\wandb\\run-20250611_194213-g56mivkr\\logs\\debug-core.log"}
+{"time":"2025-06-11T19:42:13.7917105+02:00","level":"INFO","msg":"created new stream","id":"g56mivkr"}
+{"time":"2025-06-11T19:42:13.7917105+02:00","level":"INFO","msg":"stream: started","id":"g56mivkr"}
+{"time":"2025-06-11T19:42:13.7917105+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"g56mivkr"}
+{"time":"2025-06-11T19:42:13.7922237+02:00","level":"INFO","msg":"sender: started","stream_id":"g56mivkr"}
+{"time":"2025-06-11T19:42:13.7922237+02:00","level":"INFO","msg":"handler: started","stream_id":"g56mivkr"}
+{"time":"2025-06-11T19:42:14.1904752+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-06-11T19:42:14.2006196+02:00","level":"ERROR","msg":"git repo not found","error":"repository does not exist"}
+{"time":"2025-06-11T19:43:26.48302+02:00","level":"INFO","msg":"stream: closing","id":"g56mivkr"}
+{"time":"2025-06-11T19:43:26.48302+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-06-11T19:43:26.48302+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-06-11T19:43:27.1147293+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-06-11T19:43:27.3748132+02:00","level":"INFO","msg":"handler: closed","stream_id":"g56mivkr"}
+{"time":"2025-06-11T19:43:27.3748132+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"g56mivkr"}
+{"time":"2025-06-11T19:43:27.3754067+02:00","level":"INFO","msg":"sender: closed","stream_id":"g56mivkr"}
+{"time":"2025-06-11T19:43:27.383436+02:00","level":"INFO","msg":"stream: closed","id":"g56mivkr"}

@@ -156,8 +156,8 @@ class DQNAgent:
             log_file (str, optional): path to log file. 
         """
         reward_log = []
-        # step = 0
-        # total_steps = episodes*200
+        step = 0
+        total_steps = episodes*200
         
 
         for episode in range(1, episodes + 1):
@@ -189,17 +189,17 @@ class DQNAgent:
                 if len(self.replay_buffer) >= self.batch_size:
                     q_mean, q_max, loss = self.train_iterate(states, actions, rewards, next_states, dones, indices, weights)
                     # Soft update in target network
-                    # tau = 0.005
-                    # for w, w_t in zip(self.q_network.weights, self.target_network.weights):
-                    #     w_t.assign((1 - tau) * w_t + tau * w)
+                    tau = 0.005
+                    for w, w_t in zip(self.q_network.weights, self.target_network.weights):
+                        w_t.assign((1 - tau) * w_t + tau * w)
                         
                     self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
                     
                     ## Decaying learning rate
-                    # progress = step / total_steps
-                    # new_lr = self.learning_rate * (1 - progress) + 1e-5 * progress
-                    # self.optimizer.learning_rate.assign(new_lr)
-                    # step += 1
+                    progress = self.global_step / total_steps
+                    new_lr = self.learning_rate * (1 - progress) + 1e-5 * progress
+                    self.optimizer.learning_rate.assign(new_lr)
+                    step += 1
                     
                     avg_q = q_mean.numpy()
                     max_q = q_max.numpy()
