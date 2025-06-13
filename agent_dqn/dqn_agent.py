@@ -1,18 +1,16 @@
 import os
 
-# decide backend FIRST
-if os.environ.get("MPLBACKEND") == "Agg":
-    import matplotlib
-    matplotlib.use("Agg")        # head-less
+# # decide backend FIRST
+# if os.environ.get("MPLBACKEND") == "Agg":
+#     import matplotlib
+#     matplotlib.use("Agg")        # head-less
 
-import matplotlib.pyplot as plt  # safe to import now
+# import matplotlib.pyplot as plt  # safe to import now
 import numpy as np
 import tensorflow as tf
 from .model import build_cnn_network, build_mlp_network, build_combine_network
-from .model import InputSplitter  # 👈 needed to deserialize the model
 from .visualizer import GridVisualizer
 from .replay_buffer import ReplayBuffer, PrioritizedReplayBuffer
-from datetime import datetime
 from config import args
 import wandb 
 
@@ -31,7 +29,6 @@ class DQNAgent:
                  buffer_size=10000, batch_size=64,
                  prioritized_replay=True, alpha=0.6, beta=0.4,
                  network_type=args.network):
-        ## Check the state_dim in get_obs
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.gamma = gamma
@@ -73,17 +70,13 @@ class DQNAgent:
             self.replay_buffer = ReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,))
             self.use_per = False
         
-        ## Logger
-        # log_dir = "logs/dqn/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-        # self.summary_writer = tf.summary.create_file_writer(log_dir)
-        # self.train_step = 0
-        self.q_log = {
-            'avg_q': [],
-            'max_q': []
-        }
-        self.loss_log = {
-            'loss':[]
-        }
+        # self.q_log = {
+        #     'avg_q': [],
+        #     'max_q': []
+        # }
+        # self.loss_log = {
+        #     'loss':[]
+        # }
         
         self.update_target_network()
 
@@ -205,9 +198,9 @@ class DQNAgent:
                     max_q = q_max.numpy()
                     loss_val = loss.numpy()
 
-                    self.q_log['avg_q'].append(avg_q)
-                    self.q_log['max_q'].append(max_q)
-                    self.loss_log['loss'].append(loss_val)
+                    # self.q_log['avg_q'].append(avg_q)
+                    # self.q_log['max_q'].append(max_q)
+                    # self.loss_log['loss'].append(loss_val)
 
 
                     if wandb.run:
@@ -253,40 +246,40 @@ class DQNAgent:
         print(f"\n[Training Done] Overall Avg Reward: {overall_avg:.2f}")
         
         
-        plt.plot(self.q_log['avg_q'], label="Avg Q-value")
-        plt.plot(self.q_log['max_q'], label="Max Q-value", alpha=0.6)
-        plt.xlabel("Training steps")
-        plt.ylabel("Q-value")
-        plt.title(f"Q-value Convergence \n Last 50 Avg Reward={last_avg:.2f}")
-        plt.legend()
-        plt.grid(True)
-        plots_dir = os.getenv("PLOTS_DIR", "plots")
-        os.makedirs(plots_dir, exist_ok=True)
+        # plt.plot(self.q_log['avg_q'], label="Avg Q-value")
+        # plt.plot(self.q_log['max_q'], label="Max Q-value", alpha=0.6)
+        # plt.xlabel("Training steps")
+        # plt.ylabel("Q-value")
+        # plt.title(f"Q-value Convergence \n Last 50 Avg Reward={last_avg:.2f}")
+        # plt.legend()
+        # plt.grid(True)
+        # plots_dir = os.getenv("PLOTS_DIR", "plots")
+        # os.makedirs(plots_dir, exist_ok=True)
 
-        if os.environ.get("MPLBACKEND") == "Agg":
-            # cluster run – save and close
-            plt.savefig(os.path.join(plots_dir, f"qvals_{self.global_step}.png"))
-            plt.close()
-        else:
-            # local run – interactive
-            plt.show()
+        # if os.environ.get("MPLBACKEND") == "Agg":
+        #     # cluster run – save and close
+        #     plt.savefig(os.path.join(plots_dir, f"qvals_{self.global_step}.png"))
+        #     plt.close()
+        # else:
+        #     # local run – interactive
+        #     plt.show()
         
-        plt.plot(self.loss_log['loss'], label="Weighted Loss")
-        plt.xlabel("Training steps")
-        plt.ylabel("Loss")
-        plt.title(f"Loss")
-        plt.legend()
-        plt.grid(True)
-        plots_dir = os.getenv("PLOTS_DIR", "plots")
-        os.makedirs(plots_dir, exist_ok=True)
+        # plt.plot(self.loss_log['loss'], label="Weighted Loss")
+        # plt.xlabel("Training steps")
+        # plt.ylabel("Loss")
+        # plt.title(f"Loss")
+        # plt.legend()
+        # plt.grid(True)
+        # plots_dir = os.getenv("PLOTS_DIR", "plots")
+        # os.makedirs(plots_dir, exist_ok=True)
 
-        if os.environ.get("MPLBACKEND") == "Agg":
-            # cluster run – save and close
-            plt.savefig(os.path.join(plots_dir, f"loss_{self.global_step}.png"))
-            plt.close()
-        else:
-            # local run – interactive
-            plt.show()
+        # if os.environ.get("MPLBACKEND") == "Agg":
+        #     # cluster run – save and close
+        #     plt.savefig(os.path.join(plots_dir, f"loss_{self.global_step}.png"))
+        #     plt.close()
+        # else:
+        #     # local run – interactive
+        #     plt.show()
 
         
         return self.save_model(overall_avg)
@@ -384,11 +377,3 @@ class DQNAgent:
         print(f"Model saved: {file_name} in {full_path}")
         
         return full_path
-    
-    # def log_training_step(self, loss, td_errors, q_pred):
-    #     with self.summary_writer.as_default():
-    #         tf.summary.scalar("loss", loss, step=self.train_step)
-    #         tf.summary.scalar("td_error_mean", tf.reduce_mean(tf.abs(td_errors)), step=self.train_step)
-    #         tf.summary.scalar("td_error_max", tf.reduce_max(tf.abs(td_errors)), step=self.train_step)
-    #         tf.summary.scalar("q_value_mean", tf.reduce_mean(q_pred), step=self.train_step)
-    #     self.train_step += 1

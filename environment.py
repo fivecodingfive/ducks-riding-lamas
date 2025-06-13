@@ -15,9 +15,6 @@ from itertools import compress
 import numpy as np
 import tensorflow as tf
 from config import args
-import numpy as np
-import tensorflow as tf
-from config import args
 
 _df = pd.read_csv("item_spawn_counts.csv", index_col=0)
 _counts = _df.to_numpy(dtype=np.float32)
