@@ -1,0 +1,25 @@
+>>> [Checkpoint] Entering mode switch
+>>> [Agent] Entered train()
+>>> [Agent] Episodes: 10, Mode: training, Update freq: 5
+[Training][Episode 5/10] Avg reward: -9.50 | Epsilon: 0.100
+[Training][Episode 10/10] Avg reward: 89.70 | Epsilon: 0.100
+
+[Training Done] Overall Avg Reward: 40.10
+Traceback (most recent call last):
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\main.py", line 161, in <module>
+    model_path = dqn_agent.train(
+                 ^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agent_dqn\dqn_agent.py", line 272, in train
+    plt.show()
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\matplotlib\pyplot.py", line 614, in show
+    return _get_backend_mod().show(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\matplotlib\backend_bases.py", line 3548, in show
+    cls.mainloop()
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\matplotlib\backends\backend_qt.py", line 642, in start_main_loop
+    with _allow_interrupt_qt(qapp):
+  File "C:\Users\jonas\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\venv\Lib\site-packages\matplotlib\backend_bases.py", line 1658, in _allow_interrupt
+    old_sigint_handler(*handler_args)
+KeyboardInterrupt
