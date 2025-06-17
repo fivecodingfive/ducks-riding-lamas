@@ -20,7 +20,7 @@ parser.add_argument('--mode', type=str, default='training', choices=['training',
 parser.add_argument('--modelpath', type=str,
                     help="Path to model parameters")
 
-parser.add_argument('--network', type=str, default='combine', choices=['mlp', 'cnn', 'combine'],
+parser.add_argument('--network', type=str, default='mlp', choices=['mlp', 'cnn', 'combine'],
                     help="Type of neural network to use")
 
 parser.add_argument('--algorithm', type=str, default='dqn', choices=['dqn', 'ppo', 'a2c'],

@@ -1,6 +1,6 @@
 
 ppo_config = {
-    "state_size": tbd
+    "state_size": 10,
     "action_size": 5,
 
     "gamma": 0.99,
@@ -11,6 +11,7 @@ ppo_config = {
     "train_value_function_epochs": 40,
     "policy_learning_rate": 0.0003,
     "value_learning_rate": 0.001,
+    "max_time_steps": 100000,
 
     "n_episodes": 200
 }
