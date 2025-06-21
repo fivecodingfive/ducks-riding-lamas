@@ -12,6 +12,5 @@ if __name__ == "__main__":
     env = Environment(variant=variant, data_dir=data_dir)
 
     agent = PPO_Agent(config=ppo_config)
-
     
     reward_log, _ = agent.train_ppo(agent, env)

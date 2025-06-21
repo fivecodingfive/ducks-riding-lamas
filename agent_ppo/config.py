@@ -11,7 +11,7 @@ ppo_config = {
     "train_value_function_epochs": 40,
     "policy_learning_rate": 0.0003,
     "value_learning_rate": 0.001,
-    "max_time_steps": 100000,
+    "max_time_steps": 200,
 
     "n_episodes": 200
 }

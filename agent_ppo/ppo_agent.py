@@ -64,7 +64,6 @@ class PPO_Agent:
     def run_ppo(self, agent, training, env):
         number_episodes = self.no_episodes  # use the one from config
         reward_log = []
-        step_count = 0
         total_steps = number_episodes*200
 
         if training is True:
@@ -74,6 +73,8 @@ class PPO_Agent:
             obs = env.reset(mode=mode)
             state = obs
             total_reward = 0
+            # episodic step count
+            step_count = 0
             done = False
             
             # STEP LOOP
@@ -117,6 +118,7 @@ class PPO_Agent:
             if episode % 5 == 0:
                 avg_reward = np.mean(reward_log[-5:])  # average over the last 5 episodes
                 print(f"[{episode}/{number_episodes}] Average Reward: {avg_reward:.1f}")
+
 
         return reward_log, episode 
             # OLD RETURN: rew[:,:episode+1],episode
@@ -195,10 +197,13 @@ class PPO_Agent:
         # Setup of policy loss function
         with tf.GradientTape() as tape:
             ratio = tf.exp(self.calc_logprobability(self.actor_network(states_buffer), action_buffer) - logprobability_buffer)  # Calculate pi_new/pi_old
-            clip_advantage = tf.where(advantages_buffer > 0, (1 + self.clip_ratio) * advantages_buffer,
-                                     (1 - self.clip_ratio) * advantages_buffer,)  # Apply clipping
-            policy_loss = -tf.reduce_mean(tf.minimum(ratio * advantages_buffer, clip_advantage))  # Setup loss function as mean of individual L_clip and negative sign, as tf minimizes by default
+            #old version: calculates the ratio wrong in some cases says ChatGPT
+            # clip_advantage = tf.where(advantages_buffer > 0, (1 + self.clip_ratio) * advantages_buffer,
+            #                          (1 - self.clip_ratio) * advantages_buffer,)  # Apply clipping
+            # policy_loss = -tf.reduce_mean(tf.minimum(ratio * advantages_buffer, clip_advantage))  # Setup loss function as mean of individual L_clip and negative sign, as tf minimizes by default
 
+            clipped_ratio = tf.clip_by_value(ratio, 1 - self.clip_ratio, 1 + self.clip_ratio)   # Apply clipping
+            policy_loss = -tf.reduce_mean(tf.minimum(ratio * advantages_buffer, clipped_ratio * advantages_buffer))  # Setup loss function as mean of individual L_clip and negative sign, as tf minimizes by default
         # Use gradient based optimizer to optimize loss function and update weights
         policy_grads = tape.gradient(policy_loss, self.actor_network.trainable_variables)
         self.policy_optimizer.apply_gradients(zip(policy_grads, self.actor_network.trainable_variables))
