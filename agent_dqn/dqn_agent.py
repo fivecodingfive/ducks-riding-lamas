@@ -137,8 +137,6 @@ class DQNAgent:
         return q_mean, q_max, loss
     
     def train(self, env, episodes=int, mode=str, target_update_freq=int) -> None:
-        print(">>> [Agent] Entered train()", flush=True)
-        print(f">>> [Agent] Episodes: {episodes}, Mode: {mode}, Update freq: {target_update_freq}", flush=True)
         """
         Training process of the DQN agent and produce the log file of the training reward log if file path is given.
 
@@ -148,11 +146,12 @@ class DQNAgent:
             target_update_freq (int, optional): update frequency of target Q-network.
             log_file (str, optional): path to log file. 
         """
+        print(">>> [DQNAgent] Entered train()", flush=True)
+        print(f">>> [DQNAgent] Episodes: {episodes}, Mode: {mode}, Update freq: {target_update_freq}", flush=True)
         reward_log = []
         step = 0
         total_steps = episodes*200
         
-
         for episode in range(1, episodes + 1):
             obs = env.reset(mode=mode)
             state = obs.numpy() if hasattr(obs, "numpy") else obs
@@ -362,18 +361,18 @@ class DQNAgent:
         """
         os.makedirs(base_dir, exist_ok=True)
 
-        existing = [f for f in os.listdir(base_dir) if f.startswith("model_") and f.endswith(".keras")]
+        existing = [f for f in os.listdir(base_dir) if f.startswith("DQNmodel_") and f.endswith(".keras")]
 
         index = len(existing)
-        file_name = f"model_{index}_reward{avg_reward:.2f}.keras"
+        file_name = f"DQNmodel_{index}_reward{avg_reward:.2f}.keras"
         full_path = os.path.join(base_dir, file_name)
 
         while os.path.exists(full_path):
             index += 1
-            file_name = f"model_{index}_reward{avg_reward:.2f}.keras"
+            file_name = f"DQNmodel_{index}_reward{avg_reward:.2f}.keras"
             full_path = os.path.join(base_dir, file_name)
 
         self.q_network.save(full_path)
-        print(f"Model saved: {file_name} in {full_path}")
+        print(f"DQN Model saved: {file_name} in {full_path}")
         
         return full_path

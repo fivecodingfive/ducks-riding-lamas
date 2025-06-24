@@ -38,16 +38,9 @@ args.learning_rate  = lr
 args.batch_size     = bs
 args.epsilon_decay  = eps_decay
 
-
-
-
-
 import wandb
 from datetime import datetime
-
-
-# initialize environment
-from environment import Environment
+from environment import Environment, TrainEnvironment
 
 NETWORK_TYPE = args.network
 data_dir = './data'         # specify relative path to data directory (e.g., './data', not './data/variant_0')
@@ -55,23 +48,92 @@ variant = args.variant      # specify problem variant (0 for base variant, 1 for
 episodes = args.episodes    # specify episodes
 mode = args.mode            # specify mode of agent with different dataset (training, validation, test)
 model_path = args.modelpath # specify path to model parameters in ../models folder
+agent = args.algorithm
 
 print(f"Args: variant={variant}, episodes={episodes}, mode={mode}, network={NETWORK_TYPE}", flush=True)
 
-print(">>> [Checkpoint] Creating environment", flush=True)
-env = Environment(variant=variant, data_dir=data_dir)
-print(">>> [Checkpoint] Environment created", flush=True)
-
-
-target_update_freq = 5  # Or read from args/config later if you wish
-
 from agent_dqn.dqn_agent import DQNAgent
+from agent_sac.sac_agent import SACAgent
+target_update_freq = 5
 print(">>> [Checkpoint] Creating agent", flush=True)
-dqn_agent = DQNAgent(
-    learning_rate=args.learning_rate,
-    batch_size=args.batch_size,
-    epsilon_decay=args.epsilon_decay,
-)
+match agent:
+    case "dqn":
+        agent = DQNAgent(
+            learning_rate=args.learning_rate,
+            batch_size=args.batch_size,
+            epsilon_decay=args.epsilon_decay,
+        )
+        config = vars(args)
+        config.update({
+            "learning_rate": agent.learning_rate,
+            "gamma": agent.gamma,
+            "batch_size": agent.batch_size,
+            "buffer_size": agent.buffer_size,
+            "epsilon_start": agent.epsilon,
+            "epsilon_min": agent.epsilon_min,
+            "epsilon_decay": agent.epsilon_decay,
+            "target_update_freq": target_update_freq,
+            "prioritized_replay": agent.use_per,
+            "network_type": type(agent.q_network).__name__,
+            "device": "gpu" if tf.config.list_physical_devices('GPU') else "cpu",
+        })
+
+        # -------- nest for nicer UI --------
+        organized_config = {
+            "environment": {
+                "variant": config["variant"],
+                "data_dir": config["data_dir"],
+                "mode": config["mode"],
+            },
+            "model": {
+                "network": config["network"],
+                "network_type": config["network_type"],
+                "target_update_freq": config["target_update_freq"],
+                "prioritized_replay": config["prioritized_replay"],
+                "device": config["device"],
+            },
+            "training": {
+                "episodes": config["episodes"],
+                "seed": config["seed"],
+                "learning_rate": config["learning_rate"],
+                "gamma": config["gamma"],
+                "batch_size": config["batch_size"],
+                "buffer_size": config["buffer_size"],
+                "epsilon_start": config["epsilon_start"],
+                "epsilon_min": config["epsilon_min"],
+                "epsilon_decay": config["epsilon_decay"],
+            }
+        }
+
+    case "sac":
+        agent = SACAgent(
+            learning_rate=args.learning_rate,
+        )
+        config = vars(args)
+        config.update({
+            "learning_rate": agent.learning_rate,
+            "gamma": agent.gamma,
+            "device": "gpu" if tf.config.list_physical_devices('GPU') else "cpu",
+        })
+
+        # -------- nest for nicer UI --------
+        organized_config = {
+            "environment": {
+                "variant": config["variant"],
+                "data_dir": config["data_dir"],
+                "mode": config["mode"],
+            },
+            "model": {
+                "network": config["network"],
+                "device": config["device"],
+            },
+            "training": {
+                "episodes": config["episodes"],
+                "seed": config["seed"],
+                "learning_rate": config["learning_rate"],
+                "gamma": config["gamma"],
+            }
+        }
 print(">>> [Checkpoint] Agent created", flush=True)
 
 
@@ -80,49 +142,6 @@ print(">>> [Checkpoint] Agent created", flush=True)
 
 
 # -------- build flat config from args -------
-config = vars(args)
-
-config.update({
-    "learning_rate": dqn_agent.learning_rate,
-    "gamma": dqn_agent.gamma,
-    "batch_size": dqn_agent.batch_size,
-    "buffer_size": dqn_agent.buffer_size,
-    "epsilon_start": dqn_agent.epsilon,
-    "epsilon_min": dqn_agent.epsilon_min,
-    "epsilon_decay": dqn_agent.epsilon_decay,
-    "target_update_freq": target_update_freq,
-    "prioritized_replay": dqn_agent.use_per,
-    "network_type": type(dqn_agent.q_network).__name__,
-    "device": "gpu" if tf.config.list_physical_devices('GPU') else "cpu",
-})
-
-# -------- nest for nicer UI --------
-organized_config = {
-    "environment": {
-        "variant": config["variant"],
-        "data_dir": config["data_dir"],
-        "mode": config["mode"],
-    },
-    "model": {
-        "network": config["network"],
-        "network_type": config["network_type"],
-        "target_update_freq": config["target_update_freq"],
-        "prioritized_replay": config["prioritized_replay"],
-        "device": config["device"],
-    },
-    "training": {
-        "episodes": config["episodes"],
-        "seed": config["seed"],
-        "learning_rate": config["learning_rate"],
-        "gamma": config["gamma"],
-        "batch_size": config["batch_size"],
-        "buffer_size": config["buffer_size"],
-        "epsilon_start": config["epsilon_start"],
-        "epsilon_min": config["epsilon_min"],
-        "epsilon_decay": config["epsilon_decay"],
-    }
-}
-
 print(">>> [Checkpoint] Initializing W&B", flush=True)
 
 run_name = (
@@ -135,12 +154,12 @@ try:
         entity="ducks-riding-llamas", 
         project="ride-those-llamas",
         name = run_name,
-        group=f"variant{str(args.variant)}_algorithm{str(args.algorithm)}",
+        group=f"variant{str(args.variant)}_algorithm{str(args.agent)}",
         config=organized_config,
         tags=[
             f"variant{args.variant}", 
             f"network{args.network}",
-            "replay buffer: prioritized" if dqn_agent.use_per else "replay buffer: uniform",
+            # "replay buffer: prioritized" if dqn_agent.use_per else "replay buffer: uniform",
             "cuda" if tf.config.list_physical_devices('GPU') else "cpu",
             f"seed{args.seed}"
         ],
@@ -152,21 +171,20 @@ except Exception as e:
     os.environ["WANDB_MODE"] = "disabled"
 
 
-
-
 print(">>> [Checkpoint] Entering mode switch", flush=True)
 
 match mode:
     case 'training':
-        model_path = dqn_agent.train(
-            env=env,
+        train_env = TrainEnvironment(variant=variant, data_dir=data_dir)
+        agent.train(
+            env=train_env,
             episodes=episodes,
-            mode=mode, 
+            mode=mode,
             target_update_freq=target_update_freq
             )
     case 'validation':
-        if model_path:
-            dqn_agent.validate(env=env,
-                               model_path=model_path)
-        else:
-            print("No model param to validate")
+        env = Environment(variant=variant, data_dir=data_dir)
+        agent.validate(
+            env=env,
+            model_path=model_path
+        )
