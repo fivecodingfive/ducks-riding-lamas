@@ -304,3 +304,4 @@ class Environment(object):
     def get_loc(self):
     
         return self.agent_loc, self.target_loc, self.item_locs   
+  
