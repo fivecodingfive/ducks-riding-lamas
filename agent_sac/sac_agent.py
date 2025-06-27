@@ -6,7 +6,6 @@ from config import args
 from .model import build_cnn_network, build_mlp_network, build_combine_network
 from .replay_buffer import ReplayBuffer, PrioritizedReplayBuffer
 from .visualizer import GridVisualizer
-import matplotlib.pyplot as plt
 
 if args.network == 'cnn':
     STATE_DIM = 100
@@ -18,16 +17,20 @@ elif args.network == 'combine':
 PLOT_INTERVAL = 99
 
 class SACAgent:
-    def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001, gamma=0.99, tau=0.005, alpha=0.2, buffer_size=50000, batch_size=64, network_type=args.network):
+    def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001, 
+                 gamma=0.99, tau=0.005, alpha=0.2, use_per=False,
+                 buffer_size=50000, batch_size=64, network_type=args.network):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.gamma = gamma
         self.tau = tau
         self.alpha = alpha
+        self.use_per = use_per
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.global_step = 0
-
+        
+        ## Double Q network to avoid overestimation
         if network_type == 'cnn':
             self.actor = build_cnn_network(state_dim, action_dim, output_activation='softmax')
             self.q1 = build_cnn_network(state_dim, action_dim)
@@ -52,8 +55,10 @@ class SACAgent:
         self.q2_optimizer = tf.keras.optimizers.Adam(learning_rate)
 
         self.update_target_networks(tau=1.0)
-
-        self.replay_buffer = ReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,))
+        
+        ## ReplayBuffer
+        self.replay_buffer = ReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,)) 
+        # if not use_per else PrioritizedReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,))
 
     def act(self, state, deterministic=False):
         state_tensor = tf.convert_to_tensor([state], dtype=tf.float32)
@@ -68,6 +73,15 @@ class SACAgent:
             target_var.assign(tau * var + (1 - tau) * target_var)
         for var, target_var in zip(self.q2.trainable_variables, self.target_q2.trainable_variables):
             target_var.assign(tau * var + (1 - tau) * target_var)
+    
+    def update_learning_rate(self, current_step, episodes):
+        ## Decaying learning rate
+        total_steps = episodes * 200
+        progress = current_step / total_steps
+        new_lr = self.learning_rate * (1 - progress) + 1e-5 * progress
+        self.q1_optimizer.learning_rate.assign(new_lr)
+        self.q2_optimizer.learning_rate.assign(new_lr)
+        self.actor_optimizer.learning_rate.assign(new_lr)
 
     def remember(self, state, action, reward, next_state, done):
         self.replay_buffer.add(state, action, reward, next_state, done)
@@ -78,17 +92,13 @@ class SACAgent:
             tf.TensorSpec(shape=[None], dtype=tf.int32),
             tf.TensorSpec(shape=[None], dtype=tf.float32),
             tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
-            tf.TensorSpec(shape=[None], dtype=tf.float32),
+            tf.TensorSpec(shape=[None], dtype=tf.float32)
+            # tf.TensorSpec(shape=[None], dtype=tf.int32),
+            # tf.TensorSpec(shape=[None], dtype=tf.float32)
         ],
         jit_compile=True
     )
-    def train_iterate(self, states, actions, rewards, next_states, dones):
-        # states = tf.convert_to_tensor(states, dtype=tf.float32)
-        # actions = tf.convert_to_tensor(actions, dtype=tf.int32)
-        # rewards = tf.convert_to_tensor(rewards, dtype=tf.float32)
-        # next_states = tf.convert_to_tensor(next_states, dtype=tf.float32)
-        # dones = tf.convert_to_tensor(dones, dtype=tf.float32)
-
+    def train_iterate(self, states, actions, rewards, next_states, dones, indices, weights):
         # Target Q calculation
         next_probs = self.actor(next_states)
         next_log_probs = tf.math.log(tf.clip_by_value(next_probs, 1e-8, 1.0))
@@ -104,8 +114,10 @@ class SACAgent:
         with tf.GradientTape() as tape1, tf.GradientTape() as tape2:
             q1_vals = tf.reduce_sum(self.q1(states) * tf.one_hot(actions, self.action_dim), axis=1)
             q2_vals = tf.reduce_sum(self.q2(states) * tf.one_hot(actions, self.action_dim), axis=1)
-            q1_loss = tf.reduce_mean(tf.square(targets - q1_vals))
-            q2_loss = tf.reduce_mean(tf.square(targets - q2_vals))
+            td1 = targets - q1_vals
+            td2 = targets - q2_vals
+            q1_loss = tf.reduce_mean(weights * tf.square(td1))
+            q2_loss = tf.reduce_mean(weights * tf.square(td2))
             
         # Two Q networks to solve over-estimation problem
         grads1 = tape1.gradient(q1_loss, self.q1.trainable_variables)
@@ -124,15 +136,17 @@ class SACAgent:
         self.actor_optimizer.apply_gradients(zip(actor_grads, self.actor.trainable_variables))
         
         q_val = tf.reduce_mean(q_vals)
-        loss = tf.reduce_mean(tf.minimum(q1_loss, q2_loss))
 
         self.update_target_networks()
-        
-        return q_val, loss
+        # if self.use_per:
+        #     self.replay_buffer.update_priorities(indices, tf.maximum(td1,td2)) 
+            
+        return q_val, q1_loss, q2_loss, actor_loss
 
     def train(self, env, episodes=400, target_update_freq = int):
         print(">>> [SACAgent] Entered train()", flush=True)
         print(f">>> [SACAgent] Episodes: {episodes}, Mode: training", flush=True)
+        ## local log
         reward_log = []
         critic_loss_log =[]
 
@@ -144,7 +158,6 @@ class SACAgent:
             visualizer = GridVisualizer() if episode % PLOT_INTERVAL == (PLOT_INTERVAL-1) else None
             
             while not done:
-                self.global_step += 1
                 action = self.act(state)
                 train_reward, reward, next_obs, done = env.step(action)
                 next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
@@ -154,18 +167,34 @@ class SACAgent:
                 total_reward += reward
                
                 if len(self.replay_buffer) >= self.batch_size:
+                    # Sampling from replay buffer
+                    # if self.use_per:
+                    #     states, actions, rewards, next_states, dones, indices, weights = self.replay_buffer.sample(self.batch_size)
+                    # else:
+                    #     states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
+                    #     weights = tf.ones(self.batch_size, dtype=tf.float32)
+                    #     indices = tf.ones(self.batch_size, dtype=tf.int32)
+                    # states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
+                    # q_val, q1_loss, q2_loss, actor_loss = self.train_iterate(states, actions, rewards, next_states, dones, indices, weights)
+                    
                     states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
-                    q_val, loss = self.train_iterate(states, actions, rewards, next_states, dones)
-                    critic_loss_log.append(loss)
+                    q_val, q1_loss, q2_loss, actor_loss = self.train_iterate(states, actions, rewards, next_states, dones)
+                    critic_loss_log.append((q1_loss+q2_loss)/2)
+                    
+                    self.update_learning_rate(self.global_step, episodes)
 
-                if wandb.run:
-                    wandb.log({
-                        "train/q_value": q_val.numpy(),
-                        "train/loss": loss.numpy()
-                    }, 
-                    step=self.global_step, 
-                    commit=False
-                    )
+                    ## wandb recording
+                    self.global_step += 1
+                    if wandb.run:
+                        wandb.log({
+                            "train/q_value": q_val,
+                            "train/q_loss": (q1_loss+q2_loss)/2,
+                            "train/over_estimation": (q1_loss-q2_loss),
+                            "train/actor_loss": actor_loss
+                        }, 
+                        step=self.global_step, 
+                        commit=False
+                        )
 
                 # Visualizer update
                 if visualizer is not None:
@@ -188,60 +217,12 @@ class SACAgent:
                         "episode/reward": total_reward,
                         "episode":        episode,
                     },
-                    step=episode
+                    step=self.global_step
                 )
 
         overall_avg = sum(reward_log) / len(reward_log)
         print(f"\n[Training Done] Overall Avg Reward: {overall_avg:.2f}")
-        self.save_model(overall_avg)
 
-    # def validate(self, env, model_path=str, episodes=100):
-    #     print(f">>> [SACAgent] Validating over {episodes} episodes")
-    #     # examine if the model exist
-    #     if not os.path.exists(model_path):
-    #         print(f"Model file not found: {model_path}")
-    #         return None
-
-    #     # load model
-    #     print(f"Loading model from: {model_path}")
-    #     reward_log = []
-
-    #     for episode in range(episodes):
-    #         obs = env.reset(mode='validation')
-    #         state = obs.numpy() if hasattr(obs, "numpy") else obs
-    #         done = False
-    #         total_reward = 0
-
-    #         visualizer = None
-    #         if episode % PLOT_INTERVAL == (PLOT_INTERVAL-1):
-    #             visualizer = GridVisualizer()
-
-    #         while not done:
-    #             state_tensor = tf.convert_to_tensor([state], dtype=tf.float32)
-    #             probs = self.actor(state_tensor)[0].numpy()
-    #             action = int(np.argmax(probs))
-
-    #             reward, next_obs, done = env.step(action)
-    #             next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
-
-    #             state = next_state
-    #             total_reward += reward
-
-    #             if visualizer is not None:
-    #                 agent, target, items = env.get_loc()
-    #                 visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, reward=total_reward)
-
-    #         if visualizer is not None:
-    #             visualizer.close()
-
-    #         reward_log.append(total_reward)
-
-    #         if episode % 5 == 0:
-    #             avg_recent = sum(reward_log[-5:]) / 5
-    #             print(f"[Validating][Episode {episode}/{episodes}] Avg reward (last 5): {avg_recent:.2f}")
-
-    #     avg_reward = sum(reward_log) / len(reward_log)
-    #     print(f"\n[Validation Done] Avg Reward: {avg_reward:.2f}")
     def validate(self, env, episodes=100, model_path=str):
         print(f">>> [SACAgent] Validating over {episodes} episodes")
         # examine if the model exist
@@ -251,6 +232,7 @@ class SACAgent:
 
         # load model
         print(f"Loading model from: {model_path}")
+        self.actor = tf.keras.models.load_model(model_path)
 
         reward_log = []
         for episode in range(episodes):
@@ -287,18 +269,19 @@ class SACAgent:
         print(f"\n[Validation Done] Avg Reward: {avg_reward:.2f}")
 
         
-    def save_model(self, avg_reward, base_dir='models'):
+    def save_model(self, variant):
+        base_dir='models'
         os.makedirs(base_dir, exist_ok=True)
 
         existing = [f for f in os.listdir(base_dir) if f.startswith("SACmodel_") and f.endswith(".keras")]
 
         index = len(existing)
-        file_name = f"SACmodel_{index}_reward{avg_reward:.2f}.keras"
+        file_name = f"SACmodel_{index}_{variant}.keras"
         full_path = os.path.join(base_dir, file_name)
 
         while os.path.exists(full_path):
             index += 1
-            file_name = f"SACmodel_{index}_reward{avg_reward:.2f}.keras"
+            file_name = f"SACmodel_{index}_{variant}.keras"
             full_path = os.path.join(base_dir, file_name)
 
         self.actor.save(full_path)

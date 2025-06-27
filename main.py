@@ -49,8 +49,9 @@ episodes = args.episodes    # specify episodes
 mode = args.mode            # specify mode of agent with different dataset (training, validation, test)
 model_path = args.modelpath # specify path to model parameters in ../models folder
 agent = args.algorithm
+per = args.per
 
-print(f"Args: variant={variant}, episodes={episodes}, mode={mode}, network={NETWORK_TYPE}", flush=True)
+print(f"Args: variant={variant}, episodes={episodes}, mode={mode}, network={NETWORK_TYPE}, per={per}", flush=True)
 
 from agent_dqn.dqn_agent import DQNAgent
 from agent_sac.sac_agent import SACAgent
@@ -108,6 +109,7 @@ match agent:
     case "sac":
         agent = SACAgent(
             learning_rate=args.learning_rate,
+            use_per=args.per
         )
         config = vars(args)
         config.update({
@@ -154,7 +156,7 @@ try:
         entity="ducks-riding-llamas", 
         project="ride-those-llamas",
         name = run_name,
-        group=f"variant{str(args.variant)}_algorithm{str(args.agent)}",
+        group=f"variant{str(args.variant)}_algorithm{str(args.algorithm)}",
         config=organized_config,
         tags=[
             f"variant{args.variant}", 
@@ -179,9 +181,9 @@ match mode:
         agent.train(
             env=train_env,
             episodes=episodes,
-            mode=mode,
             target_update_freq=target_update_freq
             )
+        agent.save_model(variant)
     case 'validation':
         env = Environment(variant=variant, data_dir=data_dir)
         agent.validate(

@@ -499,28 +499,6 @@ class TrainEnvironment(object):
                     grid3[ix, iy] = 1.0
                     grid0[ix, iy] = 0.0
 
-            if self.agent_load == 0:
-                # reward field from items
-                for (ix, iy), t in zip(self.item_locs, self.item_times):
-                    for dx in range(-max_range, max_range + 1):
-                        for dy in range(-max_range, max_range + 1):
-                            nx, ny = ix + dx, iy + dy
-                            if (0 <= nx < self.vertical_cell_count) and (0 <= ny < self.horizontal_cell_count):
-                                dist = abs(dx) + abs(dy)
-                                if dist <= max_range:
-                                    decay = field_strength / (dist + epsilon)
-                                    grid4[nx, ny] += decay
-            else:
-                # reward field from target location
-                for dx in range(-max_range, max_range + 1):
-                    for dy in range(-max_range, max_range + 1):
-                        nx, ny = target_x + dx, target_y + dy
-                        if (0 <= nx < self.vertical_cell_count) and (0 <= ny < self.horizontal_cell_count):
-                            dist = abs(dx) + abs(dy)
-                            if dist <= max_range:
-                                decay = field_strength / (dist + epsilon)
-                                grid4[nx, ny] += decay
-
             obs = np.stack([grid0, grid1, grid2, grid3, grid4], axis=-1)  # shape: (5, 5, 5)
             obs = tf.convert_to_tensor(obs, dtype=tf.float32)
             return tf.reshape(obs, [-1])

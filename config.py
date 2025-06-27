@@ -8,7 +8,7 @@ parser.add_argument('--variant', type=int, default=0, choices=[0, 1, 2],
 parser.add_argument('--data_dir', type=str, default='./data',
                     help="Path to the data directory (e.g., ./data)")
 
-parser.add_argument('--episodes', type=int, default=200,
+parser.add_argument('--episodes', type=int, default=400,
                     help="Number of training episodes")
 
 parser.add_argument('--seed', type=int, default=42,
@@ -24,6 +24,9 @@ parser.add_argument('--network', type=str, default='mlp', choices=['mlp', 'cnn',
                     help="Type of neural network to use")
 
 parser.add_argument('--algorithm', type=str, default='sac', choices=['dqn', 'ppo', 'a2c', 'sac'],
+                    help="Type of agent to use")
+
+parser.add_argument('--per', type=str, default='0', choices=['0', '1'],
                     help="Type of agent to use")
 
 parser.add_argument('--sweep_id', type=int, default=None,
