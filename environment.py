@@ -61,12 +61,14 @@ class Environment(object):
                                    (2,0), (2,1), (2,2), (2,3), (2,4),
                                    (3,0), (3,1), (3,2), (3,3), (3,4),
                                    (4,0), (4,1), (4,2), (4,3), (4,4)]
+            self.block_locs = []
         else:
             self.eligible_cells = [(0,0),        (0,2), (0,3), (0,4),
                                    (1,0),        (1,2),        (1,4),
                                    (2,0),        (2,2),        (2,4),
                                    (3,0), (3,1), (3,2),        (3,4),
                                    (4,0), (4,1), (4,2),        (4,4)]
+            self.block_locs = [(0,1),(1,1),(2,1),(1,3),(2,3),(3,3),(4,3)]
 
     # initialize a new episode (specify if training, validation, or testing via the mode argument)
     def reset(self, mode):
@@ -300,7 +302,7 @@ class Environment(object):
 
     def get_loc(self):
     
-        return self.agent_loc, self.target_loc, self.item_locs   
+        return self.agent_loc, self.target_loc, self.item_locs, self.block_locs
     
 class TrainEnvironment(object):
     def __init__(self, variant, data_dir):
@@ -338,12 +340,14 @@ class TrainEnvironment(object):
                                    (2,0), (2,1), (2,2), (2,3), (2,4),
                                    (3,0), (3,1), (3,2), (3,3), (3,4),
                                    (4,0), (4,1), (4,2), (4,3), (4,4)]
+            self.block_locs = []
         else:
             self.eligible_cells = [(0,0),        (0,2), (0,3), (0,4),
                                    (1,0),        (1,2),        (1,4),
                                    (2,0),        (2,2),        (2,4),
                                    (3,0), (3,1), (3,2),        (3,4),
                                    (4,0), (4,1), (4,2),        (4,4)]
+            self.block_locs = [(0,1),(1,1),(2,1),(1,3),(2,3),(3,3),(4,3)]
 
     # initialize a new episode (specify if training, validation, or testing via the mode argument)
     def reset(self, mode):
@@ -464,7 +468,7 @@ class TrainEnvironment(object):
 
     def get_loc(self):
     
-        return self.agent_loc, self.target_loc, self.item_locs   
+        return self.agent_loc, self.target_loc, self.item_locs, self.block_locs
     
     def get_obs(self):
         if network_type == 'cnn':
@@ -486,11 +490,6 @@ class TrainEnvironment(object):
             else:
                 grid2[agent_x, agent_y] = 0.5
                 grid0[agent_x, agent_y] = 0.0
-
-            # Populate grid3 (items) and grid4 (reward field)
-            field_strength = 1.0
-            max_range = 3
-            epsilon = 1e-3
 
             for loc, time in zip(self.item_locs, self.item_times):
                 ix, iy = loc

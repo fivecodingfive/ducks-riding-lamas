@@ -42,7 +42,7 @@ class GridVisualizer:
         self.ax.set_yticks(np.arange(self.grid_size[0]))
         self.ax.grid(True)
 
-    def update(self, agent_loc, target_loc, item_locs, reward):
+    def update(self, agent_loc, target_loc, item_locs, block_locs, reward):
         grid = np.full(self.grid_size, '.', dtype=str)
         ax, ay = agent_loc
         tx, ty = target_loc
@@ -52,6 +52,10 @@ class GridVisualizer:
         for ix, iy in item_locs:
             if grid[ix, iy] == '.':
                 grid[ix, iy] = 'I'
+        for bx, by in block_locs:
+            if grid[bx, by] == '.':
+                grid[bx, by] = 'B'
+            
 
         self.ax.set_title(f"Step {self.step} \n Reward:{reward}")
         for i in range(self.grid_size[0]):

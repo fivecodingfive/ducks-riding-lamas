@@ -14,7 +14,7 @@ elif args.network == 'mlp':
 elif args.network == 'combine':
     STATE_DIM = 108
 
-PLOT_INTERVAL = 99
+PLOT_INTERVAL = 5
 
 class SACAgent:
     def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001, 
@@ -57,9 +57,9 @@ class SACAgent:
         self.update_target_networks(tau=1.0)
         
         ## ReplayBuffer
-        self.replay_buffer = ReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,)) 
-        # if not use_per else PrioritizedReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,))
-
+        self.replay_buffer = PrioritizedReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,)) if use_per else ReplayBuffer(capacity=buffer_size, state_shape=(self.state_dim,))
+        print(f">>> Using per:{use_per}")
+        
     def act(self, state, deterministic=False):
         state_tensor = tf.convert_to_tensor([state], dtype=tf.float32)
         probs = self.actor(state_tensor)[0].numpy()
@@ -92,9 +92,9 @@ class SACAgent:
             tf.TensorSpec(shape=[None], dtype=tf.int32),
             tf.TensorSpec(shape=[None], dtype=tf.float32),
             tf.TensorSpec(shape=[None, STATE_DIM], dtype=tf.float32),
+            tf.TensorSpec(shape=[None], dtype=tf.float32),
+            tf.TensorSpec(shape=[None], dtype=tf.int32),
             tf.TensorSpec(shape=[None], dtype=tf.float32)
-            # tf.TensorSpec(shape=[None], dtype=tf.int32),
-            # tf.TensorSpec(shape=[None], dtype=tf.float32)
         ],
         jit_compile=True
     )
@@ -138,8 +138,8 @@ class SACAgent:
         q_val = tf.reduce_mean(q_vals)
 
         self.update_target_networks()
-        # if self.use_per:
-        #     self.replay_buffer.update_priorities(indices, tf.maximum(td1,td2)) 
+        if self.use_per:
+            self.replay_buffer.update_priorities(indices, tf.maximum(td1,td2)) 
             
         return q_val, q1_loss, q2_loss, actor_loss
 
@@ -168,17 +168,17 @@ class SACAgent:
                
                 if len(self.replay_buffer) >= self.batch_size:
                     # Sampling from replay buffer
-                    # if self.use_per:
-                    #     states, actions, rewards, next_states, dones, indices, weights = self.replay_buffer.sample(self.batch_size)
-                    # else:
-                    #     states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
-                    #     weights = tf.ones(self.batch_size, dtype=tf.float32)
-                    #     indices = tf.ones(self.batch_size, dtype=tf.int32)
-                    # states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
-                    # q_val, q1_loss, q2_loss, actor_loss = self.train_iterate(states, actions, rewards, next_states, dones, indices, weights)
+                    if self.use_per:
+                        states, actions, rewards, next_states, dones, indices, weights = self.replay_buffer.sample(self.batch_size)
+                    else:
+                        states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
+                        weights = tf.ones(self.batch_size, dtype=tf.float32)
+                        indices = tf.ones(self.batch_size, dtype=tf.int32)
+                        
+                    q_val, q1_loss, q2_loss, actor_loss = self.train_iterate(states, actions, rewards, next_states, dones, indices, weights)
                     
-                    states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
-                    q_val, q1_loss, q2_loss, actor_loss = self.train_iterate(states, actions, rewards, next_states, dones)
+                    # states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
+                    # q_val, q1_loss, q2_loss, actor_loss = self.train_iterate(states, actions, rewards, next_states, dones)
                     critic_loss_log.append((q1_loss+q2_loss)/2)
                     
                     self.update_learning_rate(self.global_step, episodes)
@@ -192,14 +192,14 @@ class SACAgent:
                             "train/over_estimation": (q1_loss-q2_loss),
                             "train/actor_loss": actor_loss
                         }, 
-                        step=self.global_step, 
+                        step=self.global_step,
                         commit=False
                         )
 
                 # Visualizer update
                 if visualizer is not None:
-                    agent, target, items = env.get_loc()
-                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, reward=total_reward)
+                    agent, target, items, blocks = env.get_loc()
+                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, block_locs=blocks, reward=total_reward)
 
             if visualizer is not None:
                 visualizer.close()

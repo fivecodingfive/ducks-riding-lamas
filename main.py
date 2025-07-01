@@ -147,7 +147,7 @@ print(">>> [Checkpoint] Agent created", flush=True)
 print(">>> [Checkpoint] Initializing W&B", flush=True)
 
 run_name = (
-    f"lr{args.learning_rate}_bs{args.batch_size}_"
+    f"var{args.variant}_per{args.per}_"
     f"decay{args.epsilon_decay}_{datetime.now():%b%d}"
 )
 
