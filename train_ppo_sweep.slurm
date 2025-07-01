@@ -1,30 +1,41 @@
 #!/bin/bash
-#SBATCH --job-name=ppo_sweep
-#SBATCH --partition=gpu
-#SBATCH --gres=gpu:1
+#SBATCH -J ppo_sweep
+#SBATCH -D .                                # Working directory
+#SBATCH -o logs/sweep_%A_%a.out            # Stdout
+#SBATCH -e logs/sweep_%A_%a.err            # Stderr
+#SBATCH --get-user-env
+#SBATCH --export=NONE
+#SBATCH --clusters=serial
+#SBATCH --partition=serial_std
+#SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=06:00:00
-#SBATCH --array=0-89            # 90 combinations (3*2*3*3*2*2 = 90)
-#SBATCH --output=logs/sweep_%A_%a.out
+#SBATCH --array=0-44%10                     # 45 tasks (3*2*3*3*2 = 45), max 10 running at once
 
-# Load required modules (adjust to match LRZ environment)
-module load cuda/12.1
+# Load environment
+module load slurm_setup
+module load python/3.10.10-extended
+source ../tfvenv/bin/activate
 
-# Activate virtual environment
-source ~/venvs/rl/bin/activate
+# Make sure our log directory exists
+mkdir -p logs
 
-# Set up W&B offline mode for cluster runs
-export WANDB_MODE="offline"
-export WANDB_DIR="$SCRATCH/wandb"
-mkdir -p $WANDB_DIR
+# W&B offline & plotting
+export MPLBACKEND=Agg
+export WANDB_MODE=offline
+export WANDB_DIR=$SCRATCH/wandb
+mkdir -p "$WANDB_DIR"
 
-# Run the PPO training with sweep configuration
-# The hyperparameters are set inside the script based on SLURM_ARRAY_TASK_ID
+# Use all allocated CPUs for OMP/BLAS
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+echo ">>> Starting PPO sweep task $SLURM_ARRAY_TASK_ID on $(hostname) at $(date)"
+
 srun python -u main_ppo.py \
-    --variant 0 \
     --mode training \
     --episodes 5 \
-    --seed $((123 + $SLURM_ARRAY_TASK_ID))
+    --variant 0 \
+    --sweep_id $SLURM_ARRAY_TASK_ID
 
-echo "Sweep task $SLURM_ARRAY_TASK_ID completed at $(date)"
+echo ">>> Sweep task $SLURM_ARRAY_TASK_ID done at $(date)"

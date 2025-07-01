@@ -45,25 +45,7 @@ if args.sweep_id is not None or "SLURM_ARRAY_TASK_ID" in os.environ:
     except ImportError:
         print("Warning: sweep_grid_ppo.py not found. Using fallback sweep configuration.")
         # Fallback sweep configuration if the import fails
-        import itertools
-        
-        # Define a minimal grid with just a few values
-        learning_rates = [3e-4, 1e-4]
-        value_lrs = [1e-3]
-        clips = [0.2]
-        entropies = [0.05]
-        lams = [0.95]
-        
-        grid = list(itertools.product(learning_rates, value_lrs, clips, entropies, lams))
-        sweep_id = int(os.getenv("SLURM_ARRAY_TASK_ID", args.sweep_id or 0))
-        sweep_id = sweep_id % len(grid)
-        
-        args.policy_lr, args.value_lr, args.clip, args.entropy, args.lam = grid[sweep_id]
-        grid_size = len(grid)
-        
-        print(f"[FALLBACK SWEEP] ID: {sweep_id}/{grid_size-1} | "
-              f"Policy LR: {args.policy_lr} | Value LR: {args.value_lr} | "
-              f"Clip: {args.clip} | Entropy: {args.entropy} | Lambda: {args.lam}")
+    
 
 # ─────────────────────── reproducibility & device ───────────────────────────
 if args.seed is None:
