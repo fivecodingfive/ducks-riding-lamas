@@ -9,9 +9,6 @@ from environment import Environment
 from agent_ppo.ppo_agent import PPO_Agent
 from agent_ppo.config import ppo_config
 
-algo = "ppo"
-lr   = ppo_config["policy_learning_rate"]
-
 # ─────────────────────────────── CLI ────────────────────────────────────────
 parser = argparse.ArgumentParser(description="PPO runner with W&B logging")
 parser.add_argument('--variant',   type=int,   default=0,                    help='environment variant to load')
@@ -66,51 +63,38 @@ organized_cfg = {
 
 tags = [
     f"variant{args.variant}",
-    f"algo-{algo}",
-    f"lr{lr}",
+    f"mode-{args.mode}",
+    f"lr{ppo_config['policy_learning_rate']}",
     f"seed{args.seed}",
     device,
 ]
 
 
-run_name = f"{algo}_v{args.variant}_{datetime.now():%b%d}"
+run_name = f"ppo_lr{ppo_config['policy_learning_rate']}_{datetime.now():%b%d}"
 
 
 try:
-    run = wandb.init(
+    wandb.init(
         entity="ducks-riding-llamas",
         project="ride-those-llamas",
         name=run_name,
-        group = f"v{args.variant}_{algo}",
+        group=f"variant{args.variant}_algorithmppo",
         config=organized_cfg,
         tags=tags,
         save_code=True,
         dir=os.getenv("WANDB_DIR", "./wandb"),
     )
-    if run is not None:
-        wandb.define_metric("episode")
-        wandb.define_metric("*", step_metric="episode")
 except Exception as e:
     print(f"[W&B WARNING] failed to initialise – logging disabled ({e})", flush=True)
     os.environ["WANDB_MODE"] = "disabled"
 
 
 # ────────────────────────────── run mode ────────────────────────────────────
-# (Includes W&B logging)
-
+start_time = time.time()
 if args.mode == "training":
-    reward_log, _ = agent.train_ppo(env)       # ← capture return
-    avg = float(np.mean(reward_log))
-
-    # rename the run to include final reward
-    if wandb.run is not None:
-        wandb.run.name = (
-            f"{algo}_v{args.variant}-----Rew:{avg:.1f}_{datetime.now():%b%d}"
-        )
-        wandb.run.save()
+    agent.train_ppo(env)
 else:
     agent.validate_ppo(env, model_path=args.modelpath)
-
 print(f"Total runtime: {time.time() - start_time:.2f}s", flush=True)
 
 if wandb.run is not None:

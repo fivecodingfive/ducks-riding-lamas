@@ -1,0 +1,21 @@
+{"time":"2025-07-01T18:32:38.3853023+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"wandb\\wandb\\run-20250701_183238-dzem6xda\\logs\\debug-core.log"}
+{"time":"2025-07-01T18:32:38.7093404+02:00","level":"INFO","msg":"created new stream","id":"dzem6xda"}
+{"time":"2025-07-01T18:32:38.7093404+02:00","level":"INFO","msg":"stream: started","id":"dzem6xda"}
+{"time":"2025-07-01T18:32:38.7093404+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"dzem6xda"}
+{"time":"2025-07-01T18:32:38.7093404+02:00","level":"INFO","msg":"handler: started","stream_id":"dzem6xda"}
+{"time":"2025-07-01T18:32:38.7093404+02:00","level":"INFO","msg":"sender: started","stream_id":"dzem6xda"}
+{"time":"2025-07-01T18:32:43.5695434+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-07-01T18:32:43.5775356+02:00","level":"ERROR","msg":"git repo not found","error":"repository does not exist"}
+{"time":"2025-07-01T18:32:58.595019+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-01T18:33:13.5935431+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-01T18:33:28.584199+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-01T18:33:43.5858781+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-01T18:33:44.0899714+02:00","level":"INFO","msg":"stream: closing","id":"dzem6xda"}
+{"time":"2025-07-01T18:33:44.0899714+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-07-01T18:33:44.0899714+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-07-01T18:34:14.5914027+02:00","level":"INFO","msg":"api: retrying error","error":"Post \"https://api.wandb.ai/graphql\": net/http: request canceled (Client.Timeout exceeded while awaiting headers)"}
+{"time":"2025-07-01T18:34:17.1710001+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-07-01T18:34:17.9237035+02:00","level":"INFO","msg":"handler: closed","stream_id":"dzem6xda"}
+{"time":"2025-07-01T18:34:17.9237035+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"dzem6xda"}
+{"time":"2025-07-01T18:34:17.9237035+02:00","level":"INFO","msg":"sender: closed","stream_id":"dzem6xda"}
+{"time":"2025-07-01T18:34:17.9268889+02:00","level":"INFO","msg":"stream: closed","id":"dzem6xda"}

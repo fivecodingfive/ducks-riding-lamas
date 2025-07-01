@@ -6,6 +6,7 @@ import scipy.signal
 import tensorflow as tf
 import numpy as np
 import os
+import wandb 
 from environment import Environment
 
 # Initialize agent with config
@@ -103,19 +104,46 @@ class PPO_Agent:
                         self.calc_advantage(step_count) # Calculate advantages
                     break
             reward_log.append(total_reward)
+            
+            # ─────────────────────────── W&B logging ─────────────────────────────
+            if training:      
+                wandb.log({
+                    "episode": episode,
+                    "reward":          total_reward,
+                    "episode_length":  step_count,
+                    "entropy_coef":    self.entropy,
+                }, step=episode)
         
 
-            # WEIGHT UPDATE LOOP
-        
+            # ─────────────────────────── Weight update loop ─────────────────────────────
             if training:
-                # Prepare data to be used in weight update
-                reward_buffer,states_buffer,action_buffer,logprobability_buffer,advantages_buffer,return_buffer = self.prepare_training_data(step_count)
+                # 1) gather buffers
+                reward_buf, states_buf, action_buf, logp_buf, adv_buf, return_buf = \
+                    self.prepare_training_data(step_count)
 
-                # Calculate weight updates for policy and value network
+                # 2) collect losses
+                policy_losses, value_losses = [], []
+
+                #   Policy updates
                 for _ in range(self.train_policy_epochs):
-                    self.train_policy(states_buffer,action_buffer,logprobability_buffer,advantages_buffer)
+                    pl, ent = self.train_policy(
+                        states_buf, action_buf, logp_buf, adv_buf
+                    )
+                    policy_losses.append(float(pl))         # to Python float
+                    entropy_bonus = float(ent)
+
+                #   Value-function updates
                 for _ in range(self.train_value_function_epochs):
-                    self.train_value_function(states_buffer,return_buffer)
+                    vl = self.train_value_function(states_buf, return_buf)
+                    value_losses.append(float(vl))
+
+                # 3) single W&B log for this episode’s gradients
+                wandb.log({
+                    "episode": episode,
+                    "policy_loss":   np.mean(policy_losses),
+                    "value_loss":    np.mean(value_losses),
+                    "entropy_bonus": entropy_bonus,
+                }, step=episode)
             
             # Print average every fifth episode
             if episode % 5 == 0:
@@ -127,6 +155,7 @@ class PPO_Agent:
         overall_avg = sum(reward_log) / len(reward_log)
         if training:
             print(f"\n[Training Done] Overall Avg Reward: {overall_avg:.2f}")
+            wandb.summary["overall_avg_reward"] = overall_avg 
             print("Saving model...")
             self.save_model(overall_avg)
             return reward_log, number_episodes
@@ -227,6 +256,7 @@ class PPO_Agent:
 
         policy_grads = tape.gradient(policy_loss, self.actor_network.trainable_variables)
         self.policy_optimizer.apply_gradients(zip(policy_grads, self.actor_network.trainable_variables))
+        return policy_loss, entropy_bonus
 
 
 
@@ -240,6 +270,7 @@ class PPO_Agent:
         # Use gradient based optimizer to optimize loss function and update weights
         value_grads = tape.gradient(value_loss, self.critic_network.trainable_variables)
         self.value_optimizer.apply_gradients(zip(value_grads, self.critic_network.trainable_variables))
+        return value_loss
 
     def save_model(self, avg_reward, base_dir='models'):
         os.makedirs(base_dir, exist_ok=True)

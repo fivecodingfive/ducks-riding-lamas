@@ -1,0 +1,14 @@
+Initial action probs: ['0.19', '0.17', '0.24', '0.21', '0.19'] Entropy: 0.10
+[5/20] Average Reward: -69.60
+Action probabilities: ['0.25', '0.11', '0.12', '0.31', '0.22'] Entropy: 0.10
+[10/20] Average Reward: -48.10
+Action probabilities: ['0.11', '0.10', '0.15', '0.30', '0.35'] Entropy: 0.10
+[15/20] Average Reward: -17.70
+Action probabilities: ['0.16', '0.12', '0.08', '0.24', '0.40'] Entropy: 0.09
+[20/20] Average Reward: -13.90
+Action probabilities: ['0.12', '0.08', '0.04', '0.17', '0.59'] Entropy: 0.09
+
+[Training Done] Overall Avg Reward: -37.33
+Saving model...
+PPO Agent saved: ppo_agent_15_reward-37.33.keras in models\ppo_agent_15_reward-37.33.keras
+Total runtime: 41.55s

@@ -77,7 +77,7 @@ run_name = f"{algo}_v{args.variant}_{datetime.now():%b%d}"
 
 
 try:
-    run = wandb.init(
+    wandb.init(
         entity="ducks-riding-llamas",
         project="ride-those-llamas",
         name=run_name,
@@ -87,9 +87,7 @@ try:
         save_code=True,
         dir=os.getenv("WANDB_DIR", "./wandb"),
     )
-    if run is not None:
-        wandb.define_metric("episode")
-        wandb.define_metric("*", step_metric="episode")
+
 except Exception as e:
     print(f"[W&B WARNING] failed to initialise – logging disabled ({e})", flush=True)
     os.environ["WANDB_MODE"] = "disabled"

@@ -1,0 +1,18 @@
+{"time":"2025-07-01T18:53:55.4001541+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"wandb\\wandb\\run-20250701_185355-h1u5k0cx\\logs\\debug-core.log"}
+{"time":"2025-07-01T18:53:55.7411769+02:00","level":"INFO","msg":"created new stream","id":"h1u5k0cx"}
+{"time":"2025-07-01T18:53:55.7411769+02:00","level":"INFO","msg":"stream: started","id":"h1u5k0cx"}
+{"time":"2025-07-01T18:53:55.7411769+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"h1u5k0cx"}
+{"time":"2025-07-01T18:53:55.7411769+02:00","level":"INFO","msg":"sender: started","stream_id":"h1u5k0cx"}
+{"time":"2025-07-01T18:53:55.7411769+02:00","level":"INFO","msg":"handler: started","stream_id":"h1u5k0cx"}
+{"time":"2025-07-01T18:53:56.0468441+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-07-01T18:53:56.061794+02:00","level":"ERROR","msg":"git repo not found","error":"repository does not exist"}
+{"time":"2025-07-01T18:54:11.060947+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-01T18:54:26.0618369+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-01T18:54:38.3342974+02:00","level":"INFO","msg":"stream: closing","id":"h1u5k0cx"}
+{"time":"2025-07-01T18:54:38.3342974+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-07-01T18:54:38.3342974+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-07-01T18:54:39.0059759+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-07-01T18:54:39.2623007+02:00","level":"INFO","msg":"handler: closed","stream_id":"h1u5k0cx"}
+{"time":"2025-07-01T18:54:39.2623007+02:00","level":"INFO","msg":"sender: closed","stream_id":"h1u5k0cx"}
+{"time":"2025-07-01T18:54:39.2623007+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"h1u5k0cx"}
+{"time":"2025-07-01T18:54:39.2656019+02:00","level":"INFO","msg":"stream: closed","id":"h1u5k0cx"}

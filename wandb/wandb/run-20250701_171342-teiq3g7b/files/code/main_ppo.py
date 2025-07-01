@@ -9,9 +9,6 @@ from environment import Environment
 from agent_ppo.ppo_agent import PPO_Agent
 from agent_ppo.config import ppo_config
 
-algo = "ppo"
-lr   = ppo_config["policy_learning_rate"]
-
 # ─────────────────────────────── CLI ────────────────────────────────────────
 parser = argparse.ArgumentParser(description="PPO runner with W&B logging")
 parser.add_argument('--variant',   type=int,   default=0,                    help='environment variant to load')
@@ -33,11 +30,7 @@ ppo_config["n_episodes"] = args.episodes      # allow CLI override
 env   = Environment(variant=args.variant, data_dir='./data')
 agent = PPO_Agent(config=ppo_config)
 
-
-
 # ───────────────────────────── W&B init ─────────────────────────────────────
-device = "gpu" if tf.config.list_physical_devices('GPU') else "cpu"
-
 organized_cfg = {
     "environment": {
         "variant": args.variant,
@@ -45,73 +38,85 @@ organized_cfg = {
         "data_dir": "./data",
     },
     "model": {
-        "clip_ratio":       ppo_config["clip_ratio"],
-        "entropy_start":    ppo_config["entropy"],
-        "entropy_decay":    ppo_config["entropy_decay"],
-        "entropy_min":      ppo_config["entropy_min"],
+        "state_size":  ppo_config["state_size"],
+        "action_size": ppo_config["action_size"],
     },
     "training": {
         "episodes":         ppo_config["n_episodes"],
         "gamma":            ppo_config["gamma"],
         "lam":              ppo_config["lam"],
+        "entropy_start":    ppo_config["entropy"],
+        "clip_ratio":       ppo_config["clip_ratio"],
         "policy_lr":        ppo_config["policy_learning_rate"],
         "value_lr":         ppo_config["value_learning_rate"],
-        "policy_epochs":    ppo_config["train_policy_epochs"],
-        "value_epochs":     ppo_config["train_value_function_epochs"],
-        "max_time_steps":   ppo_config["max_time_steps"],
-        "seed":             args.seed,
-        "device":           device,
-    }
+    },
+    "seed": args.seed,
 }
 
-tags = [
-    f"variant{args.variant}",
-    f"algo-{algo}",
-    f"lr{lr}",
-    f"seed{args.seed}",
-    device,
-]
-
-
-run_name = f"{algo}_v{args.variant}_{datetime.now():%b%d}"
-
+run_name = f"ppo_lr{ppo_config['policy_learning_rate']}_{datetime.now():%b%d}"
 
 try:
-    run = wandb.init(
+    wandb.init(
         entity="ducks-riding-llamas",
         project="ride-those-llamas",
         name=run_name,
-        group = f"v{args.variant}_{algo}",
+        group=f"variant{args.variant}_ppo",
         config=organized_cfg,
-        tags=tags,
+        tags=[f"variant{args.variant}", f"mode-{args.mode}", f"seed{args.seed}"],
         save_code=True,
         dir=os.getenv("WANDB_DIR", "./wandb"),
     )
-    if run is not None:
-        wandb.define_metric("episode")
-        wandb.define_metric("*", step_metric="episode")
 except Exception as e:
     print(f"[W&B WARNING] failed to initialise – logging disabled ({e})", flush=True)
     os.environ["WANDB_MODE"] = "disabled"
 
-
 # ────────────────────────────── run mode ────────────────────────────────────
-# (Includes W&B logging)
-
+start_time = time.time()
 if args.mode == "training":
-    reward_log, _ = agent.train_ppo(env)       # ← capture return
-    avg = float(np.mean(reward_log))
-
-    # rename the run to include final reward
-    if wandb.run is not None:
-        wandb.run.name = (
-            f"{algo}_v{args.variant}-----Rew:{avg:.1f}_{datetime.now():%b%d}"
-        )
-        wandb.run.save()
+    agent.train_ppo(env)
 else:
     agent.validate_ppo(env, model_path=args.modelpath)
-
 print(f"Total runtime: {time.time() - start_time:.2f}s", flush=True)
 
 if wandb.run is not None:
     wandb.finish()
+
+
+
+
+
+from agent_ppo.ppo_agent import PPO_Agent
+from environment import Environment
+import argparse
+from agent_ppo.config import ppo_config
+import time
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1" # to disable GPU usage
+seed = 42 
+import random
+random.seed(seed)
+import numpy as np
+np.random.seed(seed)
+import tensorflow as tf
+tf.random.set_seed(seed)
+
+data_dir = './data'        
+mode = 'training'  # 'training' or 'validation'
+variant = 0     
+model_path = './models/ppo_agent_11_reward89.76.keras'  
+# episodes defined in ppo_config
+# episodes = 200    # specify episodes
+
+
+if __name__ == "__main__":
+    start_time = time.time()
+
+    env = Environment(variant=variant, data_dir=data_dir)
+
+    agent = PPO_Agent(config=ppo_config)
+    if mode == 'validation':
+        agent.validate_ppo(env, model_path=model_path)
+    elif mode == 'training':
+        agent.train_ppo(env)
+
+    print(f"Total time taken: {time.time() - start_time:.2f} seconds")

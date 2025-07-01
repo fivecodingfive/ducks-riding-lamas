@@ -38,9 +38,6 @@ args.learning_rate  = lr
 args.batch_size     = bs
 args.epsilon_decay  = eps_decay
 
-algo = "dqn"
-
-
 
 
 
@@ -128,29 +125,27 @@ organized_config = {
 
 print(">>> [Checkpoint] Initializing W&B", flush=True)
 
-run_name = f"{algo}_v{variant}_{datetime.now():%b%d}"
+run_name = (
+    f"lr{args.learning_rate}_bs{args.batch_size}_"
+    f"decay{args.epsilon_decay}_{datetime.now():%b%d}"
+)
 
 try:
     wandb.init(
-        entity="ducks-riding-llamas",
+        entity="ducks-riding-llamas", 
         project="ride-those-llamas",
         name = run_name,
-        group = f"v{variant}_{algo}",              # <— unified group with PPO logging
-        config = organized_config,
-        tags = [
-            f"algo:{algo}",
-            f"variant:{variant}",
-            f"network:{args.network}",
-            f"eps_decay:{eps_decay}",
-            f"batch_size:{bs}",
-            f"lr:{lr}",
-            f"seed:{seed}",
-            f"mode:{mode}",
-            "cluster" if "SLURM_JOB_ID" in os.environ else "local",
+        group=f"variant{str(args.variant)}_algorithm{str(args.algorithm)}",
+        config=organized_config,
+        tags=[
+            f"variant{args.variant}", 
+            f"network{args.network}",
+            "replay buffer: prioritized" if dqn_agent.use_per else "replay buffer: uniform",
             "cuda" if tf.config.list_physical_devices('GPU') else "cpu",
+            f"seed{args.seed}"
         ],
-        save_code = True,
-        dir = os.getenv("WANDB_DIR", "./wandb"),
+        save_code=True,
+        dir=os.getenv("WANDB_DIR", "./wandb")
     )
 except Exception as e:
     print(f"[W&B ERROR] Could not initialize W&B: {e}", flush=True)
@@ -163,20 +158,12 @@ print(">>> [Checkpoint] Entering mode switch", flush=True)
 
 match mode:
     case 'training':
-        model_path, reward_log = dqn_agent.train(
+        model_path = dqn_agent.train(
             env=env,
             episodes=episodes,
             mode=mode, 
             target_update_freq=target_update_freq
-        )
-        avg = float(np.mean(reward_log))
-
-        if wandb.run is not None:
-            wandb.run.name = (
-                f"{algo}_v{variant}-----Rew:{avg:.1f}_{datetime.now():%b%d}"
             )
-            wandb.run.save()
-
     case 'validation':
         if model_path:
             dqn_agent.validate(env=env,

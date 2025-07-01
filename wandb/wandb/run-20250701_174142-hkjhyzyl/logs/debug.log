@@ -1,0 +1,29 @@
+2025-07-01 17:41:42,338 INFO    MainThread:11956 [wandb_setup.py:_flush():70] Current SDK version is 0.19.11
+2025-07-01 17:41:42,338 INFO    MainThread:11956 [wandb_setup.py:_flush():70] Configure stats pid to 11956
+2025-07-01 17:41:42,338 INFO    MainThread:11956 [wandb_setup.py:_flush():70] Loading settings from C:\Users\jonas\.config\wandb\settings
+2025-07-01 17:41:42,338 INFO    MainThread:11956 [wandb_setup.py:_flush():70] Loading settings from C:\Users\jonas\coding\university\drl\ducks-riding-lamas\wandb\settings
+2025-07-01 17:41:42,338 INFO    MainThread:11956 [wandb_setup.py:_flush():70] Loading settings from environment variables
+2025-07-01 17:41:42,338 INFO    MainThread:11956 [wandb_init.py:setup_run_log_directory():724] Logging user logs to ./wandb\wandb\run-20250701_174142-hkjhyzyl\logs\debug.log
+2025-07-01 17:41:42,346 INFO    MainThread:11956 [wandb_init.py:setup_run_log_directory():725] Logging internal logs to ./wandb\wandb\run-20250701_174142-hkjhyzyl\logs\debug-internal.log
+2025-07-01 17:41:42,346 INFO    MainThread:11956 [wandb_init.py:init():852] calling init triggers
+2025-07-01 17:41:42,346 INFO    MainThread:11956 [wandb_init.py:init():857] wandb.init called with sweep_config: {}
+config: {'environment': {'variant': 0, 'mode': 'training', 'data_dir': './data'}, 'model': {'clip_ratio': 0.2, 'entropy_start': 0.1, 'entropy_decay': 0.98, 'entropy_min': 0.0}, 'training': {'episodes': 20, 'gamma': 0.99, 'lam': 0.9, 'policy_lr': 0.0009, 'value_lr': 0.002, 'policy_epochs': 40, 'value_epochs': 40, 'max_time_steps': 200, 'seed': 42, 'device': 'cpu'}, '_wandb': {'code_path': 'code/main_ppo.py'}}
+2025-07-01 17:41:42,346 INFO    MainThread:11956 [wandb_init.py:init():893] starting backend
+2025-07-01 17:41:42,346 INFO    MainThread:11956 [wandb_init.py:init():897] sending inform_init request
+2025-07-01 17:41:42,361 INFO    MainThread:11956 [backend.py:_multiprocessing_setup():101] multiprocessing start_methods=spawn, using: spawn
+2025-07-01 17:41:42,361 INFO    MainThread:11956 [wandb_init.py:init():907] backend started and connected
+2025-07-01 17:41:42,362 INFO    MainThread:11956 [wandb_init.py:init():1005] updated telemetry
+2025-07-01 17:41:42,423 INFO    MainThread:11956 [wandb_init.py:init():1029] communicating run to backend with 90.0 second timeout
+2025-07-01 17:41:42,936 INFO    MainThread:11956 [wandb_init.py:init():1104] starting run threads in backend
+2025-07-01 17:41:43,175 INFO    MainThread:11956 [wandb_run.py:_console_start():2573] atexit reg
+2025-07-01 17:41:43,176 INFO    MainThread:11956 [wandb_run.py:_redirect():2421] redirect: wrap_raw
+2025-07-01 17:41:43,176 INFO    MainThread:11956 [wandb_run.py:_redirect():2490] Wrapping output streams.
+2025-07-01 17:41:43,176 INFO    MainThread:11956 [wandb_run.py:_redirect():2513] Redirects installed.
+2025-07-01 17:41:43,179 INFO    MainThread:11956 [wandb_init.py:init():1150] run started, returning control to user process
+2025-07-01 17:42:24,729 INFO    MainThread:11956 [wandb_run.py:_finish():2321] finishing run ducks-riding-llamas/ride-those-llamas/hkjhyzyl
+2025-07-01 17:42:24,729 INFO    MainThread:11956 [wandb_run.py:_atexit_cleanup():2538] got exitcode: 0
+2025-07-01 17:42:24,730 INFO    MainThread:11956 [wandb_run.py:_restore():2520] restore
+2025-07-01 17:42:24,730 INFO    MainThread:11956 [wandb_run.py:_restore():2526] restore done
+2025-07-01 17:42:25,806 INFO    MainThread:11956 [wandb_run.py:_footer_history_summary_info():4188] rendering history
+2025-07-01 17:42:25,807 INFO    MainThread:11956 [wandb_run.py:_footer_history_summary_info():4220] rendering summary
+2025-07-01 17:42:25,807 INFO    MainThread:11956 [wandb_run.py:_footer_sync_info():4149] logging synced files

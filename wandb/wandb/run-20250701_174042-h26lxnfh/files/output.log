@@ -1,0 +1,18 @@
+[34m[1mwandb[0m: [32m[41mERROR[0m wandb.watch only works with pytorch, couldn't import torch.
+Traceback (most recent call last):
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\main_ppo.py", line 91, in <module>
+    wandb.watch(
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\wandb\sdk\wandb_run.py", line 406, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\wandb\sdk\wandb_run.py", line 451, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\wandb\sdk\wandb_run.py", line 3035, in watch
+    wandb.sdk._watch(self, models, criterion, log, log_freq, idx, log_graph)
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\wandb\sdk\wandb_watch.py", line 82, in _watch
+    torch = wandb.util.get_module(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\wandb\util.py", line 263, in get_module
+    raise wandb.Error(required)
+wandb.errors.errors.Error: wandb.watch only works with pytorch, couldn't import torch.
