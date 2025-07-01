@@ -41,8 +41,13 @@ class PPO_Agent:
 
     
     def train_ppo(self, env):
-        rew, total_episodes = self.run_ppo(training=True, env=env, model_path=None)
-        return rew, total_episodes
+        reward_log, total_episodes = self.run_ppo(training=True, env=env, model_path=None)
+        
+        # Save model at the end of training
+        overall_avg = sum(reward_log) / len(reward_log) if reward_log else 0
+        model_paths = self.save_model(overall_avg)
+        
+        return reward_log, total_episodes, model_paths
 
     def validate_ppo(self, env, model_path):
         rew, total_episodes = self.run_ppo(training=False, env=env, model_path=model_path)
@@ -58,14 +63,35 @@ class PPO_Agent:
             print("Initial action probs:", [f"{p:.2f}" for p in tf.nn.softmax(self.actor_network(tf.expand_dims(env.reset(mode=mode), 0)))[0].numpy()], "Entropy:", f"{self.entropy:.2f}")
         else:
             mode = 'validation'
-            # examine if the model exist
-            if not os.path.exists(model_path):
-                print(f"PPO Agent file not found: {model_path}")
-                return None
-
-            # load model
-            print(f"Loading ppo agent from: {model_path}")
-            self.actor_network = tf.keras.models.load_model(model_path)
+            # Check if model path is a tuple (actor_path, critic_path) or a string (legacy format)
+            if isinstance(model_path, tuple) and len(model_path) == 2:
+                actor_path, critic_path = model_path
+            else:
+                # Legacy path handling - assume it's the actor path
+                actor_path = model_path
+                # Try to infer critic path by replacing "_actor" with "_critic" or adding "_critic" before ".keras"
+                if "_actor" in actor_path:
+                    critic_path = actor_path.replace("_actor", "_critic")
+                else:
+                    critic_path = actor_path.replace(".keras", "_critic.keras")
+        
+            # Check if actor model exists
+            if not os.path.exists(actor_path):
+                print(f"PPO Actor file not found: {actor_path}")
+                return None, 0
+                
+            # Load actor model
+            print(f"Loading PPO actor from: {actor_path}")
+            self.actor_network = tf.keras.models.load_model(actor_path)
+            
+            # Try to load critic if it exists
+            if os.path.exists(critic_path):
+                print(f"Loading PPO critic from: {critic_path}")
+                self.critic_network = tf.keras.models.load_model(critic_path)
+            else:
+                print(f"Warning: PPO Critic file not found: {critic_path}. Using randomly initialized critic.")
+                
+            # Set exploration parameters to zero for deterministic policy
             self.entropy = 0.0
             self.entropy_decay = 0.0
             self.entropy_min = 0.0
@@ -156,8 +182,6 @@ class PPO_Agent:
         if training:
             print(f"\n[Training Done] Overall Avg Reward: {overall_avg:.2f}")
             wandb.summary["overall_avg_reward"] = overall_avg 
-            print("Saving model...")
-            self.save_model(overall_avg)
             return reward_log, number_episodes
         else:
             print(f"[Validation Done] Overall Avg Reward: {overall_avg:.2f}")
@@ -278,15 +302,19 @@ class PPO_Agent:
         existing = [f for f in os.listdir(base_dir) if f.startswith("ppo_agent_") and f.endswith(".keras")]
 
         index = len(existing)
-        file_name = f"ppo_agent_{index}_reward{avg_reward:.2f}.keras"
-        full_path = os.path.join(base_dir, file_name)
+        file_name = f"ppo_agent_{index}_reward{avg_reward:.2f}"
+        actor_path = os.path.join(base_dir, f"{file_name}_actor.keras")
+        critic_path = os.path.join(base_dir, f"{file_name}_critic.keras")
 
-        while os.path.exists(full_path):
+        while os.path.exists(actor_path) or os.path.exists(critic_path):
             index += 1
-            file_name = f"ppo_agent_{index}_reward{avg_reward:.2f}.keras"
-            full_path = os.path.join(base_dir, file_name)
+            file_name = f"ppo_agent_{index}_reward{avg_reward:.2f}"
+            actor_path = os.path.join(base_dir, f"{file_name}_actor.keras")
+            critic_path = os.path.join(base_dir, f"{file_name}_critic.keras")
 
-        self.actor_network.save(full_path)
-        print(f"PPO Agent saved: {file_name} in {full_path}")
+        # Save both networks
+        self.actor_network.save(actor_path)
+        self.critic_network.save(critic_path)
+        print(f"PPO Agent saved: {file_name} in {base_dir}")
         
-        return full_path
+        return actor_path, critic_path
