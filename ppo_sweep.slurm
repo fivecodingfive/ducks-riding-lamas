@@ -11,7 +11,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=06:00:00
-#SBATCH --array=0-44%10            # 45 configs, 10 in parallel
+#SBATCH --array=0-107%10          # 45 configs, 10 in parallel
 
 set -euo pipefail                  # fail fast
 
@@ -27,7 +27,7 @@ mkdir -p logs
 # ─── TensorBoard log dir (one subfolder per array task) ──────────────────────
 export TB_ROOT=$SCRATCH/tb
 export TB_LOGDIR=$TB_ROOT/${SLURM_JOB_ID}_${SLURM_ARRAY_TASK_ID}
-mkdir -p "$TB_LOGDI
+mkdir -p "$TB_LOGDIR"
 
 # ─── BLAS threading ──────────────────────────────────────────────────────────
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
