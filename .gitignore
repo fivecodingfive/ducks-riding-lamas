@@ -13,7 +13,9 @@ __pycache__/
 .idea/
 
 # Virtual environment directory
+venv/
 .venv/
+
 
 # Personal files with comments
 environment_with_comments.py
