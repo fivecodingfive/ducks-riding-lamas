@@ -17,19 +17,17 @@ set -euo pipefail                  # fail fast
 
 # ─── modules & venv ───────────────────────────────────────────────────────────
 module load slurm_setup
-module load python/3.10.10-extended
+module load python/3.10.12-extended
 source ~/venvs/ppo/bin/activate
 
 # ─── logging / plotting ───────────────────────────────────────────────────────
+# plain matplotlib still fine
 mkdir -p logs
-export MPLBACKEND=Agg
 
-# ─── Weights & Biases (OFFLINE) ──────────────────────────────────────────────
-export WANDB_MODE=offline
-export WANDB_DIR=$SCRATCH/wandb            # fast local storage
-export WANDB_PROJECT=ride-those-llamas
-export WANDB_ENTITY=ducks-riding-llamas
-mkdir -p "$WANDB_DIR"
+# ─── TensorBoard log dir (one subfolder per array task) ──────────────────────
+export TB_ROOT=$SCRATCH/tb
+export TB_LOGDIR=$TB_ROOT/${SLURM_JOB_ID}_${SLURM_ARRAY_TASK_ID}
+mkdir -p "$TB_LOGDI
 
 # ─── BLAS threading ──────────────────────────────────────────────────────────
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
