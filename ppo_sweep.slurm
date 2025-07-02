@@ -20,7 +20,7 @@ set -euo pipefail                  # fail fast
 # ─── modules & venv ───────────────────────────────────────────────────────────
 module load slurm_setup
 module load python/3.10.10-extended
-source ../tfvenv/bin/activate
+source ~/venvs/ppo/bin/activate
 
 # ─── logging / plotting ───────────────────────────────────────────────────────
 mkdir -p logs
