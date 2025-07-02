@@ -13,7 +13,7 @@
 #SBATCH --time=06:00:00
 #SBATCH --array=0-107%10          # 45 configs, 10 in parallel
 
-set -euo pipefail                  # fail fast
+set -euxo pipefail              # fail fast
 
 # ─── modules & venv ───────────────────────────────────────────────────────────
 module load slurm_setup
