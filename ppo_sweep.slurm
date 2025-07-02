@@ -12,8 +12,6 @@
 #SBATCH --mem=16G
 #SBATCH --time=06:00:00
 #SBATCH --array=0-44%10            # 45 configs, 10 in parallel
-#SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=jonas05.coding@gmail.com
 
 set -euo pipefail                  # fail fast
 
