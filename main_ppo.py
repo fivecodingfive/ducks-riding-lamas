@@ -112,14 +112,6 @@ agent = PPO_Agent(config=ppo_config)
 USE_TB: bool = bool(os.getenv("TB_LOGDIR"))
 USE_WANDB: bool = bool(wandb) and os.getenv("WANDB_MODE", "online") != "disabled"
 
-# ── TensorBoard ----------------------------------------------------------------
-tb_writer: SummaryWriter | None = None
-if USE_TB:
-    tb_logdir = pathlib.Path(os.getenv("TB_LOGDIR", "./tb_local"))
-    tb_logdir.mkdir(parents=True, exist_ok=True)
-    tb_writer = SummaryWriter(log_dir=str(tb_logdir))
-    print(f"[TensorBoard] logging to {tb_logdir}")
-
 # ── W&B ------------------------------------------------------------------------
 wandb_run = None
 if USE_WANDB:
@@ -162,13 +154,6 @@ start_wall = time.time()
 
 if args.mode == "training":
     reward_log, _, _ = agent.train_ppo(env)
-
-    # Log to TensorBoard
-    if tb_writer is not None:
-        for ep, rew in enumerate(reward_log):
-            tb_writer.add_scalar("reward/episode", rew, ep)
-        tb_writer.add_scalar("reward/final_avg", float(np.mean(reward_log)), len(reward_log))
-        tb_writer.flush()
 
     # Log to W&B
     if USE_WANDB and wandb_run is not None:
