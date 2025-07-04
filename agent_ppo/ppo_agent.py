@@ -269,39 +269,6 @@ class PPO_Agent:
         return actor_path, actor_path.replace(".keras", "_critic.keras")
       
     def _save_model(self, avg_reward, base=None):
-        if base is None:
-            # Identify if running on LRZ cluster
-            hostname = socket.gethostname()
-            user = getpass.getuser()
-            is_cluster = "lrz" in hostname or "cm4" in hostname or user == "drlearn002"
-
-            if is_cluster:
-                base = os.path.expanduser("~/ppo_models")  # save to home dir on LRZ
-            else:
-                base = "models"  # local default
-
-        os.makedirs(base, exist_ok=True)
-
-        idx = len([f for f in os.listdir(base) if f.startswith("ppo_agent_") and f.endswith(".keras")])
-        fn = f"ppo_agent_{idx}_reward{avg_reward:.2f}"
-        actor_path = os.path.join(base, f"{fn}_actor.keras")
-        critic_path = os.path.join(base, f"{fn}_critic.keras")
-
-        while os.path.exists(actor_path) or os.path.exists(critic_path):
-            idx += 1
-            fn = f"ppo_agent_{idx}_reward{avg_reward:.2f}"
-            actor_path = os.path.join(base, f"{fn}_actor.keras")
-            critic_path = os.path.join(base, f"{fn}_critic.keras")
-
-        self.actor_network.save(actor_path)
-        self.critic_network.save(critic_path)
-
-        print(f"[Model saved] {fn} → {base}")
-        return actor_path, critic_path
-
-
-        # OLD
-        """
         os.makedirs(base, exist_ok=True)
         idx = len([f for f in os.listdir(base) if f.startswith("ppo_agent_") and f.endswith(".keras")])
         fn  = f"ppo_agent_{idx}_reward{avg_reward:.2f}"
@@ -311,9 +278,8 @@ class PPO_Agent:
             idx += 1; fn = f"ppo_agent_{idx}_reward{avg_reward:.2f}"
             actor_path  = os.path.join(base, f"{fn}_actor.keras")
             critic_path = os.path.join(base, f"{fn}_critic.keras")
+
         self.actor_network.save(actor_path)
         self.critic_network.save(critic_path)
         print(f"[Model saved] {fn} → {base}")
         return actor_path, critic_path
-        """
-# ------------------------------------------------------------------------------
