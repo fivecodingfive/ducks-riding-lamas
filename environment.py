@@ -30,7 +30,7 @@ tf.random.set_seed(seed)
 random.seed(seed)
 
 class Environment(object):
-    def _init_(self, variant, data_dir):
+    def __init__(self, variant, data_dir):
         self.variant = variant
         self.vertical_cell_count = 5
         self.horizontal_cell_count = 5
@@ -323,5 +323,4 @@ class Environment(object):
                 return obs
 
     def get_loc(self):
-    
-        return self.agent_loc, self.target_loc, self.item_locs
+        return self.agent_loc, self.target_loc, self.item_locs
