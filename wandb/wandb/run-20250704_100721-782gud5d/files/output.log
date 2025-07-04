@@ -1,0 +1,26 @@
+[W&B] run initialised
+Initial action probs: ['0.22', '0.22', '0.15', '0.22', '0.19'] Entropy: 0.10
+[5/20] Average Reward: -67.70
+Action probabilities: ['0.22', '0.22', '0.17', '0.18', '0.21'] Entropy: 0.10
+[10/20] Average Reward: -20.90
+Action probabilities: ['0.15', '0.08', '0.13', '0.44', '0.21'] Entropy: 0.10
+[15/20] Average Reward: -32.50
+Action probabilities: ['0.18', '0.12', '0.17', '0.24', '0.29'] Entropy: 0.09
+[20/20] Average Reward: -2.90
+Action probabilities: ['0.14', '0.12', '0.26', '0.15', '0.33'] Entropy: 0.09
+
+[Training Done] Overall Avg Reward: -31.00
+PPO Agent saved: ppo_agent_24_reward-31.00 in models
+Traceback (most recent call last):
+  File "/home/battist/projects/ducks-riding-lamas/main_ppo.py", line 180, in <module>
+    wandb_run.save()
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/wandb/sdk/wandb_run.py", line 398, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/wandb/sdk/wandb_run.py", line 456, in wrapper_fn
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/wandb/sdk/wandb_run.py", line 443, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Run.save() missing 1 required positional argument: 'glob_str'
