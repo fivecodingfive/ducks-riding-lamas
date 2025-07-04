@@ -23,10 +23,10 @@ _df = pd.read_csv("item_spawn_counts.csv", index_col=0)
 _counts = _df.to_numpy(dtype=np.float32)
 spawn_distribution = _counts / _counts.sum()
 network_type = args.network
-_df = pd.read_csv("item_spawn_counts.csv", index_col=0)
-_counts = _df.to_numpy(dtype=np.float32)
-spawn_distribution = _counts / _counts.sum()
-network_type = args.network
+
+seed = args.seed or 42
+np.random.seed(seed)
+tf.random.set_seed(seed)
 
 class Environment(object):
     def __init__(self, variant, data_dir):
