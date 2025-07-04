@@ -173,7 +173,4 @@ print(f"Total runtime: {time.time() - start_wall:.2f}s", flush=True)
 # 8 · Clean‑up -------------------------------------------------------------------
 # ═══════════════════════════════════════════════════════════════════════════════
 
-if tb_writer is not None:
-    tb_writer.close()
-if USE_WANDB and wandb_run is not None:
-    wandb.finish()
+wandb.finish()

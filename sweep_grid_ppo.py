@@ -10,9 +10,9 @@ def get_sweep_config(args):
     learning_rates = [0.0003, 0.0001]
     value_lrs = [0.001, 0.0005]
     train_policy_epochs = [20]
-    clips = [0.1, 0.05]
+    clips = [0.2, 0.3, 0.4]
     entropies = [0, 0.3, 0.05]
-    entropy_decay = [0.9999, 0.95]
+    entropy_decay = [0.95]
     lams = [0.9, 0.95]
     seeds = list(range(1))
     
