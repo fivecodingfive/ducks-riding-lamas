@@ -1,0 +1,74 @@
+[W&B] run initialised
+Initial action probs: ['0.20', '0.24', '0.17', '0.17', '0.22'] Entropy: 0.10
+[5/200] Average Reward: -74.30
+Action probabilities: ['0.25', '0.24', '0.16', '0.15', '0.21'] Entropy: 0.10
+[10/200] Average Reward: -56.90
+Action probabilities: ['0.28', '0.23', '0.14', '0.14', '0.20'] Entropy: 0.09
+Traceback (most recent call last):
+  File "/home/battist/projects/ducks-riding-lamas/main_ppo.py", line 164, in <module>
+    reward_log, _, _ = agent.train_ppo(env)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/projects/ducks-riding-lamas/agent_ppo/ppo_agent.py", line 44, in train_ppo
+    reward_log, total_episodes = self.run_ppo(training=True, env=env, model_path=None)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/projects/ducks-riding-lamas/agent_ppo/ppo_agent.py", line 118, in run_ppo
+    value_from_critic = self.critic_network(encoded_state) # Get value of current state
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 117, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/layers/layer.py", line 910, in __call__
+    outputs = super().__call__(*args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 117, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/ops/operation.py", line 58, in __call__
+    return call_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 156, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/models/sequential.py", line 221, in call
+    return self._functional.call(inputs, training=training, mask=mask)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/models/functional.py", line 183, in call
+    outputs = self._run_through_graph(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/ops/function.py", line 171, in _run_through_graph
+    outputs = op(*args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/models/functional.py", line 643, in call
+    return operation(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 117, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/layers/layer.py", line 910, in __call__
+    outputs = super().__call__(*args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 117, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/ops/operation.py", line 58, in __call__
+    return call_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 156, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/layers/core/dense.py", line 148, in call
+    x = self.activation(x)
+        ^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/activations/activations.py", line 47, in relu
+    return ReLU.static_call(
+           ^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/activations/activations.py", line 101, in static_call
+    x = backend.nn.relu(x)
+        ^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/keras/src/backend/tensorflow/nn.py", line 15, in relu
+    return tf.nn.relu(x)
+           ^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/ops/gen_nn_ops.py", line 11582, in relu
+    _result = pywrap_tfe.TFE_Py_FastPathExecute(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

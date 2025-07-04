@@ -1,0 +1,43 @@
+{
+  "os":  "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python":  "CPython 3.11.9",
+  "startedAt":  "2025-07-04T08:10:44.168502Z",
+  "args":  [
+    "--seed",
+    "24"
+  ],
+  "program":  "/home/battist/projects/ducks-riding-lamas/main_ppo.py",
+  "codePath":  "main_ppo.py",
+  "codePathLocal":  "main_ppo.py",
+  "git":  {
+    "remote":  "https://github.com/fivecodingfive/ducks-riding-lamas",
+    "commit":  "ee409f68b96ad4c02c30c9751cd046404812cec1"
+  },
+  "email":  "battist.becker@web.de",
+  "root":  "./wandb",
+  "host":  "Battist-Laptop",
+  "executable":  "/home/battist/miniconda3/envs/lab/bin/python",
+  "cpu_count":  10,
+  "cpu_count_logical":  20,
+  "gpu":  "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "1081101176832",
+      "used":  "17702854656"
+    }
+  },
+  "memory":  {
+    "total":  "8235892736"
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA GeForce RTX 4050 Laptop GPU",
+      "memoryTotal":  "6439305216",
+      "architecture":  "Ada",
+      "uuid":  "GPU-f9ac9efa-30db-a625-7ab2-551748806900"
+    }
+  ],
+  "cudaVersion":  "12.2",
+  "writerId":  "6t5oq7wzaqc2v5au96roz5ulxm5ag703"
+}

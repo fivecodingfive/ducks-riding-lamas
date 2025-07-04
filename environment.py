@@ -27,6 +27,7 @@ network_type = args.network
 seed = args.seed or 42
 np.random.seed(seed)
 tf.random.set_seed(seed)
+random.seed(seed)
 
 class Environment(object):
     def __init__(self, variant, data_dir):
