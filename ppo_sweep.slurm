@@ -11,7 +11,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=06:00:00
-#SBATCH --array=0-251    
+#SBATCH --array=0-129    
 
 set -euxo pipefail              # fail fast
 
