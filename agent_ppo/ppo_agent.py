@@ -265,10 +265,10 @@ class PPO_Agent:
         if isinstance(actor_path, tuple):  # already split
             return actor_path
         if "_actor" in actor_path:
-            return actor_path, actor_path.replace("_actor", "_critic")
-        return actor_path, actor_path.replace(".keras", "_critic.keras")
+        return actor_path, actor_path.replace("_actor", "_critic")
+    return actor_path, actor_path.replace(".keras", "_critic.keras")
       
-    def _save_model(self, avg_reward, base=None):
+    def _save_model(self, avg_reward, base='models'):
         os.makedirs(base, exist_ok=True)
         idx = len([f for f in os.listdir(base) if f.startswith("ppo_agent_") and f.endswith(".keras")])
         fn  = f"ppo_agent_{idx}_reward{avg_reward:.2f}"
