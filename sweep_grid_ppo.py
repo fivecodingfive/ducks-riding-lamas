@@ -14,9 +14,12 @@ def get_sweep_config(args):
     entropies = [0.1]
     entropy_decay = [0.995, 0.95, 0.9]
     lams = [0.9, 0.95]
+    seeds = list(range(7))
     
     # Create the full grid of combinations
-    grid = list(itertools.product(learning_rates, value_lrs, train_policy_epochs, clips, entropies, entropy_decay, lams))
+    grid = list(itertools.product(
+        learning_rates, value_lrs, train_policy_epochs,
+        clips, entropies, entropy_decay, lams, seeds))
     
     # Get sweep ID from environment or argument
     sweep_id = int(os.getenv("SLURM_ARRAY_TASK_ID", args.sweep_id or 0))
@@ -27,7 +30,11 @@ def get_sweep_config(args):
         sweep_id = sweep_id % len(grid)
     
     # Set args based on grid position
-    args.policy_lr, args.value_lr, args.train_policy_epochs, args.clip, args.entropy, args.entropy_decay, args.lam = grid[sweep_id]
+    (
+        args.policy_lr, args.value_lr, args.train_policy_epochs,
+        args.clip, args.entropy, args.entropy_decay, args.lam,
+        args.seed                                       
+    ) = grid[sweep_id]
     
     # Print sweep configuration
     print(f"[SWEEP] ID: {sweep_id}/{len(grid)-1} | "

@@ -20,8 +20,7 @@ def build_critic_model(state_size, action_size):
     if action_size == 1:
         output = tf.squeeze(output, axis=1)
     return tf.keras.Model(inputs=observation_input, outputs=output)
-    """
-
+"""
 
 def build_actor_model(input_dim, output_dim):
     return models.Sequential([

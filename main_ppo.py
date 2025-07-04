@@ -52,8 +52,6 @@ parser.add_argument("--clip", type=float)
 parser.add_argument("--entropy", type=float)
 parser.add_argument("--entropy_decay", type=float)
 parser.add_argument("--lam", type=float)
-parser.add_argument("--train_policy_epochs", type=int)
-parser.add_argument("--train_value_epochs", type=int)
 args = parser.parse_args()
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -125,7 +123,7 @@ if USE_TB:
 # ── W&B ------------------------------------------------------------------------
 wandb_run = None
 if USE_WANDB:
-    run_name = f"ppo_v{args.variant}_{datetime.now():%b%d_%H%M%S}"
+    run_name = f"ppo_v{args.variant}_seed{args.seed}_{datetime.now():%b%d_%H%M%S}"
     try:
         wandb_run = wandb.init(
             entity="ducks-riding-llamas",
