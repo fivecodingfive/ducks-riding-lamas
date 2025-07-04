@@ -30,7 +30,7 @@ tf.random.set_seed(seed)
 random.seed(seed)
 
 class Environment(object):
-    def __init__(self, variant, data_dir):
+    def _init_(self, variant, data_dir):
         self.variant = variant
         self.vertical_cell_count = 5
         self.horizontal_cell_count = 5
@@ -100,11 +100,15 @@ class Environment(object):
 
         return self.get_obs()
 
+    def manhattan(self, a, b):
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
     # take one environment step based on the action act
     def step(self, act):
         self.step_count += 1
 
         rew = 0
+        prev_loc = self.agent_loc  # store previous location for distance calculation
 
         # done signal (1 if episode ends, 0 if not)
         if self.step_count == self.episode_steps:
@@ -125,7 +129,16 @@ class Environment(object):
 
             if new_loc in self.eligible_cells:
                 self.agent_loc = new_loc
-                rew += -1
+                # rew += -1
+                
+        if self.item_locs:
+            # Find distance before and after move
+            prev_dist = min([self.manhattan(prev_loc, item) for item in self.item_locs])
+            curr_dist = min([self.manhattan(self.agent_loc, item) for item in self.item_locs])
+            if curr_dist < prev_dist:
+                rew += 0.5  # moving closer
+            elif curr_dist > prev_dist:
+                rew -= 0.2  # moving away
 
         # item pick-up
         if (self.agent_load < self.agent_capacity) and (self.agent_loc in self.item_locs):
@@ -214,16 +227,20 @@ class Environment(object):
 
             elif network_type == 'mlp':
                 obs = []
+
+
                 agent_y, agent_x = self.agent_loc
                 obs.extend([float(agent_x), float(agent_y)])  # Position
                 obs.append(float(self.agent_load))            # Load
+
 
                 # Default: kein Item → nutze spawn_distribution
                 use_distribution = len(self.item_locs) == 0
                 dx, dy = 0.0, 0.0
 
+
                 if not use_distribution:
-                # Suche bestes erreichbares Item
+                    # Suche bestes erreichbares Item
                     min_step = float('inf')
                     for i, (iy, ix) in enumerate(self.item_locs):
                         time_left = self.max_response_time - self.item_times[i]
@@ -233,13 +250,16 @@ class Environment(object):
                             dy = iy - agent_y
                             min_step = step_cost
 
+
                 obs.extend([dx, dy])  # Richtung zum besten Item oder (0, 0)
+
 
                 # Entweder echte Verteilung oder Dummy
                 if use_distribution:
                     obs.extend(spawn_distribution[0, :].tolist())  # z. B. Zeile 0 nehmen
                 else:
                     obs.extend([0.0] * 5)
+
 
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
             
@@ -304,5 +324,4 @@ class Environment(object):
 
     def get_loc(self):
     
-        return self.agent_loc, self.target_loc, self.item_locs   
-  
+        return self.agent_loc, self.target_loc, self.item_locs
