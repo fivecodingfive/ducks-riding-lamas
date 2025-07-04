@@ -1,0 +1,86 @@
+[W&B] run initialised
+Initial action probs: ['0.20', '0.26', '0.22', '0.13', '0.18'] Entropy: 0.10
+[5/200] Average Reward: -54.50
+Action probabilities: ['0.25', '0.27', '0.20', '0.11', '0.17'] Entropy: 0.10
+[10/200] Average Reward: -27.30
+Action probabilities: ['0.28', '0.27', '0.19', '0.09', '0.16'] Entropy: 0.09
+[15/200] Average Reward: -13.90
+Action probabilities: ['0.30', '0.29', '0.18', '0.08', '0.16'] Entropy: 0.09
+[20/200] Average Reward: -9.10
+Action probabilities: ['0.31', '0.30', '0.16', '0.07', '0.16'] Entropy: 0.08
+[25/200] Average Reward: -7.10
+Action probabilities: ['0.33', '0.28', '0.13', '0.07', '0.18'] Entropy: 0.08
+[30/200] Average Reward: -8.90
+Action probabilities: ['0.32', '0.27', '0.13', '0.08', '0.21'] Entropy: 0.08
+[35/200] Average Reward: -7.70
+Action probabilities: ['0.33', '0.24', '0.13', '0.08', '0.23'] Entropy: 0.08
+[40/200] Average Reward: -6.40
+Action probabilities: ['0.35', '0.23', '0.12', '0.07', '0.23'] Entropy: 0.07
+[45/200] Average Reward: -5.30
+Action probabilities: ['0.46', '0.20', '0.13', '0.04', '0.17'] Entropy: 0.07
+[50/200] Average Reward: -1.10
+Action probabilities: ['0.47', '0.22', '0.13', '0.04', '0.14'] Entropy: 0.07
+[55/200] Average Reward: -2.50
+Action probabilities: ['0.40', '0.23', '0.14', '0.04', '0.18'] Entropy: 0.06
+[60/200] Average Reward: -3.70
+Action probabilities: ['0.31', '0.28', '0.17', '0.05', '0.20'] Entropy: 0.06
+[65/200] Average Reward: -5.20
+Action probabilities: ['0.34', '0.26', '0.16', '0.04', '0.19'] Entropy: 0.06
+[70/200] Average Reward: -3.30
+Action probabilities: ['0.43', '0.22', '0.15', '0.04', '0.16'] Entropy: 0.06
+[75/200] Average Reward: -0.10
+Action probabilities: ['0.50', '0.17', '0.14', '0.04', '0.15'] Entropy: 0.05
+[80/200] Average Reward: -2.50
+Action probabilities: ['0.58', '0.14', '0.13', '0.03', '0.12'] Entropy: 0.05
+[85/200] Average Reward: -0.10
+Action probabilities: ['0.57', '0.15', '0.14', '0.03', '0.12'] Entropy: 0.05
+[90/200] Average Reward: -0.90
+Action probabilities: ['0.53', '0.14', '0.15', '0.03', '0.14'] Entropy: 0.05
+[95/200] Average Reward: -0.90
+Action probabilities: ['0.57', '0.11', '0.16', '0.03', '0.13'] Entropy: 0.05
+[100/200] Average Reward: -1.30
+Action probabilities: ['0.64', '0.08', '0.16', '0.02', '0.11'] Entropy: 0.04
+[105/200] Average Reward: 0.30
+Action probabilities: ['0.64', '0.05', '0.20', '0.02', '0.09'] Entropy: 0.04
+[110/200] Average Reward: 0.70
+Action probabilities: ['0.67', '0.05', '0.18', '0.02', '0.08'] Entropy: 0.04
+[115/200] Average Reward: -0.40
+Action probabilities: ['0.68', '0.05', '0.19', '0.01', '0.07'] Entropy: 0.04
+[120/200] Average Reward: 0.70
+Action probabilities: ['0.71', '0.04', '0.17', '0.01', '0.06'] Entropy: 0.04
+[125/200] Average Reward: 0.70
+Action probabilities: ['0.62', '0.05', '0.25', '0.01', '0.07'] Entropy: 0.04
+[130/200] Average Reward: 1.10
+Action probabilities: ['0.52', '0.04', '0.35', '0.01', '0.07'] Entropy: 0.03
+[135/200] Average Reward: 1.10
+Action probabilities: ['0.53', '0.03', '0.37', '0.01', '0.06'] Entropy: 0.03
+[140/200] Average Reward: 1.50
+Action probabilities: ['0.59', '0.03', '0.31', '0.01', '0.05'] Entropy: 0.03
+[145/200] Average Reward: 1.50
+Action probabilities: ['0.69', '0.03', '0.22', '0.01', '0.05'] Entropy: 0.03
+[150/200] Average Reward: -0.80
+Action probabilities: ['0.73', '0.02', '0.20', '0.01', '0.04'] Entropy: 0.03
+[155/200] Average Reward: 0.40
+Action probabilities: ['0.71', '0.02', '0.21', '0.01', '0.05'] Entropy: 0.03
+[160/200] Average Reward: 0.90
+Action probabilities: ['0.72', '0.02', '0.20', '0.01', '0.05'] Entropy: 0.03
+[165/200] Average Reward: 1.50
+Action probabilities: ['0.75', '0.02', '0.17', '0.01', '0.05'] Entropy: 0.03
+[170/200] Average Reward: 1.50
+Action probabilities: ['0.77', '0.02', '0.16', '0.01', '0.04'] Entropy: 0.02
+[175/200] Average Reward: 1.50
+Action probabilities: ['0.81', '0.01', '0.13', '0.01', '0.04'] Entropy: 0.02
+[180/200] Average Reward: 1.10
+Action probabilities: ['0.81', '0.01', '0.14', '0.01', '0.03'] Entropy: 0.02
+[185/200] Average Reward: 1.90
+Action probabilities: ['0.80', '0.01', '0.15', '0.01', '0.03'] Entropy: 0.02
+[190/200] Average Reward: 1.60
+Action probabilities: ['0.78', '0.01', '0.17', '0.01', '0.03'] Entropy: 0.02
+[195/200] Average Reward: 2.10
+Action probabilities: ['0.73', '0.01', '0.21', '0.01', '0.04'] Entropy: 0.02
+[200/200] Average Reward: 1.90
+Action probabilities: ['0.75', '0.01', '0.19', '0.01', '0.04'] Entropy: 0.02
+
+[Training Done] Overall Avg Reward: -3.52
+PPO Agent saved: ppo_agent_26_reward-3.52 in models
+Total runtime: 623.38s

@@ -1,0 +1,45 @@
+[W&B] run initialised
+[5/200] avg rew (5eps) = -80.90 | entropy 0.100
+[10/200] avg rew (5eps) = -77.00 | entropy 0.100
+[15/200] avg rew (5eps) = -67.80 | entropy 0.096
+[20/200] avg rew (5eps) = -70.50 | entropy 0.096
+[25/200] avg rew (5eps) = -77.40 | entropy 0.092
+[30/200] avg rew (5eps) = -73.40 | entropy 0.092
+[35/200] avg rew (5eps) = -68.90 | entropy 0.088
+[40/200] avg rew (5eps) = -55.50 | entropy 0.088
+[45/200] avg rew (5eps) = -59.40 | entropy 0.085
+[50/200] avg rew (5eps) = -64.30 | entropy 0.085
+[55/200] avg rew (5eps) = -42.00 | entropy 0.082
+[60/200] avg rew (5eps) = -59.00 | entropy 0.082
+[65/200] avg rew (5eps) = -55.30 | entropy 0.078
+[70/200] avg rew (5eps) = -58.40 | entropy 0.078
+[75/200] avg rew (5eps) = -48.60 | entropy 0.075
+[80/200] avg rew (5eps) = -54.60 | entropy 0.075
+[85/200] avg rew (5eps) = -51.70 | entropy 0.072
+[90/200] avg rew (5eps) = -50.50 | entropy 0.072
+[95/200] avg rew (5eps) = -46.60 | entropy 0.069
+[100/200] avg rew (5eps) = -45.60 | entropy 0.069
+[105/200] avg rew (5eps) = -47.80 | entropy 0.066
+[110/200] avg rew (5eps) = -38.00 | entropy 0.066
+[115/200] avg rew (5eps) = -36.70 | entropy 0.064
+[120/200] avg rew (5eps) = -60.70 | entropy 0.064
+[125/200] avg rew (5eps) = -49.70 | entropy 0.061
+[130/200] avg rew (5eps) = -37.70 | entropy 0.061
+[135/200] avg rew (5eps) = -39.80 | entropy 0.059
+[140/200] avg rew (5eps) = -39.70 | entropy 0.059
+[145/200] avg rew (5eps) = -33.40 | entropy 0.056
+[150/200] avg rew (5eps) = -34.60 | entropy 0.056
+[155/200] avg rew (5eps) = -49.80 | entropy 0.054
+[160/200] avg rew (5eps) = -24.20 | entropy 0.054
+[165/200] avg rew (5eps) = -27.20 | entropy 0.052
+[170/200] avg rew (5eps) = -38.80 | entropy 0.052
+[175/200] avg rew (5eps) = -24.30 | entropy 0.050
+[180/200] avg rew (5eps) = -34.60 | entropy 0.050
+[185/200] avg rew (5eps) = -32.90 | entropy 0.048
+[190/200] avg rew (5eps) = -34.60 | entropy 0.048
+[195/200] avg rew (5eps) = -32.90 | entropy 0.046
+[200/200] avg rew (5eps) = -40.20 | entropy 0.046
+
+[Training done] overall avg reward = -49.12
+[Model saved] ppo_agent_34_reward-49.12 → models
+Total runtime: 354.60s

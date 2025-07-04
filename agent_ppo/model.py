@@ -24,23 +24,17 @@ def build_critic_model(state_size, action_size):
 
 
 def build_actor_model(input_dim, output_dim):
-    model = models.Sequential([
-        layers.Input(shape=(input_dim,)),
-        layers.BatchNormalization(),
-        layers.Dense(128, activation='relu'),
-        layers.Dense(64, activation='relu'),
-        
-        layers.Dense(output_dim)
-    ])
-    return model
+    return models.Sequential([
+        layers.Dense(128, activation='relu', kernel_initializer='he_normal', input_shape=(input_dim,)),
+        layers.LayerNormalization(),  # Better than BN for RL
+        layers.Dense(64, activation='relu', kernel_initializer='he_normal'),
+        layers.Dense(output_dim)  # Logits output
+    ], name='actor')
 
-def build_critic_model(input_dim, output_dim):
-    model = models.Sequential([
-        layers.Input(shape=(input_dim,)),
-        layers.BatchNormalization(),
-        layers.Dense(128, activation='relu'),
-        layers.Dense(64, activation='relu'),
-        
-        layers.Dense(output_dim)
-    ])
-    return model
+def build_critic_model(input_dim, output_dim=1):
+    return models.Sequential([
+        layers.Dense(128, activation='relu', kernel_initializer='he_normal', input_shape=(input_dim,)),
+        layers.LayerNormalization(),
+        layers.Dense(64, activation='relu', kernel_initializer='he_normal'),
+        layers.Dense(output_dim, activation='linear')  # Must have linear activation!
+    ], name='critic')

@@ -1,0 +1,41 @@
+{"time":"2025-07-04T10:25:24.1222136+02:00","level":"INFO","msg":"stream: starting","core version":"0.21.0"}
+{"time":"2025-07-04T10:25:24.4741824+02:00","level":"INFO","msg":"stream: created new stream","id":"z9n2lztq"}
+{"time":"2025-07-04T10:25:24.4741824+02:00","level":"INFO","msg":"stream: started","id":"z9n2lztq"}
+{"time":"2025-07-04T10:25:24.4741824+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"z9n2lztq"}
+{"time":"2025-07-04T10:25:24.4741824+02:00","level":"INFO","msg":"handler: started","stream_id":"z9n2lztq"}
+{"time":"2025-07-04T10:25:24.4741824+02:00","level":"INFO","msg":"sender: started","stream_id":"z9n2lztq"}
+{"time":"2025-07-04T10:25:24.749752+02:00","level":"ERROR","msg":"git repo not found","error":"repository does not exist"}
+{"time":"2025-07-04T10:25:39.7540812+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:25:54.7512582+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:26:09.7525512+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:26:24.7525461+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:26:39.773799+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:26:54.7766175+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:27:09.7536116+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:27:24.7500406+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:27:39.7537089+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:27:54.7537704+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:28:09.75687+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:28:24.7571426+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:28:39.7523092+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:28:54.7519496+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:29:09.7512717+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:29:24.7525569+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:29:39.7537396+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:29:54.752422+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:30:09.7526219+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:30:24.7511919+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:30:39.7537905+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:30:54.7528602+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:31:09.7540372+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:31:24.7556134+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:31:39.7506853+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:31:54.7514328+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:32:09.7536366+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T10:32:21.7970099+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-07-04T10:32:22.0114364+02:00","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2025-07-04T10:32:22.0220248+02:00","level":"INFO","msg":"stream: closing","id":"z9n2lztq"}
+{"time":"2025-07-04T10:32:22.0220248+02:00","level":"INFO","msg":"handler: closed","stream_id":"z9n2lztq"}
+{"time":"2025-07-04T10:32:22.0220248+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"z9n2lztq"}
+{"time":"2025-07-04T10:32:22.0220248+02:00","level":"INFO","msg":"sender: closed","stream_id":"z9n2lztq"}
+{"time":"2025-07-04T10:32:22.0285158+02:00","level":"INFO","msg":"stream: closed","id":"z9n2lztq"}

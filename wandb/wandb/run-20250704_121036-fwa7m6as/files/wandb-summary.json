@@ -1,0 +1,1 @@
+{"_wandb":{"runtime":366},"episode":199,"rollout_value_loss":4.978213596343994,"_timestamp":1.7516242037519937e+09,"reward":1.5,"entropy_coef":0.18183125231650604,"episode_length":200,"overall_avg_reward":-16.64,"_step":399,"_runtime":366,"rollout_policy_loss":-0.22118469774723054,"rollout_entropy":1.1021690368652344}

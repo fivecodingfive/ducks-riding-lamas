@@ -1,0 +1,31 @@
+{"time":"2025-07-04T11:38:16.3642465+02:00","level":"INFO","msg":"stream: starting","core version":"0.21.0"}
+{"time":"2025-07-04T11:38:16.6644905+02:00","level":"INFO","msg":"stream: created new stream","id":"04bihv8l"}
+{"time":"2025-07-04T11:38:16.6644905+02:00","level":"INFO","msg":"stream: started","id":"04bihv8l"}
+{"time":"2025-07-04T11:38:16.6644905+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"04bihv8l"}
+{"time":"2025-07-04T11:38:16.6644905+02:00","level":"INFO","msg":"sender: started","stream_id":"04bihv8l"}
+{"time":"2025-07-04T11:38:16.6644905+02:00","level":"INFO","msg":"handler: started","stream_id":"04bihv8l"}
+{"time":"2025-07-04T11:38:16.9063327+02:00","level":"ERROR","msg":"git repo not found","error":"repository does not exist"}
+{"time":"2025-07-04T11:38:31.9136639+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:38:46.9146243+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:39:01.9161858+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:39:16.9160718+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:39:31.9146685+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:39:46.9132728+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:40:01.9141924+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:40:16.920588+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:40:31.9486418+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:40:46.9149029+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:41:01.9171891+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:41:16.9144362+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:41:31.9143141+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:41:46.9159481+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:42:01.9131749+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:42:16.9183435+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:42:31.9196449+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:42:46.9136875+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:42:59.2506342+02:00","level":"INFO","msg":"stream: closing","id":"04bihv8l"}
+{"time":"2025-07-04T11:42:59.7891827+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-07-04T11:43:00.0210538+02:00","level":"INFO","msg":"handler: closed","stream_id":"04bihv8l"}
+{"time":"2025-07-04T11:43:00.0210538+02:00","level":"INFO","msg":"sender: closed","stream_id":"04bihv8l"}
+{"time":"2025-07-04T11:43:00.0210538+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"04bihv8l"}
+{"time":"2025-07-04T11:43:00.0243046+02:00","level":"INFO","msg":"stream: closed","id":"04bihv8l"}

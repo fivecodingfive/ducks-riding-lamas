@@ -19,3 +19,6 @@ venv/
 
 # Personal files with comments
 environment_with_comments.py
+
+# WandB files
+wandb/
