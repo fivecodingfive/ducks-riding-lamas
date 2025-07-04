@@ -177,7 +177,7 @@ if args.mode == "training":
         wandb_run.name = (
             f"ppo_v{args.variant}_avg{float(np.mean(reward_log)):.1f}_{datetime.now():%b%d}"  # rename with final reward
         )
-        wandb_run.save()
+        #wandb_run.save()
 
 else:  # validation mode
     agent.validate_ppo(env, model_path=args.modelpath)
