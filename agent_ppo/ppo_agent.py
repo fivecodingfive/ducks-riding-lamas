@@ -145,6 +145,7 @@ class PPO_Agent:
             
         if training:
             wandb.summary["overall_avg_reward"] = overall
+            wandb.summary["overall_original_reward"] = np.mean(original_reward_log)
         return reward_log, self.no_episodes
     # ──────────────────────────────────────────────────────────────────────────
 

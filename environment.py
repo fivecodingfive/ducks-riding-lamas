@@ -134,23 +134,32 @@ class Environment(object):
                 elif shaping == True:
                     rew += -0.2
 
-        if shaping == True:     
-            if self.item_locs and self.agent_load == 0:
-                # Find distance before and after move btw agent and items
-                prev_dist = min([self.manhattan(prev_loc, item) for item in self.item_locs])
-                curr_dist = min([self.manhattan(self.agent_loc, item) for item in self.item_locs])
-                if curr_dist < prev_dist:
-                    rew += 0.5  # moving closer
-                elif curr_dist > prev_dist:
-                    rew -= 0.2  # moving away
-            elif self.item_locs and self.agent_load > 0:
+        if shaping == True:
+            if self.item_locs and self.agent_load == 0:     
+                reachable = []
+                for i, item in enumerate(self.item_locs):
+                    time_left = self.max_response_time - self.item_times[i]
+                    steps_needed = self.manhattan(self.agent_loc, item)
+                    if steps_needed <= time_left:
+                        reachable.append((i, item, steps_needed))
+
+                if reachable:
+                    # Find closest reachable item
+                    closest_i, closest_item, _ = min(reachable, key=lambda x: x[2])
+                    prev_dist = self.manhattan(prev_loc, closest_item)
+                    curr_dist = self.manhattan(self.agent_loc, closest_item)
+                    if curr_dist < prev_dist:
+                        rew += 2  # moving closer
+                    elif curr_dist > prev_dist:
+                        rew -= 2  # moving away
+            elif self.agent_load > 0:
                 # Find distance before and after move btw agent and target
                 prev_dist = self.manhattan(prev_loc, self.target_loc)
                 curr_dist = self.manhattan(self.agent_loc, self.target_loc)
                 if curr_dist < prev_dist:
-                    rew += 0.5
+                    rew += 2
                 elif curr_dist > prev_dist:
-                    rew -= 0.2  # moving away
+                    rew -= 2  # moving away
 
         # item pick-up
         if (self.agent_load < self.agent_capacity) and (self.agent_loc in self.item_locs):
