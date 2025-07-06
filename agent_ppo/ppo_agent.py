@@ -32,7 +32,7 @@ class PPO_Agent:
         self.entropy_min   = config["entropy_min"]
         self.clip_ratio    = config["clip_ratio"]
         self.train_policy_epochs        = config["train_policy_epochs"]
-        self.train_value_function_epochs = config["train_value_function_epochs"]
+        self.train_value_function_epochs = config["train_policy_epochs"]
         self.no_episodes  = config["n_episodes"]
 
         # --- networks & optimizers ---------------------------------------------
