@@ -152,6 +152,14 @@ class Environment(object):
                         rew += 2  # moving closer
                     elif curr_dist > prev_dist:
                         rew -= 2  # moving away
+                else:
+                    # Find distance before and after move btw agent and target
+                    prev_dist = self.manhattan(prev_loc, self.target_loc)
+                    curr_dist = self.manhattan(self.agent_loc, self.target_loc)
+                    if curr_dist < prev_dist:
+                        rew += 2
+                    elif curr_dist > prev_dist:
+                        rew -= 2  # moving away
             elif self.agent_load > 0:
                 # Find distance before and after move btw agent and target
                 prev_dist = self.manhattan(prev_loc, self.target_loc)

@@ -7,13 +7,13 @@ def get_sweep_config(args):
     Returns modified args with hyperparameters set according to grid position
     """
     # Define hyperparameter grid
-    learning_rates = [0.0007]
-    value_lrs = [0.0008]
-    train_epochs = [35]
-    clips = [0.4, 0.45]
+    learning_rates = [0.0007, 0.0001]
+    value_lrs = [0.0008, 0.0001]
+    train_epochs = [35, 20, 50]
+    clips = [0.4, 0.2]
     entropies = [0]
     entropy_decay = [0.95]
-    lams = [0.84]
+    lams = [0.84, 0.94]
     gamma = [0.95, 0.99]
     seeds = list(range(1))
     
