@@ -9,9 +9,9 @@ def get_sweep_config(args):
     # Define hyperparameter grid
     learning_rates = [0.0001, 0.0003]
     value_lrs = [0.001, 0.0005]
-    train_policy_epochs = [10, 40]
+    train_policy_epochs = [5, 15, 40]
     clips = [0.1, 0.2, 0.3]
-    entropies = [0]
+    entropies = [0, 0.05]
     entropy_decay = [0.95]
     lams = [0.9, 0.95]
     seeds = list(range(1))
