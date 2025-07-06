@@ -31,8 +31,7 @@ class PPO_Agent:
         self.entropy_decay = config["entropy_decay"]
         self.entropy_min   = config["entropy_min"]
         self.clip_ratio    = config["clip_ratio"]
-        self.train_policy_epochs        = config["train_policy_epochs"]
-        self.train_value_function_epochs = config["train_policy_epochs"]
+        self.train_epochs = config["train_epochs"]
         self.no_episodes  = config["n_episodes"]
 
         # --- networks & optimizers ---------------------------------------------
@@ -211,12 +210,12 @@ class PPO_Agent:
 
         # --- policy updates ----------------------------------------------------
         policy_losses, value_losses = [], []
-        for _ in range(self.train_policy_epochs):
+        for _ in range(self.train_epochs):
             pl, ent = self._train_policy(states, actions, logp, adv)
             policy_losses.append(float(pl)); entropy_bonus = float(ent)
 
         # --- value-function updates -------------------------------------------
-        for _ in range(self.train_value_function_epochs):
+        for _ in range(self.train_epochs):
             vl = self._train_value_function(states, rets)
             value_losses.append(float(vl))
 
