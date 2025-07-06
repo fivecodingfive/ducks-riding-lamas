@@ -22,6 +22,7 @@ class PPO_Agent:
         self.action_size    = config["action_size"]
         self.rollout_steps  = config["rollout_steps"]
         self.max_time_steps = config["max_time_steps"]
+        self.shaping        = config["shaping"]
 
         # --- hyper-parameters ---------------------------------------------------
         self.gamma   = config["gamma"]
@@ -88,7 +89,7 @@ class PPO_Agent:
                 logits, action = self._action_selection(encoded_state)
 
                 # env-step
-                reward, next_state, done = env.step(action)
+                reward, next_state, done = env.step(action, shaping=True if training else False)
 
                 if training:
                     value = self.critic_network(encoded_state)
@@ -117,11 +118,31 @@ class PPO_Agent:
             if ep % 5 == 0:
                 avg5 = np.mean(reward_log[-5:])
                 print(f"[{ep}/{self.no_episodes}] avg rew (5eps) = {avg5:.2f} | entropy {self.entropy:.3f}")
+                
+
 
         # -------- final summary -------------------------------------------------
         overall = np.mean(reward_log) if reward_log else 0.0
         tag = "Training" if training else "Validation"
         print(f"\n[{tag} done] overall avg reward = {overall:.2f}")
+        if self.shaping == True:
+            self.entropy = self.entropy_decay = self.entropy_min = 0.0
+            total_original_reward = 0.0
+            original_reward_log = []
+            for ep in range(1, 51):
+                state = env.reset(mode="validation")
+                total_original_reward, done = 0.0, False
+                while not done:
+                    encoded_state = tf.convert_to_tensor([state], tf.float32)
+                    logits, action = self._action_selection(encoded_state)
+                    original_reward, next_state, done = env.step(action, shaping=False)
+                    state = next_state
+                    total_original_reward += original_reward
+                wandb.log({"original_reward": total_original_reward}, step=ep+self.no_episodes)
+                print(f"[{ep}/{50}] original reward (no shaping) = {total_original_reward:.2f}")
+                original_reward_log.append(total_original_reward)
+            print(f"[{ep}/{50}] original reward (no shaping) = {np.mean(original_reward_log):.2f}")
+            
         if training:
             wandb.summary["overall_avg_reward"] = overall
         return reward_log, self.no_episodes

@@ -104,7 +104,7 @@ class Environment(object):
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
     # take one environment step based on the action act
-    def step(self, act):
+    def step(self, act, shaping=False):
         self.step_count += 1
 
         rew = 0
@@ -129,16 +129,28 @@ class Environment(object):
 
             if new_loc in self.eligible_cells:
                 self.agent_loc = new_loc
-                # rew += -1
-                
-        if self.item_locs:
-            # Find distance before and after move
-            prev_dist = min([self.manhattan(prev_loc, item) for item in self.item_locs])
-            curr_dist = min([self.manhattan(self.agent_loc, item) for item in self.item_locs])
-            if curr_dist < prev_dist:
-                rew += 0.5  # moving closer
-            elif curr_dist > prev_dist:
-                rew -= 0.2  # moving away
+                if shaping == False:
+                    rew += -1
+                elif shaping == True:
+                    rew += -0.2
+
+        if shaping == True:     
+            if self.item_locs and self.agent_load == 0:
+                # Find distance before and after move btw agent and items
+                prev_dist = min([self.manhattan(prev_loc, item) for item in self.item_locs])
+                curr_dist = min([self.manhattan(self.agent_loc, item) for item in self.item_locs])
+                if curr_dist < prev_dist:
+                    rew += 0.5  # moving closer
+                elif curr_dist > prev_dist:
+                    rew -= 0.2  # moving away
+            elif self.item_locs and self.agent_load > 0:
+                # Find distance before and after move btw agent and target
+                prev_dist = self.manhattan(prev_loc, self.target_loc)
+                curr_dist = self.manhattan(self.agent_loc, self.target_loc)
+                if curr_dist < prev_dist:
+                    rew += 0.5
+                elif curr_dist > prev_dist:
+                    rew -= 0.2  # moving away
 
         # item pick-up
         if (self.agent_load < self.agent_capacity) and (self.agent_loc in self.item_locs):
