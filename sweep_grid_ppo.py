@@ -8,7 +8,7 @@ def get_sweep_config(args):
     """
     # Define hyperparameter grid
     learning_rates = [0.0003, 0.0005]
-    value_lrs = [0.001],
+    value_lrs = [0.001]
     train_policy_epochs = [20, 50]
     clips = [0.1, 0.2, 0.3]
     entropies = [0]
