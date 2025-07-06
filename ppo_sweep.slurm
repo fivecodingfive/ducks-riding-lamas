@@ -11,7 +11,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=06:00:00
-#SBATCH --array=0-11    
+#SBATCH --array=0-215    
 
 set -euxo pipefail              # fail fast
 
@@ -36,7 +36,7 @@ echo ">>> Starting PPO sweep task $SLURM_ARRAY_TASK_ID on $(hostname) at $(date)
 
 srun python -u main_ppo.py \
      --mode training \
-     --episodes 300 \
+     --episodes 400 \
      --variant 0 \
      --sweep_id $SLURM_ARRAY_TASK_ID
 
