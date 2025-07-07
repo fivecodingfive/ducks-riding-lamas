@@ -182,12 +182,12 @@ class Environment(object):
             idx = self.item_locs.index(self.agent_loc)
             self.item_locs.pop(idx)
             self.item_times.pop(idx)
-            rew += 15 if shaping else self.reward / 2
+            rew += 7.5 if shaping else self.reward / 2
 
 
         # item drop-off
         if self.agent_loc == self.target_loc:
-            rew += self.agent_load * 15 if shaping else self.agent_load * self.reward / 2
+            rew += self.agent_load * 7.5 if shaping else self.agent_load * self.reward / 2
             self.agent_load = 0
 
         # track how long ago items appeared
@@ -202,7 +202,7 @@ class Environment(object):
         # Anzahl der verfallenen Items:
         lost_items = len(self.item_locs) - sum(mask)
         if shaping and lost_items > 0:
-            rew -= lost_items * 10  # Beispiel: -2 pro verlorenes Item
+            rew -= lost_items * 5  # Beispiel: -2 pro verlorenes Item
         self.item_locs = list(compress(self.item_locs, mask))
         self.item_times = list(compress(self.item_times, mask))
 
