@@ -133,28 +133,9 @@ class Environment(object):
                 if shaping == False:
                     rew += -1
                 elif shaping == True:
-                    rew += -0.5
-                    
-        if shaping and self.agent_load < self.agent_capacity and self.item_locs:
-            # Find the most profitable reachable item
-            max_profit = float('-inf')
-            best_item = None
-            for i, item in enumerate(self.item_locs):
-                time_left = self.max_response_time - self.item_times[i]
-                dist_to_item = self.manhattan(self.agent_loc, item)
-                dist_item_to_target = self.manhattan(item, self.target_loc)
-                profit = self.reward - (dist_to_item + dist_item_to_target)
-                if dist_to_item <= time_left and profit > max_profit and profit > 0:
-                    max_profit = profit
-                    best_item = item
-            if best_item is not None:
-                prev_dist = self.manhattan(prev_loc, best_item)
-                curr_dist = self.manhattan(self.agent_loc, best_item)
-                if curr_dist < prev_dist:
-                    rew += 0.5  # moving closer to best item
-                elif curr_dist > prev_dist:
-                    rew -= 0.5  # moving away
-        elif shaping and self.agent_load == self.agent_capacity:
+                    rew += - 0.1
+
+        
         # if shaping == True:
         #     if self.item_locs and self.agent_load == 0:     
         #         reachable = []
@@ -175,12 +156,12 @@ class Environment(object):
         #                 rew -= -0.5 * self.shaping_discount  # moving away
             # elif self.agent_load > 0:
                 # Find distance before and after move btw agent and target
-            prev_dist = self.manhattan(prev_loc, self.target_loc)
-            curr_dist = self.manhattan(self.agent_loc, self.target_loc)
-            if curr_dist < prev_dist:
-                rew += 0.5
-            elif curr_dist > prev_dist:
-                rew -= 0.5  # moving away
+            # prev_dist = self.manhattan(prev_loc, self.target_loc)
+            # curr_dist = self.manhattan(self.agent_loc, self.target_loc)
+            # if curr_dist < prev_dist:
+            #     rew += 0.5
+            # elif curr_dist > prev_dist:
+            #     rew -= 0.5  # moving away
 
         # item pick-up
         if (self.agent_load < self.agent_capacity) and (self.agent_loc in self.item_locs):
@@ -272,35 +253,56 @@ class Environment(object):
 
 
                 agent_y, agent_x = self.agent_loc
-                obs.extend([float(agent_x), float(agent_y)])  # Position
+                obs.extend([float(agent_x) / 4, float(agent_y) / 4])  # Position
                 obs.append(float(self.agent_load))            # Load
+
+                profits = []
+                for i, (iy, ix) in enumerate(self.item_locs):
+                    time_left = self.max_response_time - self.item_times[i]
+                    dist_to_item = abs(agent_x - ix) + abs(agent_y - iy)
+                    dist_item_to_target = abs(ix - self.target_loc[1]) + abs(iy - self.target_loc[0])
+                    profit = self.reward - (dist_to_item + dist_item_to_target)
+                    if dist_to_item <= time_left and profit > 0:
+                        dx = ix - agent_x
+                        dy = iy - agent_y
+                        profits.append((profit, (dx, dy)))
+                # Sortiere nach Profit und nimm die besten drei
+                profits.sort(reverse=True, key=lambda tup: tup[0])
+                dx_dy_list = [p[1] for p in profits[:3]]
+                # Fülle auf, falls weniger als 3 Items verfügbar sind
+                while len(dx_dy_list) < 3:
+                    dx_dy_list.append((0.0, 0.0))
+
+                # Hänge die Richtungsvektoren an
+                for dx, dy in dx_dy_list:
+                    obs.extend([dx, dy])
 
 
                 # Default: kein Item → nutze spawn_distribution
-                use_distribution = len(self.item_locs) == 0
-                dx, dy = 0.0, 0.0
+                # use_distribution = len(self.item_locs) == 0
+                # dx, dy = 0.0, 0.0
 
 
-                if not use_distribution:
+                # if not use_distribution:
                     # Suche bestes erreichbares Item
-                    min_step = float('inf')
-                    for i, (iy, ix) in enumerate(self.item_locs):
-                        time_left = self.max_response_time - self.item_times[i]
-                        step_cost = abs(agent_x - ix) + abs(agent_y - iy)
-                        if time_left >= step_cost and step_cost < min_step:
-                            dx = ix - agent_x
-                            dy = iy - agent_y
-                            min_step = step_cost
+                    # min_step = float('inf')
+                    # for i, (iy, ix) in enumerate(self.item_locs):
+                    #     time_left = self.max_response_time - self.item_times[i]
+                    #     step_cost = abs(agent_x - ix) + abs(agent_y - iy)
+                    #     if time_left >= step_cost and step_cost < min_step:
+                    #         dx = ix - agent_x
+                    #         dy = iy - agent_y
+                    #         min_step = step_cost
 
 
-                obs.extend([dx, dy])  # Richtung zum besten Item oder (0, 0)
+                # obs.extend([dx, dy])  # Richtung zum besten Item oder (0, 0)
 
 
                 # Entweder echte Verteilung oder Dummy
-                if use_distribution:
-                    obs.extend(spawn_distribution[0, :].tolist())  # z. B. Zeile 0 nehmen
-                else:
-                    obs.extend([0.0] * 5)
+                # if use_distribution:
+                #     obs.extend(spawn_distribution[0, :].tolist())  # z. B. Zeile 0 nehmen
+                # else:
+                #     obs.extend([0.0] * 5)
 
 
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
