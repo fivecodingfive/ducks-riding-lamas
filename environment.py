@@ -100,7 +100,7 @@ class Environment(object):
         self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
                                 index_col=0)
 
-        self.shaping_discount *= 0.99
+        self.shaping_discount *= 0.994
         return self.get_obs()
 
     def manhattan(self, a, b):
