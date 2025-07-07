@@ -4,14 +4,14 @@ ppo_config = {
     "action_size": 5,
 
     "gamma": 0.95, # discount factor -> if high, future rewards are more important, and if low, immediate rewards are more important
-    "lam": 0.84,
+    "lam": 0.94,
     "entropy": 0.0,
     "entropy_decay": 0.95,  # decays every 5th episode with given factor
     "entropy_min": 0.0,  # minimum entropy value
     "clip_ratio": 0.4,
-    "train_epochs": 37,  
+    "train_epochs": 20,  
     "policy_learning_rate": 0.0007, # Smaller learning rate -> Smaller updates (risk of getting stuck if too small)
-    "value_learning_rate": 0.0014,
+    "value_learning_rate": 0.0001,
     "max_time_steps": 200,
     "rollout_steps":   2048,
 
