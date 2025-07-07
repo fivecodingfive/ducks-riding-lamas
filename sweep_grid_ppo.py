@@ -13,8 +13,8 @@ def get_sweep_config(args):
     clips = [0.4, 0.3, 0.5]
     entropies = [0]
     entropy_decay = [0.95]
-    lams = [0.84, 0.94]
-    gamma = [0.95,0.9, 0.99]
+    lams = [0.9]
+    gamma = [0.95, 0.9, 0.99]
     seeds = list(range(1))
     
     # Create the full grid of combinations
