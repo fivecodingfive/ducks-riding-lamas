@@ -259,34 +259,30 @@ class Environment(object):
 
             elif network_type == 'mlp':
                 obs = []
-                # Normalize agent position to [0, 1]
+
+                # Agent position, normalized
                 agent_y, agent_x = self.agent_loc
-                obs.extend([float(agent_x) / 4, float(agent_y) / 4])  # 0..4 mapped to 0..1
+                obs.extend([agent_x / 4, agent_y / 4])
+                obs.append(float(self.agent_load))  # Load
 
-                # Normalize load by capacity
-                obs.append(float(self.agent_load) / float(self.agent_capacity))
+                # Compute remaining times and sort
+                items_with_times = [
+                    (self.max_response_time - t, ix, iy)
+                    for (iy, ix), t in zip(self.item_locs, self.item_times)
+                ]
+                items_with_times.sort()  # ascending: most urgent first
 
-                profits = []
-                for i, (iy, ix) in enumerate(self.item_locs):
-                    time_left = self.max_response_time - self.item_times[i]
-                    dist_to_item = abs(agent_x - ix) + abs(agent_y - iy)
-                    dist_item_to_target = abs(ix - self.target_loc[1]) + abs(iy - self.target_loc[0])
-                    profit = self.reward - (dist_to_item + dist_item_to_target)
-                    if dist_to_item <= time_left and profit > 0:
-                        # Normalize dx/dy to grid range [-1, 1]
-                        dx = (ix - agent_x) / 4
+                # Add direction to up to 2 most urgent items
+                for k in range(2):
+                    if k < len(items_with_times):
+                        _, ix, iy = items_with_times[k]
+                        dx = (ix - agent_x) / 4  # normalized
                         dy = (iy - agent_y) / 4
-                        profits.append((profit, dx, dy))
+                        obs.extend([dx, dy])
+                    else:
+                        obs.extend([0.0, 0.0])  # pad
 
-                # Sort by profit and take top 2, pad with (0,0) if less than 2
-                profits.sort(reverse=True, key=lambda tup: tup[0])
-                top2 = profits[:2]
-                while len(top2) < 2:
-                    top2.append((0.0, 0.0, 0.0))
-
-                for (_, dx, dy) in top2:
-                    obs.extend([dx, dy])
-
+                # Now obs contains [agent_x, agent_y, agent_load, dx1, dy1, dx2, dy2] (length 7)
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
             
             elif network_type == 'combine':
