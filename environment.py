@@ -133,20 +133,20 @@ class Environment(object):
                 if shaping == False:
                     rew += -1
                 elif shaping == True:
-                    rew += - 0.1
+                    rew += - 1
 
-        reward_map = np.array([
-            [0,   0,   0,   0.2, 0.4],
-            [0,   0,   0.2,   0.4, 0.6],
-            [0, 0.2, 0.4, 0.6, 0.8],
-            [0,   0, 0.2, 0.4, 0.6],
-            [0,   0,   0, 0.2, 0.4]
-        ])
+        # reward_map = np.array([
+        #     [0,   0,   0,   0.2, 0.4],
+        #     [0,   0,   0.2,   0.4, 0.6],
+        #     [0, 0.2, 0.4, 0.6, 0.8],
+        #     [0,   0, 0.2, 0.4, 0.6],
+        #     [0,   0,   0, 0.2, 0.4]
+        # ])
 
-        if shaping and not self.item_locs and self.agent_load == 0:
-            agent_y, agent_x = self.agent_loc
-            # Reward für leeres Feld holen
-            rew += reward_map[agent_y, agent_x]
+        # if shaping and not self.item_locs and self.agent_load == 0:
+        #     agent_y, agent_x = self.agent_loc
+        #     # Reward für leeres Feld holen
+        #     rew += reward_map[agent_y, agent_x]
 
         
         # if shaping == True:
@@ -182,11 +182,12 @@ class Environment(object):
                 idx = self.item_locs.index(self.agent_loc)
                 self.item_locs.pop(idx)
                 self.item_times.pop(idx)
-                rew += self.reward / 2
+                rew += 15 if shaping else self.reward / 2
+
 
         # item drop-off
         if self.agent_loc == self.target_loc:
-            rew += self.agent_load * self.reward / 2
+            rew += 15 if shaping else self.reward / 2
             self.agent_load = 0
 
         # track how long ago items appeared
@@ -201,7 +202,7 @@ class Environment(object):
         # Anzahl der verfallenen Items:
         lost_items = len(self.item_locs) - sum(mask)
         if  shaping and lost_items > 0:
-            rew -= lost_items * 5  # Beispiel: -2 pro verlorenes Item
+            rew -= lost_items * 10  # Beispiel: -2 pro verlorenes Item
         self.item_locs = list(compress(self.item_locs, mask))
         self.item_times = list(compress(self.item_times, mask))
 
