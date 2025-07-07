@@ -272,18 +272,20 @@ class Environment(object):
                 ]
                 items_with_times.sort()  # ascending: most urgent first
 
-                # Add direction to up to 2 most urgent items
+                # Add direction and Manhattan distance for up to 2 most urgent items
                 for k in range(2):
                     if k < len(items_with_times):
                         _, ix, iy = items_with_times[k]
                         dx = (ix - agent_x) / 4  # normalized
                         dy = (iy - agent_y) / 4
-                        obs.extend([dx, dy])
+                        dist = (abs(ix - agent_x) + abs(iy - agent_y)) / 8  # max manhattan distance in 5x5 grid is 8
+                        obs.extend([dx, dy, dist])
                     else:
-                        obs.extend([0.0, 0.0])  # pad
+                        obs.extend([0.0, 0.0, 0.0])  # pad
 
-                # Now obs contains [agent_x, agent_y, agent_load, dx1, dy1, dx2, dy2] (length 7)
+                # Now obs contains [agent_x, agent_y, agent_load, dx1, dy1, dist1, dx2, dy2, dist2] (length 9)
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
+
             
             elif network_type == 'combine':
                 agent_x, agent_y = self.agent_loc
