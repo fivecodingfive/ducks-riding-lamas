@@ -136,11 +136,11 @@ class Environment(object):
                     rew += - 0.1
 
         reward_map = np.array([
-            [0,   0,   0,   0.1, 0.2],
-            [0,   0,   0,   0.2, 0.3],
-            [0, 0.1, 0.2, 0.3, 0.4],
-            [0,   0, 0.1, 0.2, 0.3],
-            [0,   0,   0, 0.1, 0.2]
+            [0,   0,   0,   0.2, 0.4],
+            [0,   0,   0.2,   0.4, 0.6],
+            [0, 0.2, 0.4, 0.6, 0.8],
+            [0,   0, 0.2, 0.4, 0.6],
+            [0,   0,   0, 0.2, 0.4]
         ])
 
         if shaping and not self.item_locs and self.agent_load == 0:
@@ -192,8 +192,16 @@ class Environment(object):
         # track how long ago items appeared
         self.item_times = [i + 1 for i in self.item_times]
 
+        
+        # ---- Items, die verfallen, bestrafen ----
+       
+
         # remove items for which max response time is reached
         mask = [i < self.max_response_time for i in self.item_times]
+        # Anzahl der verfallenen Items:
+        lost_items = len(self.item_locs) - sum(mask)
+        if  shaping and lost_items > 0:
+            rew -= lost_items * 5  # Beispiel: -2 pro verlorenes Item
         self.item_locs = list(compress(self.item_locs, mask))
         self.item_times = list(compress(self.item_times, mask))
 
