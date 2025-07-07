@@ -39,7 +39,6 @@ srun python -u main_ppo.py \
      --episodes 400 \
      --variant 0 \
      --sweep_id $SLURM_ARRAY_TASK_ID \
-     --sweep_group conservative2
 
 echo ">>> Sweep task $SLURM_ARRAY_TASK_ID done at $(date)"
 echo "    Offline W&B run stored at $WANDB_DIR"
