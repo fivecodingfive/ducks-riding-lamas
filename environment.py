@@ -135,19 +135,6 @@ class Environment(object):
                 elif shaping == True:
                     rew += -1
 
-        # reward_map = np.array([
-        #     [0,   0,   0,   0.2, 0.4],
-        #     [0,   0,   0.2,   0.4, 0.6],
-        #     [0, 0.2, 0.4, 0.6, 0.8],
-        #     [0,   0, 0.2, 0.4, 0.6],
-        #     [0,   0,   0, 0.2, 0.4]
-        # ])
-
-        # if shaping and not self.item_locs and self.agent_load == 0:
-        #     agent_y, agent_x = self.agent_loc
-        #     # Reward für leeres Feld holen
-        #     rew += reward_map[agent_y, agent_x]
-
         
         # if shaping == True:
         #     if self.item_locs and self.agent_load == 0:     
@@ -272,8 +259,6 @@ class Environment(object):
 
             elif network_type == 'mlp':
                 obs = []
-
-
                 agent_y, agent_x = self.agent_loc
                 obs.extend([float(agent_x), float(agent_y)])  # Position
                 obs.append(float(self.agent_load))            # Load
@@ -287,45 +272,17 @@ class Environment(object):
                     if dist_to_item <= time_left and profit > 0:
                         dx = ix - agent_x
                         dy = iy - agent_y
-                        profits.append((profit, (dx, dy)))
+                        profits.append((profit, dx, dy, time_left, dist_to_item, dist_item_to_target))
+
                 # Sortiere nach Profit und nimm die besten drei
                 profits.sort(reverse=True, key=lambda tup: tup[0])
-                dx_dy_list = [p[1] for p in profits[:3]]
-                # Fülle auf, falls weniger als 3 Items verfügbar sind
-                while len(dx_dy_list) < 3:
-                    dx_dy_list.append((0.0, 0.0))
+                top3 = profits[:3]
+                while len(top3) < 3:
+                    top3.append((0.0, 0.0, 0.0, 0.0, 0.0, 0.0))  # Dummy für fehlende Items
 
-                # Hänge die Richtungsvektoren an
-                for dx, dy in dx_dy_list:
-                    obs.extend([dx, dy])
-
-
-                # # Default: kein Item → nutze spawn_distribution
-                # use_distribution = len(self.item_locs) == 0
-                # dx, dy = 0.0, 0.0
-
-
-                # if not use_distribution:
-                # #    Suche bestes erreichbares Item
-                #     min_step = float('inf')
-                #     for i, (iy, ix) in enumerate(self.item_locs):
-                #         time_left = self.max_response_time - self.item_times[i]
-                #         step_cost = abs(agent_x - ix) + abs(agent_y - iy)
-                #         if time_left >= step_cost and step_cost < min_step:
-                #             dx = ix - agent_x
-                #             dy = iy - agent_y
-                #             min_step = step_cost
-
-
-                # obs.extend([dx, dy])  # Richtung zum besten Item oder (0, 0)
-
-
-                # # Entweder echte Verteilung oder Dummy
-                # if use_distribution:
-                #     obs.extend(spawn_distribution[0, :].tolist())  # z. B. Zeile 0 nehmen
-                # else:
-                #     obs.extend([0.0] * 5)
-
+                # Features der Top-3 (je 5 Werte)
+                for (_, dx, dy, time_left, dist_to_item, dist_item_to_target) in top3:
+                    obs.extend([dx, dy, time_left, dist_to_item, dist_item_to_target])
 
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
             
