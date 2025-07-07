@@ -135,6 +135,19 @@ class Environment(object):
                 elif shaping == True:
                     rew += - 0.1
 
+        reward_map = np.array([
+            [0,   0,   0,   0.1, 0.2],
+            [0,   0,   0,   0.2, 0.3],
+            [0, 0.1, 0.2, 0.3, 0.4],
+            [0,   0, 0.1, 0.2, 0.3],
+            [0,   0,   0, 0.1, 0.2]
+        ])
+
+        if shaping and not self.item_locs and self.agent_load == 0:
+            agent_y, agent_x = self.agent_loc
+            # Reward für leeres Feld holen
+            rew += reward_map[agent_y, agent_x]
+
         
         # if shaping == True:
         #     if self.item_locs and self.agent_load == 0:     
