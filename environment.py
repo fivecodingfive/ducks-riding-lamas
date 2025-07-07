@@ -259,9 +259,12 @@ class Environment(object):
 
             elif network_type == 'mlp':
                 obs = []
+                # Normalize agent position to [0, 1]
                 agent_y, agent_x = self.agent_loc
-                obs.extend([float(agent_x), float(agent_y)])  # Position
-                obs.append(float(self.agent_load))            # Load
+                obs.extend([float(agent_x) / 4, float(agent_y) / 4])  # 0..4 mapped to 0..1
+
+                # Normalize load by capacity
+                obs.append(float(self.agent_load) / float(self.agent_capacity))
 
                 profits = []
                 for i, (iy, ix) in enumerate(self.item_locs):
@@ -270,19 +273,19 @@ class Environment(object):
                     dist_item_to_target = abs(ix - self.target_loc[1]) + abs(iy - self.target_loc[0])
                     profit = self.reward - (dist_to_item + dist_item_to_target)
                     if dist_to_item <= time_left and profit > 0:
-                        dx = ix - agent_x
-                        dy = iy - agent_y
-                        profits.append((profit, dx, dy, time_left, dist_to_item, dist_item_to_target))
+                        # Normalize dx/dy to grid range [-1, 1]
+                        dx = (ix - agent_x) / 4
+                        dy = (iy - agent_y) / 4
+                        profits.append((profit, dx, dy))
 
-                # Sortiere nach Profit und nimm die besten drei
+                # Sort by profit and take top 2, pad with (0,0) if less than 2
                 profits.sort(reverse=True, key=lambda tup: tup[0])
-                top3 = profits[:3]
-                while len(top3) < 3:
-                    top3.append((0.0, 0.0, 0.0, 0.0, 0.0, 0.0))  # Dummy für fehlende Items
+                top2 = profits[:2]
+                while len(top2) < 2:
+                    top2.append((0.0, 0.0, 0.0))
 
-                # Features der Top-3 (je 5 Werte)
-                for (_, dx, dy, time_left, dist_to_item, dist_item_to_target) in top3:
-                    obs.extend([dx, dy, time_left, dist_to_item, dist_item_to_target])
+                for (_, dx, dy) in top2:
+                    obs.extend([dx, dy])
 
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
             
