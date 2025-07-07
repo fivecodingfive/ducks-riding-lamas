@@ -109,7 +109,7 @@ class Environment(object):
         self.step_count += 1
 
         rew = 0
-        prev_loc = self.agent_loc  # store previous location for distance calculation
+        # prev_loc = self.agent_loc  # store previous location for distance calculation
 
         # done signal (1 if episode ends, 0 if not)
         if self.step_count == self.episode_steps:
@@ -133,7 +133,7 @@ class Environment(object):
                 if shaping == False:
                     rew += -1
                 elif shaping == True:
-                    rew += - 1
+                    rew += -1
 
         # reward_map = np.array([
         #     [0,   0,   0,   0.2, 0.4],
@@ -178,16 +178,16 @@ class Environment(object):
 
         # item pick-up
         if (self.agent_load < self.agent_capacity) and (self.agent_loc in self.item_locs):
-                self.agent_load += 1
-                idx = self.item_locs.index(self.agent_loc)
-                self.item_locs.pop(idx)
-                self.item_times.pop(idx)
-                rew += 15 if shaping else self.reward / 2
+            self.agent_load += 1
+            idx = self.item_locs.index(self.agent_loc)
+            self.item_locs.pop(idx)
+            self.item_times.pop(idx)
+            rew += 15 if shaping else self.reward / 2
 
 
         # item drop-off
         if self.agent_loc == self.target_loc:
-            rew += 15 if shaping else self.reward / 2
+            rew += self.agent_load * 15 if shaping else self.agent_load * self.reward / 2
             self.agent_load = 0
 
         # track how long ago items appeared
@@ -201,7 +201,7 @@ class Environment(object):
         mask = [i < self.max_response_time for i in self.item_times]
         # Anzahl der verfallenen Items:
         lost_items = len(self.item_locs) - sum(mask)
-        if  shaping and lost_items > 0:
+        if shaping and lost_items > 0:
             rew -= lost_items * 10  # Beispiel: -2 pro verlorenes Item
         self.item_locs = list(compress(self.item_locs, mask))
         self.item_times = list(compress(self.item_times, mask))
@@ -275,7 +275,7 @@ class Environment(object):
 
 
                 agent_y, agent_x = self.agent_loc
-                obs.extend([float(agent_x) / 4, float(agent_y) / 4])  # Position
+                obs.extend([float(agent_x), float(agent_y)])  # Position
                 obs.append(float(self.agent_load))            # Load
 
                 profits = []
@@ -300,27 +300,27 @@ class Environment(object):
                     obs.extend([dx, dy])
 
 
-                # Default: kein Item → nutze spawn_distribution
+                # # Default: kein Item → nutze spawn_distribution
                 # use_distribution = len(self.item_locs) == 0
                 # dx, dy = 0.0, 0.0
 
 
                 # if not use_distribution:
-                    # Suche bestes erreichbares Item
-                    # min_step = float('inf')
-                    # for i, (iy, ix) in enumerate(self.item_locs):
-                    #     time_left = self.max_response_time - self.item_times[i]
-                    #     step_cost = abs(agent_x - ix) + abs(agent_y - iy)
-                    #     if time_left >= step_cost and step_cost < min_step:
-                    #         dx = ix - agent_x
-                    #         dy = iy - agent_y
-                    #         min_step = step_cost
+                # #    Suche bestes erreichbares Item
+                #     min_step = float('inf')
+                #     for i, (iy, ix) in enumerate(self.item_locs):
+                #         time_left = self.max_response_time - self.item_times[i]
+                #         step_cost = abs(agent_x - ix) + abs(agent_y - iy)
+                #         if time_left >= step_cost and step_cost < min_step:
+                #             dx = ix - agent_x
+                #             dy = iy - agent_y
+                #             min_step = step_cost
 
 
                 # obs.extend([dx, dy])  # Richtung zum besten Item oder (0, 0)
 
 
-                # Entweder echte Verteilung oder Dummy
+                # # Entweder echte Verteilung oder Dummy
                 # if use_distribution:
                 #     obs.extend(spawn_distribution[0, :].tolist())  # z. B. Zeile 0 nehmen
                 # else:
