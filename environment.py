@@ -44,7 +44,6 @@ class Environment(object):
         self.state_dim = 0
         self.state_dim = 0
         
-        self.shaping_discount = 1
 
         self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
         self.training_episodes = self.training_episodes.training_episodes.tolist()
@@ -100,7 +99,6 @@ class Environment(object):
         self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
                                 index_col=0)
 
-        self.shaping_discount *= 1
         return self.get_obs()
 
     def manhattan(self, a, b):
@@ -135,34 +133,54 @@ class Environment(object):
                 if shaping == False:
                     rew += -1
                 elif shaping == True:
-                    rew += max(-0.5 / self.shaping_discount, -1)
-
-        if shaping == True:
-            if self.item_locs and self.agent_load == 0:     
-                reachable = []
-                for i, item in enumerate(self.item_locs):
-                    time_left = self.max_response_time - self.item_times[i]
-                    steps_needed = self.manhattan(self.agent_loc, item)
-                    if steps_needed <= time_left:
-                        reachable.append((i, item, steps_needed))
-
-                if reachable:
-                    # Find closest reachable item
-                    closest_i, closest_item, _ = min(reachable, key=lambda x: x[2])
-                    prev_dist = self.manhattan(prev_loc, closest_item)
-                    curr_dist = self.manhattan(self.agent_loc, closest_item)
-                    if curr_dist < prev_dist:
-                        rew += 0.5 * self.shaping_discount  # moving closer
-                    elif curr_dist > prev_dist:
-                        rew -= -0.5 * self.shaping_discount  # moving away
-            elif self.agent_load > 0:
-                # Find distance before and after move btw agent and target
-                prev_dist = self.manhattan(prev_loc, self.target_loc)
-                curr_dist = self.manhattan(self.agent_loc, self.target_loc)
+                    rew += -0.5
+                    
+        if shaping and self.agent_load < self.agent_capacity and self.item_locs:
+            # Find the most profitable reachable item
+            max_profit = float('-inf')
+            best_item = None
+            for i, item in enumerate(self.item_locs):
+                time_left = self.max_response_time - self.item_times[i]
+                dist_to_item = self.manhattan(self.agent_loc, item)
+                dist_item_to_target = self.manhattan(item, self.target_loc)
+                profit = self.reward - (dist_to_item + dist_item_to_target)
+                if dist_to_item <= time_left and profit > max_profit and profit > 0:
+                    max_profit = profit
+                    best_item = item
+            if best_item is not None:
+                prev_dist = self.manhattan(prev_loc, best_item)
+                curr_dist = self.manhattan(self.agent_loc, best_item)
                 if curr_dist < prev_dist:
-                    rew += 0.5 * self.shaping_discount
+                    rew += 0.5  # moving closer to best item
                 elif curr_dist > prev_dist:
-                    rew -= 0.5 * self.shaping_discount  # moving away
+                    rew -= 0.5  # moving away
+        elif shaping and self.agent_load == self.agent_capacity:
+        # if shaping == True:
+        #     if self.item_locs and self.agent_load == 0:     
+        #         reachable = []
+        #         for i, item in enumerate(self.item_locs):
+        #             time_left = self.max_response_time - self.item_times[i]
+        #             steps_needed = self.manhattan(self.agent_loc, item)
+        #             if steps_needed <= time_left:
+        #                 reachable.append((i, item, steps_needed))
+
+        #         if reachable:
+        #             # Find closest reachable item
+        #             closest_i, closest_item, _ = min(reachable, key=lambda x: x[2])
+        #             prev_dist = self.manhattan(prev_loc, closest_item)
+        #             curr_dist = self.manhattan(self.agent_loc, closest_item)
+        #             if curr_dist < prev_dist:
+        #                 rew += 0.5 * self.shaping_discount  # moving closer
+        #             elif curr_dist > prev_dist:
+        #                 rew -= -0.5 * self.shaping_discount  # moving away
+            # elif self.agent_load > 0:
+                # Find distance before and after move btw agent and target
+            prev_dist = self.manhattan(prev_loc, self.target_loc)
+            curr_dist = self.manhattan(self.agent_loc, self.target_loc)
+            if curr_dist < prev_dist:
+                rew += 0.5
+            elif curr_dist > prev_dist:
+                rew -= 0.5  # moving away
 
         # item pick-up
         if (self.agent_load < self.agent_capacity) and (self.agent_loc in self.item_locs):
