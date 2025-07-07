@@ -44,7 +44,7 @@ class Environment(object):
         self.state_dim = 0
         self.state_dim = 0
         
-        self.shaping_discount = 0.99995
+        self.shaping_discount = 1
 
         self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
         self.training_episodes = self.training_episodes.training_episodes.tolist()
@@ -100,7 +100,7 @@ class Environment(object):
         self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
                                 index_col=0)
 
-        self.shaping_discount *= 0.994
+        self.shaping_discount *= 1
         return self.get_obs()
 
     def manhattan(self, a, b):
@@ -135,7 +135,7 @@ class Environment(object):
                 if shaping == False:
                     rew += -1
                 elif shaping == True:
-                    rew += max(-0.2 / self.shaping_discount, -1)
+                    rew += max(-0.5 / self.shaping_discount, -1)
 
         if shaping == True:
             if self.item_locs and self.agent_load == 0:     
@@ -152,17 +152,17 @@ class Environment(object):
                     prev_dist = self.manhattan(prev_loc, closest_item)
                     curr_dist = self.manhattan(self.agent_loc, closest_item)
                     if curr_dist < prev_dist:
-                        rew += 2 * self.shaping_discount  # moving closer
+                        rew += 0.5 * self.shaping_discount  # moving closer
                     elif curr_dist > prev_dist:
-                        rew -= 2 * self.shaping_discount  # moving away
+                        rew -= -0.5 * self.shaping_discount  # moving away
             elif self.agent_load > 0:
                 # Find distance before and after move btw agent and target
                 prev_dist = self.manhattan(prev_loc, self.target_loc)
                 curr_dist = self.manhattan(self.agent_loc, self.target_loc)
                 if curr_dist < prev_dist:
-                    rew += 2 * self.shaping_discount
+                    rew += 0.5 * self.shaping_discount
                 elif curr_dist > prev_dist:
-                    rew -= 2 * self.shaping_discount  # moving away
+                    rew -= 0.5 * self.shaping_discount  # moving away
 
         # item pick-up
         if (self.agent_load < self.agent_capacity) and (self.agent_loc in self.item_locs):

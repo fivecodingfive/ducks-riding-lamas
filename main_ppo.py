@@ -51,6 +51,7 @@ parser.add_argument("--clip", type=float)
 parser.add_argument("--entropy", type=float)
 parser.add_argument("--entropy_decay", type=float)
 parser.add_argument("--lam", type=float)
+parser.add_argument("--gamma", type=float)
 args = parser.parse_args()
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -95,6 +96,7 @@ override("entropy", args.entropy, ppo_config)
 override("entropy_decay", args.entropy_decay, ppo_config)
 override("lam", args.lam, ppo_config)
 override("train_epochs", args.train_epochs, ppo_config)
+override("gamma", args.gamma, ppo_config)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 5 · Environment & Agent --------------------------------------------------------
