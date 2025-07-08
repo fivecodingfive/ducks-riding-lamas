@@ -36,7 +36,7 @@ echo ">>> Starting PPO sweep task $SLURM_ARRAY_TASK_ID on $(hostname) at $(date)
 
 srun python -u main_ppo.py \
      --mode training \
-     --episodes 200 \
+     --episodes 400 \
      --variant 0 \
      --sweep_id $SLURM_ARRAY_TASK_ID \
 

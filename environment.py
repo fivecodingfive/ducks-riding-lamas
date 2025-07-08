@@ -103,9 +103,6 @@ class Environment(object):
 
     def manhattan(self, a, b):
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
-    
-    def potential(self, agent_loc, item_locs):
-        return -(sum(self.manhattan(agent_loc, item_loc) for item_loc in item_locs))/8
 
     # take one environment step based on the action act
     def step(self, act, shaping=False):
@@ -151,11 +148,13 @@ class Environment(object):
             if self.agent_load < self.agent_capacity:
                 reachable_items = []
                 for i, item_loc in enumerate(self.item_locs):
-                    if self.manhattan(item_loc, self.agent_loc) <= (self.max_response_time - self.item_times[i]):
-                        reachable_items.append(item_loc) 
+                    time_left = self.max_response_time - self.item_times[i]
+                    if self.manhattan(item_loc, self.agent_loc) <= time_left:
+                        reachable_items.append((item_loc, time_left)) 
                 if reachable_items:
-                    diff = self.potential(prev_loc, reachable_items) - (self.potential(self.agent_loc, reachable_items))
-                    rew += 0.05 * diff
+                    most_urgent_item, _ = min(reachable_items, key=lambda x: x[1])
+                    if self.manhattan(prev_loc, most_urgent_item) < self.manhattan(self.agent_loc, most_urgent_item):
+                        rew += 0.1
             if self.agent_load == self.agent_capacity:
                 # Find distance before and after move btw agent and target
                 prev_dist = self.manhattan(prev_loc, self.target_loc)
@@ -196,7 +195,7 @@ class Environment(object):
         # Anzahl der verfallenen Items:
         lost_items = len(self.item_locs) - sum(mask)
         if shaping and lost_items > 0:
-            rew -= lost_items * 0.2  # Beispiel: -2 pro verlorenes Item
+            rew -= lost_items * 0.5  # Beispiel: -2 pro verlorenes Item
         self.item_locs = list(compress(self.item_locs, mask))
         self.item_times = list(compress(self.item_times, mask))
 
@@ -267,24 +266,26 @@ class Environment(object):
             elif network_type == 'mlp':
                 obs = []
                 agent_y, agent_x = self.agent_loc
-
-                # 3x3 local grid (centered on agent)
-                for dy in [-1, 0, 1]:
-                    for dx in [-1, 0, 1]:
-                        ny, nx = agent_y + dy, agent_x + dx
-                        if 0 <= ny < 5 and 0 <= nx < 5:
-                            # Check if there's an item in (ny, nx)
-                            idx = next((i for i, loc in enumerate(self.item_locs) if loc == (ny, nx)), None)
-                            if idx is not None:
-                                rem_time = self.max_response_time - self.item_times[idx]
-                            else:
-                                rem_time = 0.0
-                        else:
-                            rem_time = 0.0  # treat out-of-bounds as 0
-                        obs.append(rem_time / self.max_response_time)  # normalize
-
-                # Agent location, normalized
                 obs.extend([agent_x / 4, agent_y / 4])
+                obs.append(len(self.item_locs)/10)
+
+                reachable_items = []
+                for i, item_loc in enumerate(self.item_locs):
+                    time_left = (self.max_response_time - self.item_times[i])
+                    dist = self.manhattan(item_loc, self.agent_loc)
+                    if dist <= time_left:
+                        reachable_items.append((item_loc, dist, time_left)) 
+                reachable_items.sort(key=lambda x: x[1])
+                for k in range(2):
+                    if k < len(reachable_items):
+                        item_loc, dist, time_left = reachable_items[k]
+                        dx = (item_loc[1] - agent_x) / 4  
+                        dy = (item_loc[0] - agent_y) / 4  
+                        obs.extend([dx, dy, time_left / 15])
+                    else:
+                        obs.extend([0.0, 0.0, 0]) 
+
+                
                 # Agent load
                 obs.append(float(self.agent_load))
 
