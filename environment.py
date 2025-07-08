@@ -266,6 +266,7 @@ class Environment(object):
                 obs.append(float(self.agent_load))  # Load
                 obs.append(len(self.item_locs))
 
+                dx, dy = 0.0, 0.0
                 min_step = float('inf')
                 for i, (iy, ix) in enumerate(self.item_locs):
                     time_left = self.max_response_time - self.item_times[i]
