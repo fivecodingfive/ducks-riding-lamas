@@ -264,6 +264,19 @@ class Environment(object):
                 agent_y, agent_x = self.agent_loc
                 obs.extend([agent_x / 4, agent_y / 4])
                 obs.append(float(self.agent_load))  # Load
+                obs.append(len(self.item_locs))
+
+                min_step = float('inf')
+                for i, (iy, ix) in enumerate(self.item_locs):
+                    time_left = self.max_response_time - self.item_times[i]
+                    step_cost = abs(agent_x - ix) + abs(agent_y - iy)
+                    if time_left >= step_cost and step_cost < min_step:
+                        dx = (ix - agent_x) / 4
+                        dy = (iy - agent_y) / 4
+                        min_step = step_cost
+                obs.extend([dx, dy])
+
+
 
                 # Compute remaining times and sort
                 items_with_times = [
