@@ -1,9 +1,9 @@
 
 ppo_config = {
-    "state_size": 5,
+    "state_size": 12,
     "action_size": 5,
 
-    "gamma": 0.95, # discount factor -> if high, future rewards are more important, and if low, immediate rewards are more important
+    "gamma": 0.995, # discount factor -> if high, future rewards are more important, and if low, immediate rewards are more important
     "lam": 0.94,
     "entropy": 0.0,
     "entropy_decay": 0.95,  # decays every 5th episode with given factor

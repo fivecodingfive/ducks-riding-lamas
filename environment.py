@@ -103,6 +103,9 @@ class Environment(object):
 
     def manhattan(self, a, b):
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
+    
+    def potential(self, agent_loc, item_locs):
+        return -(sum(self.manhattan(agent_loc, item_loc) for item_loc in item_locs))/8
 
     # take one environment step based on the action act
     def step(self, act, shaping=False):
@@ -133,7 +136,7 @@ class Environment(object):
                 if shaping == False:
                     rew += -1
                 elif shaping == True:
-                    rew += 0
+                    rew += -0.1
         
         # Define the reward map for an empty grid
         # reward_map = [
@@ -145,28 +148,15 @@ class Environment(object):
         # ]
         
         if shaping == True:
-            if self.item_locs and self.agent_load == 0:     
-                reachable = []
-                for i, item in enumerate(self.item_locs):
-                    time_left = self.max_response_time - self.item_times[i]
-                    steps_needed = self.manhattan(self.agent_loc, item)
-                    if steps_needed <= time_left:
-                        reachable.append((i, item, steps_needed, time_left))
-
-                if reachable:
-                    # Find closest reachable item
-                    _, closest_item, _, closest_item_time_left = min(reachable, key=lambda x: x[2])
-                    _, most_urgent_item, _, _ = min(reachable, key =lambda x: x[3])
-                    if (closest_item != most_urgent_item) and ((self.manhattan(prev_loc, most_urgent_item) + self.manhattan(most_urgent_item, self.target_loc)) <= (closest_item_time_left - self.manhattan(self.target_loc, closest_item))):
-                        prev_dist = self.manhattan(prev_loc, most_urgent_item)
-                        curr_dist = self.manhattan(self.agent_loc, most_urgent_item)
-                    else:
-                        prev_dist = self.manhattan(prev_loc, closest_item)
-                        curr_dist = self.manhattan(self.agent_loc, closest_item)
-                    if curr_dist < prev_dist:
-                        rew += 0.1  # moving closer
-
-            elif self.agent_load > 0:
+            if self.agent_load < self.agent_capacity:
+                reachable_items = []
+                for i, item_loc in enumerate(self.item_locs):
+                    if self.manhattan(item_loc, self.agent_loc) <= (self.max_response_time - self.item_times[i]):
+                        reachable_items.append(item_loc) 
+                if reachable_items:
+                    diff = self.potential(prev_loc, reachable_items) - (self.potential(self.agent_loc, reachable_items))
+                    rew += 0.05 * diff
+            if self.agent_load == self.agent_capacity:
                 # Find distance before and after move btw agent and target
                 prev_dist = self.manhattan(prev_loc, self.target_loc)
                 curr_dist = self.manhattan(self.agent_loc, self.target_loc)
@@ -206,7 +196,7 @@ class Environment(object):
         # Anzahl der verfallenen Items:
         lost_items = len(self.item_locs) - sum(mask)
         if shaping and lost_items > 0:
-            rew -= lost_items * 0  # Beispiel: -2 pro verlorenes Item
+            rew -= lost_items * 0.2  # Beispiel: -2 pro verlorenes Item
         self.item_locs = list(compress(self.item_locs, mask))
         self.item_times = list(compress(self.item_times, mask))
 
@@ -276,31 +266,27 @@ class Environment(object):
 
             elif network_type == 'mlp':
                 obs = []
-
-                # Agent position, normalized
                 agent_y, agent_x = self.agent_loc
+
+                # 3x3 local grid (centered on agent)
+                for dy in [-1, 0, 1]:
+                    for dx in [-1, 0, 1]:
+                        ny, nx = agent_y + dy, agent_x + dx
+                        if 0 <= ny < 5 and 0 <= nx < 5:
+                            # Check if there's an item in (ny, nx)
+                            idx = next((i for i, loc in enumerate(self.item_locs) if loc == (ny, nx)), None)
+                            if idx is not None:
+                                rem_time = self.max_response_time - self.item_times[idx]
+                            else:
+                                rem_time = 0.0
+                        else:
+                            rem_time = 0.0  # treat out-of-bounds as 0
+                        obs.append(rem_time / self.max_response_time)  # normalize
+
+                # Agent location, normalized
                 obs.extend([agent_x / 4, agent_y / 4])
-                obs.append(float(self.agent_load))  # Load
-
-                dx, dy = 0.0, 0.0
-                reachable = []
-                for i, item in enumerate(self.item_locs):
-                    time_left = self.max_response_time - self.item_times[i]
-                    steps_needed = self.manhattan(self.agent_loc, item)
-                    if steps_needed <= time_left:
-                        reachable.append((i, item, steps_needed, time_left))
-
-                if reachable:
-                    # Find closest reachable item
-                    _, closest_item, _, closest_item_time_left = min(reachable, key=lambda x: x[2])
-                    _, most_urgent_item, _, _ = min(reachable, key =lambda x: x[3])
-                    if (closest_item != most_urgent_item) and ((self.manhattan(self.agent_loc, most_urgent_item) + self.manhattan(most_urgent_item, self.target_loc)) <= (closest_item_time_left - self.manhattan(self.target_loc, closest_item))):
-                        dx = (most_urgent_item[0] - agent_x) / 4
-                        dy = (most_urgent_item[1] - agent_y) / 4
-                    else:
-                        dx = (closest_item[0] - agent_x) / 4
-                        dy = (closest_item[1] - agent_y) / 4
-                obs.extend([dx, dy])
+                # Agent load
+                obs.append(float(self.agent_load))
 
                 # Now obs contains [agent_x, agent_y, agent_load, dx1, dy1, dist1, dx2, dy2, dist2] (length 9)
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
