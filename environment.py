@@ -386,7 +386,7 @@ class TrainEnvironment(object):
             raise ValueError('Invalid mode. Expected one of: %s' % modes)
 
         self.step_count = 0
-        self.agent_loc = (self.vertical_idx_target, self.horizontal_idx_target)
+        # self.agent_loc = (self.vertical_idx_target, self.horizontal_idx_target)
         self.agent_loc = random.choice(self.eligible_cells)
         self.agent_load = 0  # number of items loaded (0 or 1, except for first extension, where it can be 0,1,2,3)
         self.item_locs = []
