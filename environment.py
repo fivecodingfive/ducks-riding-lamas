@@ -136,13 +136,13 @@ class Environment(object):
                     rew += 0
         
         # Define the reward map for an empty grid
-        reward_map = [
-            [0,    0,    0,     0, 0.05],
-            [0,    0, 0.05, 0.075,  0.1],
-            [0, 0.05,  0.1,  0.15,  0.2],
-            [0,    0, 0.05, 0.075,  0.1],
-            [0,    0,    0,     0, 0.05]
-        ]
+        # reward_map = [
+        #     [0,    0,    0,     0, 0.05],
+        #     [0,    0, 0.05, 0.075,  0.1],
+        #     [0, 0.05,  0.1,  0.15,  0.2],
+        #     [0,    0, 0.05, 0.075,  0.1],
+        #     [0,    0,    0,     0, 0.05]
+        # ]
         
         if shaping == True:
             if self.item_locs and self.agent_load == 0:     
@@ -151,31 +151,20 @@ class Environment(object):
                     time_left = self.max_response_time - self.item_times[i]
                     steps_needed = self.manhattan(self.agent_loc, item)
                     if steps_needed <= time_left:
-                        reachable.append((i, item, steps_needed))
+                        reachable.append((i, item, steps_needed, time_left))
 
                 if reachable:
                     # Find closest reachable item
-                    closest_i, closest_item, _ = min(reachable, key=lambda x: x[2])
-                    prev_dist = self.manhattan(prev_loc, closest_item)
-                    curr_dist = self.manhattan(self.agent_loc, closest_item)
-                    if curr_dist < prev_dist:
-                        rew += 0.1  # moving closer
-
-                # Compute remaining times and sort (ascending: most urgent first)
-                items_with_times = [
-                    (self.max_response_time - t, loc)
-                    for loc, t in zip(self.item_locs, self.item_times)
-                ]
-                items_with_times.sort()
-
-                # Find most urgent reachable item and add as obs feature
-                for remaining_time, most_urgent_item in items_with_times:
-                    manhattan_dist = self.manhattan(self.agent_loc, most_urgent_item)
-                    if remaining_time >= manhattan_dist:
+                    _, closest_item, _, closest_item_time_left = min(reachable, key=lambda x: x[2])
+                    _, most_urgent_item, _, _ = min(reachable, key =lambda x: x[3])
+                    if (closest_item != most_urgent_item) and ((self.manhattan(prev_loc, most_urgent_item) + self.manhattan(most_urgent_item, self.target_loc)) <= (closest_item_time_left - self.manhattan(self.target_loc, closest_item))):
                         prev_dist = self.manhattan(prev_loc, most_urgent_item)
                         curr_dist = self.manhattan(self.agent_loc, most_urgent_item)
-                        if curr_dist < prev_dist:
-                            rew += 0.1   # moving closer
+                    else:
+                        prev_dist = self.manhattan(prev_loc, closest_item)
+                        curr_dist = self.manhattan(self.agent_loc, closest_item)
+                    if curr_dist < prev_dist:
+                        rew += 0.1  # moving closer
 
             elif self.agent_load > 0:
                 # Find distance before and after move btw agent and target
@@ -183,13 +172,11 @@ class Environment(object):
                 curr_dist = self.manhattan(self.agent_loc, self.target_loc)
                 if curr_dist < prev_dist:
                     rew += 0.1
-                elif curr_dist > prev_dist:
-                    rew -= 0.1  # moving away
-                    
+
             # Inside your step function, when there are no items:
-            elif not self.item_locs:
-                agent_y, agent_x = self.agent_loc
-                rew += reward_map[agent_y][agent_x]
+            # elif not self.item_locs:
+            #     agent_y, agent_x = self.agent_loc
+            #     rew += reward_map[agent_y][agent_x]
 
         
 
@@ -294,41 +281,26 @@ class Environment(object):
                 agent_y, agent_x = self.agent_loc
                 obs.extend([agent_x / 4, agent_y / 4])
                 obs.append(float(self.agent_load))  # Load
-                obs.append(len(self.item_locs) / 10)
 
                 dx, dy = 0.0, 0.0
-                min_step = float('inf')
-                for i, (iy, ix) in enumerate(self.item_locs):
+                reachable = []
+                for i, item in enumerate(self.item_locs):
                     time_left = self.max_response_time - self.item_times[i]
-                    step_cost = abs(agent_x - ix) + abs(agent_y - iy)
-                    if time_left >= step_cost and step_cost < min_step:
-                        dx = (ix - agent_x) / 4
-                        dy = (iy - agent_y) / 4
-                        min_step = step_cost
+                    steps_needed = self.manhattan(self.agent_loc, item)
+                    if steps_needed <= time_left:
+                        reachable.append((i, item, steps_needed, time_left))
+
+                if reachable:
+                    # Find closest reachable item
+                    _, closest_item, _, closest_item_time_left = min(reachable, key=lambda x: x[2])
+                    _, most_urgent_item, _, _ = min(reachable, key =lambda x: x[3])
+                    if (closest_item != most_urgent_item) and ((self.manhattan(self.agent_loc, most_urgent_item) + self.manhattan(most_urgent_item, self.target_loc)) <= (closest_item_time_left - self.manhattan(self.target_loc, closest_item))):
+                        dx = (most_urgent_item[0] - agent_x) / 4
+                        dy = (most_urgent_item[1] - agent_y) / 4
+                    else:
+                        dx = (closest_item[0] - agent_x) / 4
+                        dy = (closest_item[1] - agent_y) / 4
                 obs.extend([dx, dy])
-
-
-
-                # Compute remaining times and sort (ascending: most urgent first)
-                items_with_times = [
-                    (self.max_response_time - t, ix, iy)
-                    for (iy, ix), t in zip(self.item_locs, self.item_times)
-                ]
-                items_with_times.sort()
-
-                # Find most urgent reachable item
-                added = False
-                for remaining_time, ix, iy in items_with_times:
-                    manhattan_dist = abs(ix - agent_x) + abs(iy - agent_y)
-                    if remaining_time >= manhattan_dist:
-                        dx = (ix - agent_x) / 4  # normalized
-                        dy = (iy - agent_y) / 4
-                        obs.extend([dx, dy])
-                        added = True
-                        break
-                # Pad with zeros if none found
-                if not added:
-                    obs.extend([0.0, 0.0])
 
                 # Now obs contains [agent_x, agent_y, agent_load, dx1, dy1, dist1, dx2, dy2, dist2] (length 9)
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
