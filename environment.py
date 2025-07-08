@@ -264,7 +264,7 @@ class Environment(object):
                 agent_y, agent_x = self.agent_loc
                 obs.extend([agent_x / 4, agent_y / 4])
                 obs.append(float(self.agent_load))  # Load
-                obs.append(len(self.item_locs))
+                obs.append(len(self.item_locs) / 10)
 
                 dx, dy = 0.0, 0.0
                 min_step = float('inf')
@@ -279,23 +279,26 @@ class Environment(object):
 
 
 
-                # Compute remaining times and sort
+                # Compute remaining times and sort (ascending: most urgent first)
                 items_with_times = [
                     (self.max_response_time - t, ix, iy)
                     for (iy, ix), t in zip(self.item_locs, self.item_times)
                 ]
-                items_with_times.sort()  # ascending: most urgent first
+                items_with_times.sort()
 
-                # Add direction and Manhattan distance for up to 2 most urgent items
-                for k in range(2):
-                    if k < len(items_with_times):
-                        _, ix, iy = items_with_times[k]
+                # Find most urgent reachable item
+                added = False
+                for remaining_time, ix, iy in items_with_times:
+                    manhattan_dist = abs(ix - agent_x) + abs(iy - agent_y)
+                    if remaining_time >= manhattan_dist:
                         dx = (ix - agent_x) / 4  # normalized
                         dy = (iy - agent_y) / 4
-                        dist = (abs(ix - agent_x) + abs(iy - agent_y)) / 8  # max manhattan distance in 5x5 grid is 8
-                        obs.extend([dx, dy, dist])
-                    else:
-                        obs.extend([0.0, 0.0, 0.0])  # pad
+                        obs.extend([dx, dy])
+                        added = True
+                        break
+                # Pad with zeros if none found
+                if not added:
+                    obs.extend([0.0, 0.0])
 
                 # Now obs contains [agent_x, agent_y, agent_load, dx1, dy1, dist1, dx2, dy2, dist2] (length 9)
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
