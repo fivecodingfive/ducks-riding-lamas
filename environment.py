@@ -134,7 +134,15 @@ class Environment(object):
                     rew += -1
                 elif shaping == True:
                     rew += 0
-
+        
+        # Define the reward map for an empty grid
+        reward_map = [
+            [0,    0,    0,     0, 0.05],
+            [0,    0, 0.05, 0.075,  0.1],
+            [0, 0.05,  0.1,  0.15,  0.2],
+            [0,    0, 0.05, 0.075,  0.1],
+            [0,    0,    0,     0, 0.05]
+        ]
         
         if shaping == True:
             if self.item_locs and self.agent_load == 0:     
@@ -177,6 +185,11 @@ class Environment(object):
                     rew += 0.1
                 elif curr_dist > prev_dist:
                     rew -= 0.1  # moving away
+                    
+            # Inside your step function, when there are no items:
+            elif not self.item_locs:
+                agent_y, agent_x = self.agent_loc
+                rew += reward_map[agent_y][agent_x]
 
         
 
