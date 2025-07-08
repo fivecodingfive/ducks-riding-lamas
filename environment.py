@@ -152,8 +152,6 @@ class Environment(object):
                     curr_dist = self.manhattan(self.agent_loc, closest_item)
                     if curr_dist < prev_dist:
                         rew += 0.1  # moving closer
-                    elif curr_dist > prev_dist:
-                        rew -= 0.1  # moving away
 
                 # Compute remaining times and sort (ascending: most urgent first)
                 items_with_times = [
@@ -170,8 +168,6 @@ class Environment(object):
                         curr_dist = self.manhattan(self.agent_loc, most_urgent_item)
                         if curr_dist < prev_dist:
                             rew += 0.1   # moving closer
-                        elif curr_dist > prev_dist:
-                            rew -= 0.1   # moving away
 
             elif self.agent_load > 0:
                 # Find distance before and after move btw agent and target
