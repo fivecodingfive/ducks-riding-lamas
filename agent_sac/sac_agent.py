@@ -10,15 +10,15 @@ from .visualizer import GridVisualizer
 if args.network == 'cnn':
     STATE_DIM = 100
 elif args.network == 'mlp':
-    STATE_DIM = 10
+    STATE_DIM = 25
 elif args.network == 'combine':
     STATE_DIM = 108
 
-PLOT_INTERVAL = 5
+PLOT_INTERVAL = 50
 
 class SACAgent:
     def __init__(self, state_dim=STATE_DIM, action_dim=5, learning_rate=0.001, 
-                 gamma=0.99, tau=0.005, alpha=0.2, use_per=False,
+                 gamma=0.99, tau=0.005, alpha=0.3, use_per=False,
                  buffer_size=50000, batch_size=64, network_type=args.network):
         self.state_dim = state_dim
         self.action_dim = action_dim
@@ -108,6 +108,7 @@ class SACAgent:
         min_target_q = tf.reduce_sum(next_probs * tf.minimum(target_q1_vals, target_q2_vals), axis=1)
 
         entropy_term = -tf.reduce_sum(next_probs * next_log_probs, axis=1)
+        self.alpha = max(self.alpha * 0.995, 0.3)
         targets = rewards + self.gamma * (1 - dones) * (min_target_q + self.alpha * entropy_term)
 
         # Q1, Q2 Losses
@@ -137,7 +138,8 @@ class SACAgent:
         
         q_val = tf.reduce_mean(q_vals)
 
-        self.update_target_networks()
+        if self.global_step % 5 == 0:
+            self.update_target_networks()
         if self.use_per:
             self.replay_buffer.update_priorities(indices, tf.maximum(td1,td2)) 
             
@@ -176,9 +178,7 @@ class SACAgent:
                         indices = tf.ones(self.batch_size, dtype=tf.int32)
                         
                     q_val, q1_loss, q2_loss, actor_loss = self.train_iterate(states, actions, rewards, next_states, dones, indices, weights)
-                    
-                    # states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
-                    # q_val, q1_loss, q2_loss, actor_loss = self.train_iterate(states, actions, rewards, next_states, dones)
+    
                     critic_loss_log.append((q1_loss+q2_loss)/2)
                     
                     self.update_learning_rate(self.global_step, episodes)
@@ -198,8 +198,8 @@ class SACAgent:
 
                 # Visualizer update
                 if visualizer is not None:
-                    agent, target, items, blocks = env.get_loc()
-                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, block_locs=blocks, reward=total_reward)
+                    agent, target, items, blocks, load = env.get_loc()
+                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, block_locs=blocks, reward=total_reward, load=load)
 
             if visualizer is not None:
                 visualizer.close()
@@ -209,7 +209,7 @@ class SACAgent:
             if episode % target_update_freq == 0:
                 avg_recent = sum(reward_log[-target_update_freq:]) / target_update_freq
                 loss_recent = sum(critic_loss_log[-target_update_freq*200:]) / (target_update_freq*200)
-                print(f"[Training][Episode {episode}/{episodes}] Avg Reward: {avg_recent:.2f}; Avg Loss: {loss_recent}")
+                print(f"[Training][Episode {episode}/{episodes}] Avg Reward: {avg_recent:.2f}; Avg Loss: {loss_recent:.3f}")
 
             if wandb.run:
                 wandb.log(
@@ -253,8 +253,8 @@ class SACAgent:
                 total_reward += reward
 
                 if visualizer is not None:
-                    agent, target, items = env.get_loc()
-                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, reward=total_reward)
+                    agent, target, items, blocks, load = env.get_loc()
+                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, block_locs=blocks, reward=total_reward, load=load)
 
             if visualizer is not None:
                 visualizer.close()
@@ -276,12 +276,12 @@ class SACAgent:
         existing = [f for f in os.listdir(base_dir) if f.startswith("SACmodel_") and f.endswith(".keras")]
 
         index = len(existing)
-        file_name = f"SACmodel_{index}_{variant}.keras"
+        file_name = f"SACmodel_{index}_v{variant}.keras"
         full_path = os.path.join(base_dir, file_name)
 
         while os.path.exists(full_path):
             index += 1
-            file_name = f"SACmodel_{index}_{variant}.keras"
+            file_name = f"SACmodel_{index}_v{variant}.keras"
             full_path = os.path.join(base_dir, file_name)
 
         self.actor.save(full_path)

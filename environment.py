@@ -16,14 +16,17 @@ import numpy as np
 import tensorflow as tf
 from config import args
 
-_df = pd.read_csv("item_spawn_counts.csv", index_col=0)
+variant = args.variant
+if variant == 2:
+    _df = pd.read_csv("item_spawn_counts_v2.csv", index_col=0)
+    # _df = pd.read_csv("item_expected_value_var2.csv", index_col=0)
+else:
+    _df = pd.read_csv("item_spawn_counts.csv", index_col=0)
+
 _counts = _df.to_numpy(dtype=np.float32)
 spawn_distribution = _counts / _counts.sum()
 network_type = args.network
-_df = pd.read_csv("item_spawn_counts.csv", index_col=0)
-_counts = _df.to_numpy(dtype=np.float32)
-spawn_distribution = _counts / _counts.sum()
-network_type = args.network
+algorithm = args.algorithm
 
 class Environment(object):
     def __init__(self, variant, data_dir):
@@ -96,7 +99,7 @@ class Environment(object):
         self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
                                 index_col=0)
 
-        return self.get_obs()
+        return self.get_obs_pb()
 
     # take one environment step based on the action act
     def step(self, act):
@@ -154,7 +157,7 @@ class Environment(object):
         self.item_times += [0] * len(new_items)
 
         # get new observation
-        next_obs = self.get_obs()
+        next_obs = self.get_obs_pb()
 
         return rew, next_obs, done
 
@@ -235,9 +238,9 @@ class Environment(object):
 
                 # Entweder echte Verteilung oder Dummy
                 if use_distribution:
-                    obs.extend(spawn_distribution[0, :].tolist())  # z. B. Zeile 0 nehmen
+                    obs.extend(spawn_distribution.flatten().tolist())
                 else:
-                    obs.extend([0.0] * 5)
+                    obs.extend([0.0] * 25)
 
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
             
@@ -302,7 +305,32 @@ class Environment(object):
 
     def get_loc(self):
     
-        return self.agent_loc, self.target_loc, self.item_locs, self.block_locs
+        return self.agent_loc, self.target_loc, self.item_locs, self.block_locs, self.agent_load
+    
+    def get_obs_pb(self):
+        obs = np.zeros(self.vertical_cell_count * self.horizontal_cell_count, dtype=np.float32)
+
+        target_idx = self.target_loc[0] * self.horizontal_cell_count + self.target_loc[1]
+        obs[target_idx] = -self.agent_load * 1.0 if self.agent_load != 0 else 0
+
+        for bx, by in self.block_locs:
+            idx = bx * self.horizontal_cell_count + by
+            if (self.agent_loc[0], self.agent_loc[1]) in [(4,0),(4,1),(4,2)]: 
+                obs[idx] = -self.agent_load * 0.75
+            else:
+                obs[idx] = -self.agent_load * 0.5
+
+        agent_idx = self.agent_loc[0] * self.horizontal_cell_count + self.agent_loc[1]
+        obs[agent_idx] = 0.5 + self.agent_load * 1
+
+        for loc, time in zip(self.item_locs, self.item_times):
+            ix, iy = loc
+            idx = ix * self.horizontal_cell_count + iy
+            mapped_time = min(time/self.max_response_time, 1) * 0.8
+            obs[idx] = mapped_time
+            
+        ## 25-element vector
+        return tf.convert_to_tensor(obs, dtype=tf.float32)
     
 class TrainEnvironment(object):
     def __init__(self, variant, data_dir):
@@ -317,7 +345,9 @@ class TrainEnvironment(object):
         self.reward = 25 if self.variant == 2 else 15
         self.data_dir = data_dir
         self.state_dim = 0
-        self.state_dim = 0
+        self.item_cost = 0
+        self.item_expects = np.zeros(self.vertical_cell_count * self.horizontal_cell_count, dtype=np.float32)
+        self.item_counts = np.zeros(self.vertical_cell_count * self.horizontal_cell_count, dtype=np.int32)
 
         self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
         self.training_episodes = self.training_episodes.training_episodes.tolist()
@@ -357,6 +387,7 @@ class TrainEnvironment(object):
 
         self.step_count = 0
         self.agent_loc = (self.vertical_idx_target, self.horizontal_idx_target)
+        self.agent_loc = random.choice(self.eligible_cells)
         self.agent_load = 0  # number of items loaded (0 or 1, except for first extension, where it can be 0,1,2,3)
         self.item_locs = []
         self.item_times = []
@@ -375,7 +406,7 @@ class TrainEnvironment(object):
         self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
                                 index_col=0)
 
-        return self.get_obs()
+        return self.get_obs_pb()
 
     # take one environment step based on the action act
     def step(self, act):
@@ -401,40 +432,35 @@ class TrainEnvironment(object):
 
             if new_loc in self.eligible_cells:
                 self.agent_loc = new_loc
-                rew += -1  # movement penalty
-
-        ax, ay = self.agent_loc
-        epsilon = 1e-3
-        max_range = 3
-        field_strength = 1.0
-
-        # --- Reward shaping based on current context ---
-        for (ix, iy), t in zip(self.item_locs, self.item_times):
-            dist = abs(ax - ix) + abs(ay - iy)
-            if dist <= max_range and t < self.max_response_time:
-                # More urgent items give stronger signal
-                urgency = 1.0 - (t / self.max_response_time)
-                signal = (urgency * field_strength * (self.reward / 2)) / (dist + epsilon)
-                shaped_reward += signal
-
-        # --- Field-based reward from target (if agent is carrying item) ---
-        if self.agent_load > 0:
-            tx, ty = self.target_loc
-            dist_to_target = abs(ax - tx) + abs(ay - ty)
-            if dist_to_target <= max_range:
-                shaped_reward += (field_strength * (self.reward / 2) * self.agent_load) / (dist_to_target + epsilon)
-
+                self.item_cost += 1
+                rew += -1
+                if new_loc in [(3,0), (3,1),(3,2)]:
+                    shaped_reward += 1
+            else:
+                shaped_reward += -1
+        else:
+            if self.agent_load != 0:
+                shaped_reward += -1
 
         # --- Item pickup ---
         if (self.agent_load < self.agent_capacity) and (self.agent_loc in self.item_locs):
+            
+            item_idx = self.agent_loc[0] * self.horizontal_cell_count + self.agent_loc[1]
+            self.item_expects[item_idx] += (self.reward/2 - self.item_cost)
+            self.item_counts[item_idx] += 1
+            self.item_expects[item_idx] /= self.item_counts[item_idx]
+            self.item_cost = 0
+            
             self.agent_load += 1
             idx = self.item_locs.index(self.agent_loc)
             self.item_locs.pop(idx)
             self.item_times.pop(idx)
             rew += self.reward / 2
-
+            # shaped_reward += self.item_expects[item_idx]
+            
         # --- Item drop-off ---
         if self.agent_loc == self.target_loc:
+            self.item_cost = 0
             rew += self.agent_load * self.reward / 2
             self.agent_load = 0
 
@@ -451,7 +477,7 @@ class TrainEnvironment(object):
         self.item_locs += new_items
         self.item_times += [0] * len(new_items)
 
-        next_obs = self.get_obs()
+        next_obs = self.get_obs_pb()
         train_rew = rew + shaped_reward
 
         return train_rew, rew, next_obs, done
@@ -468,7 +494,7 @@ class TrainEnvironment(object):
 
     def get_loc(self):
     
-        return self.agent_loc, self.target_loc, self.item_locs, self.block_locs
+        return self.agent_loc, self.target_loc, self.item_locs, self.block_locs, self.agent_load
     
     def get_obs(self):
         if network_type == 'cnn':
@@ -524,8 +550,34 @@ class TrainEnvironment(object):
 
             # Spawn distribution dummy if no items
             if use_distribution:
-                obs.extend(spawn_distribution[0, :].tolist())
+                obs.extend(spawn_distribution.flatten().tolist())
             else:
-                obs.extend([0.0] * 5)
+                obs.extend([0.0] * 25)
                 
             return tf.convert_to_tensor(obs, dtype=tf.float32)
+    
+    def get_obs_pb(self):
+        obs = np.zeros(self.vertical_cell_count * self.horizontal_cell_count, dtype=np.float32)
+
+        target_idx = self.target_loc[0] * self.horizontal_cell_count + self.target_loc[1]
+        obs[target_idx] = -self.agent_load * 1.0 if self.agent_load != 0 else 0
+
+        for bx, by in self.block_locs:
+            idx = bx * self.horizontal_cell_count + by
+            # if (self.agent_loc[0], self.agent_loc[1]) in [(4,0),(4,1),(4,2)]: 
+            obs[idx] = -self.agent_load * 0.75
+            # else:
+            #     obs[idx] = -self.agent_load * 0.5
+
+        agent_idx = self.agent_loc[0] * self.horizontal_cell_count + self.agent_loc[1]
+        obs[agent_idx] = 0.5 + self.agent_load * 1
+
+        for loc, time in zip(self.item_locs, self.item_times):
+            ix, iy = loc
+            idx = ix * self.horizontal_cell_count + iy
+            mapped_time = min(time/self.max_response_time, 1)
+            obs[idx] = mapped_time 
+            # obs[idx] = mapped_time * self.item_expects[idx]
+        
+        ## 25-element vector
+        return tf.convert_to_tensor(obs, dtype=tf.float32)

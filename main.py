@@ -50,8 +50,9 @@ mode = args.mode            # specify mode of agent with different dataset (trai
 model_path = args.modelpath # specify path to model parameters in ../models folder
 agent = args.algorithm
 per = args.per
+alpha = args.alpha
 
-print(f"Args: variant={variant}, episodes={episodes}, mode={mode}, network={NETWORK_TYPE}, per={per}", flush=True)
+print(f">> [Args] variant={variant}, episodes={episodes}, alpha={alpha}", flush=True)
 
 from agent_dqn.dqn_agent import DQNAgent
 from agent_sac.sac_agent import SACAgent
@@ -109,7 +110,7 @@ match agent:
     case "sac":
         agent = SACAgent(
             learning_rate=args.learning_rate,
-            use_per=args.per
+            alpha=float(args.alpha)
         )
         config = vars(args)
         config.update({
@@ -147,7 +148,7 @@ print(">>> [Checkpoint] Agent created", flush=True)
 print(">>> [Checkpoint] Initializing W&B", flush=True)
 
 run_name = (
-    f"var{args.variant}_per{args.per}_"
+    f"var{args.variant}_alpha{args.alpha}_"
     f"decay{args.epsilon_decay}_{datetime.now():%b%d}"
 )
 
