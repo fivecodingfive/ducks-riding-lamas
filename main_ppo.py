@@ -121,7 +121,7 @@ if USE_WANDB:
             entity="ducks-riding-llamas",
             project="ride-those-llamas",
             name=run_name,
-            group= "new",
+            group= "fucking-idiot",
             config={
                 "env_variant": args.variant,
                 "ppo_config": ppo_config,
