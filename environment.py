@@ -232,7 +232,7 @@ class Environment(object):
         # Anzahl der verfallenen Items:
         lost_items = len(self.item_locs) - sum(mask)
         if shaping and lost_items > 0:
-            rew -= lost_items * 0.5  # Beispiel: -2 pro verlorenes Item
+            rew -= lost_items * 0  # Beispiel: -2 pro verlorenes Item
         self.item_locs = list(compress(self.item_locs, mask))
         self.item_times = list(compress(self.item_times, mask))
 
