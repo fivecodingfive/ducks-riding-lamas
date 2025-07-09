@@ -72,6 +72,19 @@ class Environment(object):
                                    (3,0), (3,1), (3,2),        (3,4),
                                    (4,0), (4,1), (4,2),        (4,4)]
             self.block_locs = [(0,1),(1,1),(2,1),(1,3),(2,3),(3,3),(4,3)]
+            self.first_sec =   [(0,0),        
+                                (1,0),        
+                                (2,0),        
+                                (3,0), (3,1), (3,2),
+                                (4,0), (4,1), (4,2)]
+            self.second_sec = [(0,2), (0,3),
+                               (1,2),        
+                               (2,2)]
+            self.third_sec =    [(0,4),
+                                 (1,4),
+                                 (2,4),
+                                 (3,4),
+                                 (4,4)]
 
     # initialize a new episode (specify if training, validation, or testing via the mode argument)
     def reset(self, mode):
@@ -307,29 +320,61 @@ class Environment(object):
     
         return self.agent_loc, self.target_loc, self.item_locs, self.block_locs, self.agent_load
     
-    def get_obs_pb(self):
-        obs = np.zeros(self.vertical_cell_count * self.horizontal_cell_count, dtype=np.float32)
+    # def get_obs_pb(self):
+    #     obs = np.zeros(self.vertical_cell_count * self.horizontal_cell_count, dtype=np.float32)
 
-        target_idx = self.target_loc[0] * self.horizontal_cell_count + self.target_loc[1]
-        obs[target_idx] = -self.agent_load * 1.0 if self.agent_load != 0 else 0
+    #     target_idx = self.target_loc[0] * self.horizontal_cell_count + self.target_loc[1]
+    #     obs[target_idx] = -self.agent_load * 1.0 if self.agent_load != 0 else 0
 
-        for bx, by in self.block_locs:
-            idx = bx * self.horizontal_cell_count + by
-            if (self.agent_loc[0], self.agent_loc[1]) in [(4,0),(4,1),(4,2)]: 
-                obs[idx] = -self.agent_load * 0.75
-            else:
-                obs[idx] = -self.agent_load * 0.5
+    #     for bx, by in self.block_locs:
+    #         idx = bx * self.horizontal_cell_count + by
+    #         if (self.agent_loc[0], self.agent_loc[1]) in [(4,0),(4,1),(4,2)]: 
+    #             obs[idx] = -self.agent_load * 0.75
+    #         else:
+    #             obs[idx] = -self.agent_load * 0.5
 
-        agent_idx = self.agent_loc[0] * self.horizontal_cell_count + self.agent_loc[1]
-        obs[agent_idx] = 0.5 + self.agent_load * 1
+    #     agent_idx = self.agent_loc[0] * self.horizontal_cell_count + self.agent_loc[1]
+    #     obs[agent_idx] = 0.5 + self.agent_load * 1
 
-        for loc, time in zip(self.item_locs, self.item_times):
-            ix, iy = loc
-            idx = ix * self.horizontal_cell_count + iy
-            mapped_time = min(time/self.max_response_time, 1) * 0.8
-            obs[idx] = mapped_time
+    #     for loc, time in zip(self.item_locs, self.item_times):
+    #         ix, iy = loc
+    #         idx = ix * self.horizontal_cell_count + iy
+    #         mapped_time = min(time/self.max_response_time, 1) * 0.8
+    #         obs[idx] = mapped_time
             
-        ## 25-element vector
+    #     ## 25-element vector
+    #     return tf.convert_to_tensor(obs, dtype=tf.float32)
+    def get_obs_pb(self):
+        obs = []
+        agent_y, agent_x = self.agent_loc
+        obs.extend([float(agent_x), float(agent_y)])  # Position
+        obs.append(float(self.agent_load))            # Load
+        
+        locs = np.zeros(3, dtype=np.float32)
+        times = np.full(3, np.inf)
+        num = len(self.item_locs)
+        if num != 0:
+            for loc, time in zip(self.item_locs, self.item_times):
+                ix, iy = loc
+                if(ix,iy) in self.first_sec:
+                    locs[0] += 1/num
+                    if time < times[0]:
+                        times[0] = time
+                elif (ix,iy) in self.second_sec:
+                    locs[1] += 1/num
+                    if time < times[1]:
+                        times[1] = time
+                elif (ix,iy) in self.third_sec:
+                    locs[2] += 1/num
+                    if time < times[2]:
+                        times[2] = time
+        else:
+            locs = np.array([0.269, 0.245, 0.485])
+            times = np.zeros(3, dtype=np.float32)
+        obs.extend(locs)
+        # obs.extend(times)
+        
+        
         return tf.convert_to_tensor(obs, dtype=tf.float32)
     
 class TrainEnvironment(object):
@@ -378,6 +423,19 @@ class TrainEnvironment(object):
                                    (3,0), (3,1), (3,2),        (3,4),
                                    (4,0), (4,1), (4,2),        (4,4)]
             self.block_locs = [(0,1),(1,1),(2,1),(1,3),(2,3),(3,3),(4,3)]
+            self.first_sec =   [(0,0),        
+                                (1,0),        
+                                (2,0),        
+                                (3,0), (3,1), (3,2),
+                                (4,0), (4,1), (4,2)]
+            self.second_sec = [(0,2), (0,3),
+                               (1,2),        
+                               (2,2)]
+            self.third_sec =    [(0,4),
+                                 (1,4),
+                                 (2,4),
+                                 (3,4),
+                                 (4,4)]
 
     # initialize a new episode (specify if training, validation, or testing via the mode argument)
     def reset(self, mode):
@@ -420,13 +478,18 @@ class TrainEnvironment(object):
             done = 0
 
         # --- Agent movement ---
+        # ax, ay = self.agent_loc
         if act != 0:
             if act == 1:  # up
                 new_loc = (self.agent_loc[0] - 1, self.agent_loc[1])
+                # if (ax, ay) in self.third_sec: 
+                #     shaped_reward+=0.2 if self.agent_load==0 else 0.2
             elif act == 2:  # right
                 new_loc = (self.agent_loc[0], self.agent_loc[1] + 1)
             elif act == 3:  # down
                 new_loc = (self.agent_loc[0] + 1, self.agent_loc[1])
+                # if (ax, ay) in self.third_sec: 
+                #     shaped_reward+=0.3 if self.agent_load==0 else 0.2
             elif act == 4:  # left
                 new_loc = (self.agent_loc[0], self.agent_loc[1] - 1)
 
@@ -462,6 +525,7 @@ class TrainEnvironment(object):
         if self.agent_loc == self.target_loc:
             self.item_cost = 0
             rew += self.agent_load * self.reward / 2
+            shaped_reward += self.agent_load * self.reward / 4
             self.agent_load = 0
 
         # --- Update item timers ---
@@ -556,28 +620,61 @@ class TrainEnvironment(object):
                 
             return tf.convert_to_tensor(obs, dtype=tf.float32)
     
-    def get_obs_pb(self):
-        obs = np.zeros(self.vertical_cell_count * self.horizontal_cell_count, dtype=np.float32)
+    # def get_obs_pb(self):
+    #     obs = np.zeros(self.vertical_cell_count * self.horizontal_cell_count, dtype=np.float32)
 
-        target_idx = self.target_loc[0] * self.horizontal_cell_count + self.target_loc[1]
-        obs[target_idx] = -self.agent_load * 1.0 if self.agent_load != 0 else 0
+    #     target_idx = self.target_loc[0] * self.horizontal_cell_count + self.target_loc[1]
+    #     obs[target_idx] = -self.agent_load * 1.0 if self.agent_load != 0 else 0
 
-        for bx, by in self.block_locs:
-            idx = bx * self.horizontal_cell_count + by
-            # if (self.agent_loc[0], self.agent_loc[1]) in [(4,0),(4,1),(4,2)]: 
-            obs[idx] = -self.agent_load * 0.75
-            # else:
-            #     obs[idx] = -self.agent_load * 0.5
+    #     for bx, by in self.block_locs:
+    #         idx = bx * self.horizontal_cell_count + by
+    #         # if (self.agent_loc[0], self.agent_loc[1]) in [(4,0),(4,1),(4,2)]: 
+    #         obs[idx] = -self.agent_load * 0.75
+    #         # else:
+    #         #     obs[idx] = -self.agent_load * 0.5
 
-        agent_idx = self.agent_loc[0] * self.horizontal_cell_count + self.agent_loc[1]
-        obs[agent_idx] = 0.5 + self.agent_load * 1
+    #     agent_idx = self.agent_loc[0] * self.horizontal_cell_count + self.agent_loc[1]
+    #     obs[agent_idx] = 0.5 + self.agent_load * 1
 
-        for loc, time in zip(self.item_locs, self.item_times):
-            ix, iy = loc
-            idx = ix * self.horizontal_cell_count + iy
-            mapped_time = min(time/self.max_response_time, 1)
-            obs[idx] = mapped_time 
-            # obs[idx] = mapped_time * self.item_expects[idx]
+    #     for loc, time in zip(self.item_locs, self.item_times):
+    #         ix, iy = loc
+    #         idx = ix * self.horizontal_cell_count + iy
+    #         mapped_time = min(time/self.max_response_time, 1)
+    #         obs[idx] = mapped_time 
+    #         # obs[idx] = mapped_time * self.item_expects[idx]
         
-        ## 25-element vector
+    #     ## 25-element vector
+    #     return tf.convert_to_tensor(obs, dtype=tf.float32)
+    
+    def get_obs_pb(self):
+        obs = []
+        agent_y, agent_x = self.agent_loc
+        obs.extend([float(agent_x), float(agent_y)])  # Position
+        obs.append(float(self.agent_load))            # Load
+        
+        locs = np.zeros(3, dtype=np.float32)
+        times = np.array([1000, 1000, 1000])
+        num = len(self.item_locs)
+        if num != 0:
+            for loc, time in zip(self.item_locs, self.item_times):
+                ix, iy = loc
+                if(ix,iy) in self.first_sec:
+                    locs[0] += 1/num
+                    if time < times[0]:
+                        times[0] = time
+                elif (ix,iy) in self.second_sec:
+                    locs[1] += 1/num
+                    if time < times[1]:
+                        times[1] = time
+                elif (ix,iy) in self.third_sec:
+                    locs[2] += 1/num
+                    if time < times[2]:
+                        times[2] = time
+        else:
+            locs = np.array([0.269, 0.245, 0.485])
+            times = np.ones(3, dtype=np.float32)
+        obs.extend(locs)
+        # obs.extend(times)
+        
+        
         return tf.convert_to_tensor(obs, dtype=tf.float32)

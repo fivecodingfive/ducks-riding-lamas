@@ -12,7 +12,7 @@ from scipy.sparse.csgraph import dijkstra
 from environment import Environment
 
 
-variant = 0  # problem variant (0 for base variant, 1 for first extension, 2 for second extension)
+variant = 2  # problem variant (0 for base variant, 1 for first extension, 2 for second extension)
 mode = 'validation'  # validation or testing
 data_dir = './data'  # relative path to data directory (e.g., './data', not './data/variant_0')
 
@@ -57,7 +57,7 @@ else:
     # |  4 |  6 | 11 |  X | 17 |
 
     mapping = [(0,0), (1,0), (2,0), (3,0), (4,0),
-               (3,1), (4,1),
+                                    (3,1),  (4,1),
                (0,2), (1,2), (2,2), (3,2), (4,2),
                (0,3),
                (0,4), (1,4), (2,4), (3,4), (4,4)]
