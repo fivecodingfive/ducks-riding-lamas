@@ -22,7 +22,6 @@ class PPO_Agent:
         self.action_size    = config["action_size"]
         self.rollout_steps  = config["rollout_steps"]
         self.max_time_steps = config["max_time_steps"]
-        self.shaping        = config["shaping"]
 
         # --- hyper-parameters ---------------------------------------------------
         self.gamma   = config["gamma"]
@@ -98,6 +97,7 @@ class PPO_Agent:
                     self._update_networks_if_ready(ep)          # may trigger roll-out update
 
                 if not training:
+                    action_probs = tf.nn.softmax(logits).numpy().tolist()[0]
                     replay_buffer.append(dict(
                     agent_loc=env.agent_loc,
                     target_loc=env.target_loc,
@@ -105,6 +105,7 @@ class PPO_Agent:
                     item_times=env.item_times.copy(),
                     reward=reward,
                     agent_load=env.agent_load,
+                    action_probs=action_probs
                     ))
                         
 
@@ -138,9 +139,11 @@ class PPO_Agent:
         print(f"\n[{tag} done] overall avg reward = {overall:.2f}")
         if not training:
             print(f"\nReplay buffer length= {len(replay_buffer)}")
+            for i in range(len(replay_buffer) - 1):
+                replay_buffer[i]['action_probs'] = replay_buffer[i+1]['action_probs']
             csv_path = "last_replay_buffer.csv"  # Always overwritten
             with open(csv_path, mode="w", newline="") as f:
-                writer = csv.DictWriter(f, fieldnames=["step", "agent_loc", "target_loc", "item_locs", "item_times", "reward", "agent_load"])
+                writer = csv.DictWriter(f, fieldnames=["step", "agent_loc", "target_loc", "item_locs", "item_times", "reward", "agent_load", "action_probs"])
                 writer.writeheader()
                 for step, frame in enumerate(replay_buffer):
                     row = {
@@ -150,10 +153,11 @@ class PPO_Agent:
                         "item_locs": str(frame["item_locs"]),  # List of tuples
                         "item_times": str(frame["item_times"]),
                         "reward": frame["reward"],
-                        "agent_load": frame["agent_load"]
+                        "agent_load": frame["agent_load"],
+                        "action_probs": frame["action_probs"]
                     }
                     writer.writerow(row)
-        if self.shaping == True:
+        if training:
             self.entropy = self.entropy_decay = self.entropy_min = 0.0
             total_original_reward = 0.0
             original_reward_log = []

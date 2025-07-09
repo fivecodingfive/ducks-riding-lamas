@@ -17,6 +17,7 @@ with open("last_replay_buffer.csv", "r") as f:
             "item_times": ast.literal_eval(row["item_times"]),
             "reward": float(row["reward"]),
             "agent_load": int(row["agent_load"]),
+            "action_probs": ast.literal_eval(row["action_probs"]),
         }
         replay_buffer.append(step_data)
 
@@ -34,8 +35,9 @@ class GridVisualizer:
         self.ax.set_xticks(np.arange(self.grid_size[1]))
         self.ax.set_yticks(np.arange(self.grid_size[0]))
         self.ax.grid(True)
+        self.action_text = None
 
-    def update(self, agent_loc, target_loc, item_locs, item_times, reward, agent_load, step=0):
+    def update(self, agent_loc, target_loc, item_locs, item_times, reward, agent_load, step=0, action_probs=None):
         grid = np.full(self.grid_size, '.', dtype=str)
         ax, ay = agent_loc
         tx, ty = target_loc
@@ -53,6 +55,19 @@ class GridVisualizer:
                     self.texts[i][j].set_color('red')
                 else:
                     self.texts[i][j].set_color('black')
+        # Remove old action_probs text if exists
+        if self.action_text is not None:
+            self.action_text.remove()
+        # Show action probabilities at bottom right
+        if action_probs is not None:
+            action_names = ["0=stand", "1=up", "2=right", "3=down", "4=left"]
+            prob_str = "\n".join([f"{name}: {prob:.2f}" for name, prob in zip(action_names, action_probs)])
+            self.action_text = self.ax.text(
+                1.02, 0.01, f"Action probs:\n{prob_str}",
+                transform=self.ax.transAxes,
+                fontsize=12, va="bottom", ha="left",
+                bbox=dict(boxstyle="round", facecolor="white", alpha=0.85)
+            )
         self.fig.canvas.draw_idle()
 
 
@@ -69,7 +84,8 @@ def visualize_buffer_buttons(replay_buffer):
         visualizer.update(
             data["agent_loc"], data["target_loc"], data["item_locs"],
             data["item_times"],   # <--- Hier einfügen!
-            data["reward"], data["agent_load"], step[0]
+            data["reward"], data["agent_load"], step[0],
+            action_probs=data.get("action_probs")
         )
 
 

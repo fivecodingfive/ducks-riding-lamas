@@ -102,7 +102,7 @@ override("gamma", args.gamma, ppo_config)
 # 5 · Environment & Agent --------------------------------------------------------
 # ═══════════════════════════════════════════════════════════════════════════════
 
-env = Environment(variant=1, data_dir="./data")
+env = Environment(variant=args.variant, data_dir="./data")
 agent = PPO_Agent(config=ppo_config)
 
 # ═══════════════════════════════════════════════════════════════════════════════
