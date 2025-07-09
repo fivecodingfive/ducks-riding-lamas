@@ -1,6 +1,6 @@
 
 ppo_config = {
-    "state_size": 6,
+    "state_size": 10,
     "action_size": 5,
 
     "gamma": 0.95, # discount factor -> if high, future rewards are more important, and if low, immediate rewards are more important
@@ -16,7 +16,7 @@ ppo_config = {
     "rollout_steps":   2048,
 
 
-    "n_episodes": 300,
+    "n_episodes": 600,
     "shaping": True
 }
 
