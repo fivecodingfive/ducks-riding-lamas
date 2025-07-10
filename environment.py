@@ -304,7 +304,6 @@ class Environment(object):
                 obs = []
                 agent_y, agent_x = self.agent_loc
                 obs.extend([agent_x / 4, agent_y / 4])
-                obs.append(len(self.item_locs))
 
                 reachable_items = []
                 for i, item_loc in enumerate(self.item_locs):
