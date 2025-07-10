@@ -1,6 +1,6 @@
 
 ppo_config = {
-    "state_size": 6,
+    "state_size": 5,
     "action_size": 5,
 
     "gamma": 0.9, # discount factor -> if high, future rewards are more important, and if low, immediate rewards are more important
