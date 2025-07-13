@@ -47,8 +47,8 @@ class Environment(object):
 
         self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
         self.training_episodes = self.training_episodes.training_episodes.tolist()
-        self.validation_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/test_episodes.csv')
-        self.validation_episodes = self.validation_episodes.test_episodes.tolist()
+        self.validation_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/validation_episodes.csv')
+        self.validation_episodes = self.validation_episodes.validation_episodes.tolist()
         self.test_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/test_episodes.csv')
         self.test_episodes = self.test_episodes.test_episodes.tolist()
 
