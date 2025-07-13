@@ -10,7 +10,7 @@ from .visualizer import GridVisualizer
 if args.network == 'cnn':
     STATE_DIM = 100
 elif args.network == 'mlp':
-    STATE_DIM = 9
+    STATE_DIM = 30
 elif args.network == 'combine':
     STATE_DIM = 108
 
@@ -163,7 +163,7 @@ class SACAgent:
                 action = self.act(state)
                 train_reward, reward, next_obs, done = env.step(action)
                 next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
-                self.remember(state, action, reward, next_state, done)
+                self.remember(state, action, train_reward, next_state, done)
                 
                 state = next_state
                 total_reward += reward
@@ -260,7 +260,7 @@ class SACAgent:
             while not done:
                 action = self.act(state, deterministic=True)
 
-                reward, next_obs, done = env.step(action)
+                _, reward, next_obs, done = env.step(action)
                 next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
 
                 state = next_state
