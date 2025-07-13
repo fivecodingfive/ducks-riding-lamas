@@ -47,8 +47,8 @@ class Environment(object):
 
         self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
         self.training_episodes = self.training_episodes.training_episodes.tolist()
-        self.validation_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/validation_episodes.csv')
-        self.validation_episodes = self.validation_episodes.validation_episodes.tolist()
+        self.validation_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/test_episodes.csv')
+        self.validation_episodes = self.validation_episodes.test_episodes.tolist()
         self.test_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/test_episodes.csv')
         self.test_episodes = self.test_episodes.test_episodes.tolist()
 
@@ -178,7 +178,7 @@ class Environment(object):
                     closest_item, _ = min(reachable_items, key=lambda x: x[1])
                     # Belohne, wenn man sich dem nächsten Item nähert
                     if self.manhattan(prev_loc, closest_item) > self.manhattan(self.agent_loc, closest_item):
-                        rew += 0.5
+                        rew += 1
 
             # 2. Agent ist voll (unabhängig davon, ob noch Items da sind) → Belohnung fürs Annähern ans Ziel
             elif self.agent_load == self.agent_capacity:
@@ -196,15 +196,15 @@ class Environment(object):
 
             # 4. Keine Items & Agent ist leer → Belohne Bewegung in Richtung "Warteposition" (optional)
             elif not self.item_locs and self.agent_load == 0:
-                optimal_loc = (2, 3)
+                optimal_loc = (2, 3) #could try out (2,2) maybe as last chance
                 prev_dist = self.manhattan(prev_loc, optimal_loc)
                 curr_dist = self.manhattan(self.agent_loc, optimal_loc)
                 if self.agent_loc == optimal_loc:
                     rew += 1
                 elif curr_dist < prev_dist:
-                    rew += 0.5  # Weniger Belohnung, nur als "Idle-Handling"
+                    rew += 1  # Weniger Belohnung, nur als "Idle-Handling"
                 elif curr_dist > prev_dist:
-                    rew -= 0.5  # Penalty für Weglaufen
+                    rew -= 1  # Penalty für Weglaufen
 
             # 5. Sonst kein shaping
 
