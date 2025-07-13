@@ -10,7 +10,7 @@ from .visualizer import GridVisualizer
 if args.network == 'cnn':
     STATE_DIM = 100
 elif args.network == 'mlp':
-    STATE_DIM = 6
+    STATE_DIM = 9
 elif args.network == 'combine':
     STATE_DIM = 108
 
@@ -98,7 +98,7 @@ class SACAgent:
         ],
         jit_compile=True
     )
-    def train_iterate(self, states, actions, rewards, next_states, dones, indices, weights):
+    def train_iterate(self, states, actions, rewards, next_states, dones, indices, weights, min_alpha=0.2):
         # Target Q calculation
         next_probs = self.actor(next_states)
         next_log_probs = tf.math.log(tf.clip_by_value(next_probs, 1e-8, 1.0))
@@ -108,7 +108,7 @@ class SACAgent:
         min_target_q = tf.reduce_sum(next_probs * tf.minimum(target_q1_vals, target_q2_vals), axis=1)
 
         entropy_term = -tf.reduce_sum(next_probs * next_log_probs, axis=1)
-        self.alpha = max(self.alpha * 0.995, 0.3)
+        self.alpha = max(self.alpha * 0.995, min_alpha)
         targets = rewards + self.gamma * (1 - dones) * (min_target_q + self.alpha * entropy_term)
 
         # Q1, Q2 Losses
@@ -163,7 +163,7 @@ class SACAgent:
                 action = self.act(state)
                 train_reward, reward, next_obs, done = env.step(action)
                 next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
-                self.remember(state, action, train_reward, next_state, done)
+                self.remember(state, action, reward, next_state, done)
                 
                 state = next_state
                 total_reward += reward
@@ -210,6 +210,20 @@ class SACAgent:
                 avg_recent = sum(reward_log[-target_update_freq:]) / target_update_freq
                 loss_recent = sum(critic_loss_log[-target_update_freq*200:]) / (target_update_freq*200)
                 print(f"[Training][Episode {episode}/{episodes}] Avg Reward: {avg_recent:.2f}; Avg Loss: {loss_recent:.3f}")
+                
+            # if episode % 9 == 0:
+            #     state_tensor = tf.convert_to_tensor([state], dtype=tf.float32)
+            #     probs = self.actor(state_tensor)[0].numpy()
+
+            #     import matplotlib.pyplot as plt
+            #     plt.figure(figsize=(6, 4))
+            #     plt.bar(range(self.action_dim), probs)
+            #     plt.xlabel("Action")
+            #     plt.ylabel("Probability")
+            #     plt.title(f"Policy Distribution (Episode {episode})")
+            #     plt.grid(True)
+            #     plt.tight_layout()
+            #     plt.show()
 
             if wandb.run:
                 wandb.log(

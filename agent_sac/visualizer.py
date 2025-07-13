@@ -47,8 +47,6 @@ class GridVisualizer:
         ax, ay = agent_loc
         tx, ty = target_loc
         grid[ax, ay] = f'{load}'
-        # color = 'blue' if load == 0 else 'red'
-        # grid[ax, ay].set_color(color)
             
         grid[tx, ty] = 'T'
 
@@ -58,7 +56,6 @@ class GridVisualizer:
         for bx, by in block_locs:
             if grid[bx, by] == '.':
                 grid[bx, by] = 'B'
-                # grid[bx, by].set_color('gray')
             
 
         self.ax.set_title(f"Step {self.step} \n Reward:{reward}")

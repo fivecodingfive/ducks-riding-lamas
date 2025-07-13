@@ -54,12 +54,11 @@ alpha = args.alpha
 
 print(f">> [Args] variant={variant}, episodes={episodes}, alpha={alpha}", flush=True)
 
-from agent_dqn.dqn_agent import DQNAgent
-from agent_sac.sac_agent import SACAgent
 target_update_freq = 5
 print(">>> [Checkpoint] Creating agent", flush=True)
 match agent:
     case "dqn":
+        from agent_dqn.dqn_agent import DQNAgent
         agent = DQNAgent(
             learning_rate=args.learning_rate,
             batch_size=args.batch_size,
@@ -108,9 +107,41 @@ match agent:
         }
 
     case "sac":
+        from agent_sac.sac_agent import SACAgent
         agent = SACAgent(
             learning_rate=args.learning_rate,
-            alpha=float(args.alpha)
+            alpha=args.alpha
+        )
+        config = vars(args)
+        config.update({
+            "learning_rate": agent.learning_rate,
+            "gamma": agent.gamma,
+            "device": "gpu" if tf.config.list_physical_devices('GPU') else "cpu",
+        })
+
+        # -------- nest for nicer UI --------
+        organized_config = {
+            "environment": {
+                "variant": config["variant"],
+                "data_dir": config["data_dir"],
+                "mode": config["mode"],
+            },
+            "model": {
+                "network": config["network"],
+                "device": config["device"],
+            },
+            "training": {
+                "episodes": config["episodes"],
+                "seed": config["seed"],
+                "learning_rate": config["learning_rate"],
+                "gamma": config["gamma"],
+            }
+        }
+    case "a2c":
+        from agent_sac.a2c_agent import A2CAgent
+        agent = A2CAgent(
+            learning_rate=args.learning_rate,
+            alpha=args.alpha
         )
         config = vars(args)
         config.update({
