@@ -163,7 +163,7 @@ class SACAgent:
                 action = self.act(state)
                 train_reward, reward, next_obs, done = env.step(action)
                 next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
-                self.remember(state, action, reward, next_state, done)
+                self.remember(state, action, train_reward, next_state, done)
                 
                 state = next_state
                 total_reward += reward

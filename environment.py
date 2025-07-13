@@ -455,8 +455,6 @@ class TrainEnvironment(object):
         # --- Agent movement ---
         ax, ay = self.agent_loc
         if act != 0:
-            if (ax,ay) in self.third_sec:
-                shaped_reward+=2
             if act == 1:  # up
                 new_loc = (self.agent_loc[0] - 1, self.agent_loc[1])
                 # if (ax, ay) in self.third_sec: 
@@ -474,12 +472,12 @@ class TrainEnvironment(object):
                 self.agent_loc = new_loc
                 self.item_cost += 1
                 rew += -1
-                if new_loc in [(3,0), (3,1),(3,2)]:
-                    shaped_reward += 1
+                ix,iy = new_loc
+                if (ix,iy) in self.third_sec:
+                    shaped_reward+=4
+                # if new_loc in [(3,0), (3,1),(3,2)] and len(self.item_locs != 0):
+                #     shaped_reward += 4
             else:
-                shaped_reward += -1
-        else:
-            if self.agent_load != 0:
                 shaped_reward += -1
 
         # --- Item pickup ---
