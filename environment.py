@@ -134,6 +134,9 @@ class Environment(object):
                     rew += -1
                 elif shaping == True:
                     rew += -0.1
+            elif shaping:
+                rew -= 2
+                
         
         
         # if shaping == True:
@@ -196,10 +199,12 @@ class Environment(object):
                 optimal_loc = (2, 3)
                 prev_dist = self.manhattan(prev_loc, optimal_loc)
                 curr_dist = self.manhattan(self.agent_loc, optimal_loc)
-                if curr_dist < prev_dist:
-                    rew += 0.1  # Weniger Belohnung, nur als "Idle-Handling"
+                if self.agent_loc == optimal_loc:
+                    rew += 1
+                elif curr_dist < prev_dist:
+                    rew += 0.5  # Weniger Belohnung, nur als "Idle-Handling"
                 elif curr_dist > prev_dist:
-                    rew -= 0.1  # Penalty für Weglaufen
+                    rew -= 0.5  # Penalty für Weglaufen
 
             # 5. Sonst kein shaping
 
@@ -304,25 +309,35 @@ class Environment(object):
                 obs = []
                 agent_y, agent_x = self.agent_loc
                 obs.extend([agent_x / 4, agent_y / 4])
-
-                reachable_items = []
-                for i, item_loc in enumerate(self.item_locs):
-                    time_left = (self.max_response_time - self.item_times[i])
-                    dist = self.manhattan(item_loc, self.agent_loc)
-                    if dist <= time_left:
-                        reachable_items.append((item_loc, dist)) 
-
-                if reachable_items:
-                    closest_item, _ = min(reachable_items, key=lambda x: x[1])
-                    dx = (closest_item[1] - agent_x) / 4
-                    dy = (closest_item[0] - agent_y) / 4
-                    obs.extend([dx, dy])
-                else:
-                    obs.extend([0.0, 0.0])
-
+                obs.append(float(self.agent_load) / self.agent_capacity)
                 
-                # Agent load
-                obs.append(float(self.agent_load)/3)
+                # Dynamisch bestimmen, welche Richtung wichtig ist:
+                if self.agent_load < self.agent_capacity and self.item_locs:
+                    # Richtung zum nächsten erreichbaren Item
+                    reachable_items = []
+                    for i, item_loc in enumerate(self.item_locs):
+                        time_left = (self.max_response_time - self.item_times[i])
+                        dist = self.manhattan(item_loc, self.agent_loc)
+                        if dist <= time_left:
+                            reachable_items.append((item_loc, dist))
+                    if reachable_items:
+                        closest_item, _ = min(reachable_items, key=lambda x: x[1])
+                        dx = (closest_item[1] - agent_x) / 4
+                        dy = (closest_item[0] - agent_y) / 4
+                    else:
+                        dx, dy = 0.0, 0.0
+                elif self.agent_load > 0:
+                    # Richtung zum Ziel
+                    dx = (self.target_loc[1] - agent_x) / 4
+                    dy = (self.target_loc[0] - agent_y) / 4
+                else:
+                    # Idle: z.B. Richtung zur Warteposition
+                    wait_x, wait_y = 3, 2
+                    dx = (wait_x - agent_x) / 4
+                    dy = (wait_y - agent_y) / 4
+                
+                obs.extend([dx, dy])
+
 
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
 

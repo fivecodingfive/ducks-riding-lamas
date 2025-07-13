@@ -134,33 +134,80 @@ class Environment(object):
                     rew += -1
                 elif shaping == True:
                     rew += -0.1
+            elif shaping:
+                rew -= 2
+                
         
         
-        if shaping == True:
+        # if shaping == True:
+        #     if self.agent_load < self.agent_capacity and self.item_locs:
+        #         reachable_items = []
+        #         for i, item_loc in enumerate(self.item_locs):
+        #             distance = self.manhattan(self.agent_loc, item_loc)
+        #             if self.manhattan(item_loc, self.agent_loc) <= self.max_response_time - self.item_times[i]:
+        #                 reachable_items.append((item_loc, distance)) 
+        #         if reachable_items:
+        #             closest_item, _ = min(reachable_items, key=lambda x: x[1])
+        #             if self.manhattan(prev_loc, closest_item) < self.manhattan(self.agent_loc, closest_item):
+        #                 rew += 0.5
+
+        #     elif not self.item_locs and self.agent_load >= 1:
+        #         # Find distance before and after move btw agent and target
+        #         prev_dist = self.manhattan(prev_loc, self.target_loc)
+        #         curr_dist = self.manhattan(self.agent_loc, self.target_loc)
+        #         if curr_dist < prev_dist:
+        #             rew += 0.5
+
+        #     # Inside your step function, when there are no items:
+        #     elif not self.item_locs and self.agent_load == 0:
+        #         optimal_loc = (2, 3)
+        #         if self.manhattan(self.agent_loc, optimal_loc) < self.manhattan(prev_loc, optimal_loc):
+        #             rew += 0.5
+        #         elif self.manhattan(self.agent_loc, optimal_loc) > self.manhattan(prev_loc, optimal_loc):
+        #             rew -= 0.5
+
+        if shaping:
+            # 1. Agent hat noch Kapazität und es gibt Items → Belohnung fürs Annähern ans nächste erreichbare Item
             if self.agent_load < self.agent_capacity and self.item_locs:
                 reachable_items = []
                 for i, item_loc in enumerate(self.item_locs):
                     distance = self.manhattan(self.agent_loc, item_loc)
                     if self.manhattan(item_loc, self.agent_loc) <= self.max_response_time - self.item_times[i]:
-                        reachable_items.append((item_loc, distance)) 
+                        reachable_items.append((item_loc, distance))
                 if reachable_items:
                     closest_item, _ = min(reachable_items, key=lambda x: x[1])
-                    if self.manhattan(prev_loc, closest_item) < self.manhattan(self.agent_loc, closest_item):
-                        rew += 0.1
+                    # Belohne, wenn man sich dem nächsten Item nähert
+                    if self.manhattan(prev_loc, closest_item) > self.manhattan(self.agent_loc, closest_item):
+                        rew += 0.5
+
+            # 2. Agent ist voll (unabhängig davon, ob noch Items da sind) → Belohnung fürs Annähern ans Ziel
             elif self.agent_load == self.agent_capacity:
-                # Find distance before and after move btw agent and target
                 prev_dist = self.manhattan(prev_loc, self.target_loc)
                 curr_dist = self.manhattan(self.agent_loc, self.target_loc)
                 if curr_dist < prev_dist:
-                    rew += 0.1
+                    rew += 1
 
-            # Inside your step function, when there are no items:
-            elif not self.item_locs:
+            # 3. Es sind keine Items da, Agent trägt mind. 1 Item (Teilfall oben mit abgedeckt, falls du explizit willst:)
+            elif not self.item_locs and self.agent_load >= 1:
+                prev_dist = self.manhattan(prev_loc, self.target_loc)
+                curr_dist = self.manhattan(self.agent_loc, self.target_loc)
+                if curr_dist < prev_dist:
+                    rew += 1
+
+            # 4. Keine Items & Agent ist leer → Belohne Bewegung in Richtung "Warteposition" (optional)
+            elif not self.item_locs and self.agent_load == 0:
                 optimal_loc = (2, 3)
-                if self.manhattan(self.agent_loc, optimal_loc) < self.manhattan(prev_loc, optimal_loc):
-                    rew += 0.1
-                elif self.manhattan(self.agent_loc, optimal_loc) > self.manhattan(prev_loc, optimal_loc):
-                    rew -= 0.1
+                prev_dist = self.manhattan(prev_loc, optimal_loc)
+                curr_dist = self.manhattan(self.agent_loc, optimal_loc)
+                if self.agent_loc == optimal_loc:
+                    rew += 1
+                elif curr_dist < prev_dist:
+                    rew += 0.5  # Weniger Belohnung, nur als "Idle-Handling"
+                elif curr_dist > prev_dist:
+                    rew -= 0.5  # Penalty für Weglaufen
+
+            # 5. Sonst kein shaping
+
 
         
 
@@ -190,7 +237,7 @@ class Environment(object):
         # Anzahl der verfallenen Items:
         lost_items = len(self.item_locs) - sum(mask)
         if shaping and lost_items > 0:
-            rew -= lost_items * 0.5  # Beispiel: -2 pro verlorenes Item
+            rew -= lost_items * 0  # Beispiel: -2 pro verlorenes Item
         self.item_locs = list(compress(self.item_locs, mask))
         self.item_times = list(compress(self.item_times, mask))
 
@@ -262,26 +309,35 @@ class Environment(object):
                 obs = []
                 agent_y, agent_x = self.agent_loc
                 obs.extend([agent_x / 4, agent_y / 4])
-                obs.append(len(self.item_locs)/10)
-
-                reachable_items = []
-                for i, item_loc in enumerate(self.item_locs):
-                    time_left = (self.max_response_time - self.item_times[i])
-                    dist = self.manhattan(item_loc, self.agent_loc)
-                    if dist <= time_left:
-                        reachable_items.append((item_loc, dist)) 
-
-                if reachable_items:
-                    closest_item, _ = min(reachable_items, key=lambda x: x[1])
-                    dx = (closest_item[1] - agent_x) / 4
-                    dy = (closest_item[0] - agent_y) / 4
-                    obs.extend([dx, dy])
-                else:
-                    obs.extend([0.0, 0.0])
-
+                obs.append(float(self.agent_load) / self.agent_capacity)
                 
-                # Agent load
-                obs.append(float(self.agent_load))
+                # Dynamisch bestimmen, welche Richtung wichtig ist:
+                if self.agent_load < self.agent_capacity and self.item_locs:
+                    # Richtung zum nächsten erreichbaren Item
+                    reachable_items = []
+                    for i, item_loc in enumerate(self.item_locs):
+                        time_left = (self.max_response_time - self.item_times[i])
+                        dist = self.manhattan(item_loc, self.agent_loc)
+                        if dist <= time_left:
+                            reachable_items.append((item_loc, dist))
+                    if reachable_items:
+                        closest_item, _ = min(reachable_items, key=lambda x: x[1])
+                        dx = (closest_item[1] - agent_x) / 4
+                        dy = (closest_item[0] - agent_y) / 4
+                    else:
+                        dx, dy = 0.0, 0.0
+                elif self.agent_load > 0:
+                    # Richtung zum Ziel
+                    dx = (self.target_loc[1] - agent_x) / 4
+                    dy = (self.target_loc[0] - agent_y) / 4
+                else:
+                    # Idle: z.B. Richtung zur Warteposition
+                    wait_x, wait_y = 3, 2
+                    dx = (wait_x - agent_x) / 4
+                    dy = (wait_y - agent_y) / 4
+                
+                obs.extend([dx, dy])
+
 
                 return tf.convert_to_tensor(obs, dtype=tf.float32)
 
