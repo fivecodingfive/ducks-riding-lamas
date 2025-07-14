@@ -153,7 +153,7 @@ class SACAgent:
         critic_loss_log =[]
 
         for episode in range(1, episodes + 1):
-            obs = env.reset(mode='training')
+            obs = env.reset(mode='training', random_start=True) if episode % 19 == 0 else env.reset(mode='training')
             state = obs.numpy() if hasattr(obs, "numpy") else obs
             total_reward = 0
             done = False
@@ -233,6 +233,19 @@ class SACAgent:
                     },
                     step=self.global_step
                 )
+        import matplotlib.pyplot as plt
+
+        plt.figure(figsize=(6, 5))
+        plt.imshow(env.get_agent_heatmap(), cmap='hot', interpolation='nearest')
+        plt.colorbar(label='Visit Count')
+        plt.title('Agent Movement Heatmap')
+        plt.xlabel('Y-axis')
+        plt.ylabel('X-axis')
+        plt.xticks(np.arange(env.horizontal_cell_count))
+        plt.yticks(np.arange(env.vertical_cell_count))
+        plt.grid(True)
+        plt.show()
+
 
         overall_avg = sum(reward_log) / len(reward_log)
         print(f"\n[Training Done] Overall Avg Reward: {overall_avg:.2f}")
@@ -260,7 +273,7 @@ class SACAgent:
             while not done:
                 action = self.act(state, deterministic=True)
 
-                reward, next_obs, done = env.step(action)
+                _, reward, next_obs, done = env.step(action)
                 next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
 
                 state = next_state

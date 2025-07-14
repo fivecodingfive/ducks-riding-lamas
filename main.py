@@ -40,7 +40,7 @@ args.epsilon_decay  = eps_decay
 
 import wandb
 from datetime import datetime
-from environment import Environment, TrainEnvironment
+from environment import Environment
 
 NETWORK_TYPE = args.network
 data_dir = './data'         # specify relative path to data directory (e.g., './data', not './data/variant_0')
@@ -209,7 +209,7 @@ print(">>> [Checkpoint] Entering mode switch", flush=True)
 
 match mode:
     case 'training':
-        train_env = TrainEnvironment(variant=variant, data_dir=data_dir)
+        train_env = Environment(variant=variant, data_dir=data_dir)
         agent.train(
             env=train_env,
             episodes=episodes,
