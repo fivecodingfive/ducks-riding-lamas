@@ -22,9 +22,9 @@ print(">>> [Checkpoint] Script started", flush=True)
 # ---------- simple sweep grid (10 combos = array 0-9) ----------
 import os, itertools
 
-learning_rates = [1e-3, 5e-4]
+learning_rates = [1e-3, 2e-3]
 train_episodes  = [200, 250]
-alphas = [0.4, 0.35, 0.3]
+alphas = [0.5, 0.4, 0.3]
 grid = list(itertools.product(learning_rates, train_episodes, alphas))
 
 task_id = (args.sweep_id if args.sweep_id is not None
@@ -200,6 +200,7 @@ try:
         save_code=True,
         dir=os.getenv("WANDB_DIR", "./wandb")
     )
+    print(">>> [Checkpoint] W&B Initialized", flush=True)
 except Exception as e:
     print(f"[W&B ERROR] Could not initialize W&B: {e}", flush=True)
     os.environ["WANDB_MODE"] = "disabled"

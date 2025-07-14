@@ -20,7 +20,7 @@ source ../tfvenv/bin/activate
 
 # W&B and plotting config
 export MPLBACKEND=Agg
-export WANDB_MODE=online
+export WANDB_MODE=offline
 export WANDB_DIR=$SCRATCH/wandb
 
 # Pass SLURM array ID into the script
