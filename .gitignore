@@ -16,8 +16,8 @@ __pycache__/
 .venv/
 .myvenv/
 
-.models/
-.wandb/
+models/
+wandb/
 
 # Personal files with comments
 environment_with_comments.py
