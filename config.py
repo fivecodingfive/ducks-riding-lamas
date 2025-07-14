@@ -8,7 +8,7 @@ parser.add_argument('--variant', type=int, default=2, choices=[0, 1, 2],
 parser.add_argument('--data_dir', type=str, default='./data',
                     help="Path to the data directory (e.g., ./data)")
 
-parser.add_argument('--episodes', type=int, default=300,
+parser.add_argument('--episodes', type=int, default=200,
                     help="Number of training episodes")
 
 parser.add_argument('--seed', type=int, default=42,
