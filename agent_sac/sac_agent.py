@@ -196,10 +196,10 @@ class SACAgent:
                         commit=False
                         )
 
-                # Visualizer update
-                if visualizer is not None:
-                    agent, target, items, blocks, load = env.get_loc()
-                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, block_locs=blocks, reward=total_reward, load=load)
+                # # Visualizer update
+                # if visualizer is not None:
+                #     agent, target, items, blocks, load = env.get_loc()
+                #     visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, block_locs=blocks, reward=total_reward, load=load)
 
             if visualizer is not None:
                 visualizer.close()
@@ -233,18 +233,18 @@ class SACAgent:
                     },
                     step=self.global_step
                 )
-        import matplotlib.pyplot as plt
+        # import matplotlib.pyplot as plt
 
-        plt.figure(figsize=(6, 5))
-        plt.imshow(env.get_agent_heatmap(), cmap='hot', interpolation='nearest')
-        plt.colorbar(label='Visit Count')
-        plt.title('Agent Movement Heatmap')
-        plt.xlabel('Y-axis')
-        plt.ylabel('X-axis')
-        plt.xticks(np.arange(env.horizontal_cell_count))
-        plt.yticks(np.arange(env.vertical_cell_count))
-        plt.grid(True)
-        plt.show()
+        # plt.figure(figsize=(6, 5))
+        # plt.imshow(env.get_agent_heatmap(), cmap='hot', interpolation='nearest')
+        # plt.colorbar(label='Visit Count')
+        # plt.title('Agent Movement Heatmap')
+        # plt.xlabel('Y-axis')
+        # plt.ylabel('X-axis')
+        # plt.xticks(np.arange(env.horizontal_cell_count))
+        # plt.yticks(np.arange(env.vertical_cell_count))
+        # plt.grid(True)
+        # plt.show()
 
 
         overall_avg = sum(reward_log) / len(reward_log)
