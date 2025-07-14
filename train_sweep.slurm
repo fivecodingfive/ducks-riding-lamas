@@ -20,7 +20,7 @@ source ../tfvenv/bin/activate
 
 # W&B and plotting config
 export MPLBACKEND=Agg
-export WANDB_MODE=offline
+export WANDB_MODE=online
 export WANDB_DIR=$SCRATCH/wandb
 
 # Pass SLURM array ID into the script
@@ -28,8 +28,7 @@ echo ">>> Starting sweep run with SLURM_ARRAY_TASK_ID=$SLURM_ARRAY_TASK_ID"
 
 python -u main.py \
     --mode training \
-    --variant 0 \
-    --episodes 400 \
+    --variant 2 \
     --sweep_id $SLURM_ARRAY_TASK_ID
 
 # Just a test
