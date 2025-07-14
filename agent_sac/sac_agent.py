@@ -250,7 +250,7 @@ class SACAgent:
         overall_avg = sum(reward_log) / len(reward_log)
         print(f"\n[Training Done] Overall Avg Reward: {overall_avg:.2f}")
 
-    def validate(self, env, episodes=100, model_path=str):
+    def validate(self, env, episodes=200, model_path=str):
         print(f">>> [SACAgent] Validating over {episodes} episodes")
         # examine if the model exist
         if not os.path.exists(model_path):

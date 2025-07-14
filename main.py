@@ -22,21 +22,21 @@ print(">>> [Checkpoint] Script started", flush=True)
 # ---------- simple sweep grid (10 combos = array 0-9) ----------
 import os, itertools
 
-learning_rates = [1e-3, 5e-4]      # 2 values
-batch_sizes    = [64, 128]         # 2 values
-eps_decays     = [0.995, 0.98, 0.95]  # 3 values
-grid = list(itertools.product(learning_rates, batch_sizes, eps_decays))
+learning_rates = [1e-3, 5e-4]
+train_episodes  = [200, 250]
+alphas = [0.4, 0.35, 0.3]
+grid = list(itertools.product(learning_rates, train_episodes, alphas))
 
 task_id = (args.sweep_id if args.sweep_id is not None
            else int(os.environ.get("SLURM_ARRAY_TASK_ID", 0)))  # 0 when you run locally
-lr, bs, eps_decay = grid[task_id]
+lr, eps, alpha = grid[task_id]
 
-print(f">>> [Sweep] lr={lr}, batch={bs}, eps_decay={eps_decay}", flush=True)
+print(f">>> [Sweep] lr={lr}, eps={eps}, alpha={alpha}", flush=True)
 
 # overwrite the argparse defaults so the rest of the code sees them
 args.learning_rate  = lr
-args.batch_size     = bs
-args.epsilon_decay  = eps_decay
+args.episodes = eps
+args.alpha = alpha
 
 import wandb
 from datetime import datetime
@@ -180,7 +180,7 @@ print(">>> [Checkpoint] Initializing W&B", flush=True)
 
 run_name = (
     f"var{args.variant}_alpha{args.alpha}_"
-    f"decay{args.epsilon_decay}_{datetime.now():%b%d}"
+    f"eps{args.episodes}_lr{lr}_{datetime.now():%b%d}"
 )
 
 try:
