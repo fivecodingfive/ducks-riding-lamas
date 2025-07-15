@@ -294,6 +294,60 @@ class SACAgent:
 
         avg_reward = sum(reward_log) / len(reward_log)
         print(f"\n[Validation Done] Avg Reward: {avg_reward:.2f}")
+    
+    def final_test(self, env, episodes=100, model_path=str):
+        print(f">>> [SACAgent] Testing over {episodes} episodes")
+        # examine if the model exist
+        if not os.path.exists(model_path):
+            print(f"Model file not found: {model_path}")
+            return None
+
+        # load model
+        print(f"Loading model from: {model_path}")
+        self.actor = tf.keras.models.load_model(model_path)
+
+        reward_log = []
+        for episode in range(episodes):
+            obs = env.reset(mode='final testing')
+            state = obs.numpy() if hasattr(obs, "numpy") else obs
+            done = False
+            total_reward = 0
+
+            visualizer = GridVisualizer() if episode % PLOT_INTERVAL == (PLOT_INTERVAL - 1) else None
+
+            while not done:
+                action = self.act(state, deterministic=True)
+
+                _, reward, next_obs, done = env.step(action)
+                next_state = next_obs.numpy() if hasattr(next_obs, "numpy") else next_obs
+
+                state = next_state
+                total_reward += reward
+
+                if visualizer is not None:
+                    agent, target, items, blocks, load = env.get_loc()
+                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, block_locs=blocks, reward=total_reward, load=load)
+
+            if visualizer is not None:
+                visualizer.close()
+
+            reward_log.append(total_reward)
+
+            if episode % 5 == 0:
+                avg_recent = sum(reward_log[-5:]) / min(5, len(reward_log))
+                print(f"[Testing][Episode {episode}/{episodes}] Avg reward (last 5): {avg_recent:.2f}")
+                
+            if wandb.run:
+                wandb.log(
+                    {
+                        "episode/reward": total_reward,
+                        "episode":        episode,
+                    },
+                    step=self.global_step
+                )
+
+        avg_reward = sum(reward_log) / len(reward_log)
+        print(f"\n[Final Test Done] Avg Reward: {avg_reward:.2f}")
 
         
     def save_model(self, variant):

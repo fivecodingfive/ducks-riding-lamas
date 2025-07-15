@@ -23,8 +23,8 @@ print(">>> [Checkpoint] Script started", flush=True)
 import os, itertools
 
 learning_rates = [1e-3, 2e-3]
-train_episodes  = [200, 250]
-alphas = [0.5, 0.4, 0.3]
+train_episodes  = [200, 220]
+alphas = [0.45, 0.4, 0.35]
 grid = list(itertools.product(learning_rates, train_episodes, alphas))
 
 task_id = (args.sweep_id if args.sweep_id is not None
@@ -220,6 +220,13 @@ match mode:
     case 'validation':
         env = Environment(variant=variant, data_dir=data_dir)
         agent.validate(
+            env=env,
+            model_path=model_path
+        )
+    case 'final testing':
+        data_dir = './final_test_episodes'
+        env = Environment(variant=variant, data_dir=data_dir)
+        agent.final_test(
             env=env,
             model_path=model_path
         )

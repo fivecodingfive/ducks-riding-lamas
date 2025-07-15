@@ -14,7 +14,7 @@ parser.add_argument('--episodes', type=int, default=200,
 parser.add_argument('--seed', type=int, default=42,
                     help="Random seed for reproducibility")
 
-parser.add_argument('--mode', type=str, default='training', choices=['training', 'validation', 'testing'],
+parser.add_argument('--mode', type=str, default='final testing', choices=['training', 'validation', 'testing', 'final testing'],
                     help="Run mode for environment")
 
 parser.add_argument('--modelpath', type=str,

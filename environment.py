@@ -45,16 +45,19 @@ class Environment(object):
         self.item_expects = np.zeros(self.vertical_cell_count * self.horizontal_cell_count, dtype=np.float32)
         self.item_counts = np.zeros(self.vertical_cell_count * self.horizontal_cell_count, dtype=np.int32)
         self.agent_heatmap = np.zeros((self.vertical_cell_count, self.horizontal_cell_count), dtype=np.int32)
+        
+        if data_dir != './final_test_episodes':
+            self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
+            self.training_episodes = self.training_episodes.training_episodes.tolist()
+            self.validation_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/validation_episodes.csv')
+            self.validation_episodes = self.validation_episodes.validation_episodes.tolist()
+            self.test_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/test_episodes.csv')
+            self.test_episodes = self.test_episodes.test_episodes.tolist()
 
-        self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
-        self.training_episodes = self.training_episodes.training_episodes.tolist()
-        self.validation_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/validation_episodes.csv')
-        self.validation_episodes = self.validation_episodes.validation_episodes.tolist()
-        self.test_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/test_episodes.csv')
-        self.test_episodes = self.test_episodes.test_episodes.tolist()
-
-        self.remaining_training_episodes = deepcopy(self.training_episodes)
-        self.validation_episode_counter = 0
+            self.remaining_training_episodes = deepcopy(self.training_episodes)
+            self.validation_episode_counter = 0
+        else:
+            self.episode_counter = 0
 
         if self.variant == 0 or self.variant == 2:
             self.agent_capacity = 1
@@ -91,7 +94,7 @@ class Environment(object):
 
     # initialize a new episode (specify if training, validation, or testing via the mode argument)
     def reset(self, mode, random_start=False):
-        modes = ['training', 'validation', 'testing']
+        modes = ['training', 'validation', 'testing','final testing']
         if mode not in modes:
             raise ValueError('Invalid mode. Expected one of: %s' % modes)
 
@@ -104,15 +107,24 @@ class Environment(object):
         if mode == "testing":
             episode = self.test_episodes[0]
             self.test_episodes.remove(episode)
+            self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
+                                index_col=0)
         elif mode == "validation":
             episode = self.validation_episodes[self.validation_episode_counter]
             self.validation_episode_counter = (self.validation_episode_counter + 1) % 100
-        else:
+            self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
+                                index_col=0)
+        elif mode == "training":
             if not self.remaining_training_episodes:
                 self.remaining_training_episodes = deepcopy(self.training_episodes)
             episode = random.choice(self.remaining_training_episodes)
             self.remaining_training_episodes.remove(episode)
-        self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
+            self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
+                                index_col=0)
+        else:
+            episode = self.episode_counter
+            self.episode_counter = (self.episode_counter + 1)%100
+            self.data=pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_{episode:03d}.csv',
                                 index_col=0)
 
         return self.get_obs_pb()
