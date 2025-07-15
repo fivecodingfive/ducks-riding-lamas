@@ -35,8 +35,8 @@ print(f">>> [Sweep] lr={lr}, eps={eps}, alpha={alpha}", flush=True)
 
 # overwrite the argparse defaults so the rest of the code sees them
 args.learning_rate  = lr
-args.episodes = eps
-args.alpha = alpha
+# args.episodes = eps
+# args.alpha = alpha
 
 import wandb
 from datetime import datetime

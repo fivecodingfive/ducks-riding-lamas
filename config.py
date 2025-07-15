@@ -2,13 +2,13 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Train Tabular Q-learning Agent on GridWorld")
 
-parser.add_argument('--variant', type=int, default=2, choices=[0, 1, 2],
+parser.add_argument('--variant', type=int, default=1, choices=[0, 1, 2],
                     help="Environment variant: 0 (base), 1 (extension 1), 2 (extension 2)")
 
 parser.add_argument('--data_dir', type=str, default='./data',
                     help="Path to the data directory (e.g., ./data)")
 
-parser.add_argument('--episodes', type=int, default=200,
+parser.add_argument('--episodes', type=int, default=100,
                     help="Number of training episodes")
 
 parser.add_argument('--seed', type=int, default=42,

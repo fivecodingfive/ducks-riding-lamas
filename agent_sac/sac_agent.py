@@ -10,7 +10,7 @@ from .visualizer import GridVisualizer
 if args.network == 'cnn':
     STATE_DIM = 100
 elif args.network == 'mlp':
-    STATE_DIM = 9
+    STATE_DIM = 30
 elif args.network == 'combine':
     STATE_DIM = 108
 
@@ -153,11 +153,12 @@ class SACAgent:
         critic_loss_log =[]
 
         for episode in range(1, episodes + 1):
-            obs = env.reset(mode='training', random_start=True) if episode % 19 == 0 else env.reset(mode='training')
+            # obs = env.reset(mode='training', random_start=True) if episode % 19 == 0 else 
+            obs = env.reset(mode='training')
             state = obs.numpy() if hasattr(obs, "numpy") else obs
             total_reward = 0
             done = False
-            visualizer = GridVisualizer() if episode % PLOT_INTERVAL == (PLOT_INTERVAL-1) else None
+            # visualizer = GridVisualizer() if episode % PLOT_INTERVAL == (PLOT_INTERVAL-1) else None
             
             while not done:
                 action = self.act(state)
@@ -201,8 +202,8 @@ class SACAgent:
                 #     agent, target, items, blocks, load = env.get_loc()
                 #     visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, block_locs=blocks, reward=total_reward, load=load)
 
-            if visualizer is not None:
-                visualizer.close()
+            # if visualizer is not None:
+            #     visualizer.close()
 
             reward_log.append(total_reward)
 
@@ -313,7 +314,7 @@ class SACAgent:
             done = False
             total_reward = 0
 
-            visualizer = GridVisualizer() if episode % PLOT_INTERVAL == (PLOT_INTERVAL - 1) else None
+            visualizer = GridVisualizer() if episode % PLOT_INTERVAL == (episodes-1) else None
 
             while not done:
                 action = self.act(state, deterministic=True)

@@ -126,8 +126,9 @@ class Environment(object):
             self.episode_counter = (self.episode_counter + 1)%100
             self.data=pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_{episode:03d}.csv',
                                 index_col=0)
-
-        return self.get_obs_pb()
+            
+        obs = self.get_obs_pb() if self.variant == 2 else self.get_obs()
+        return obs
 
     # take one environment step based on the action act
     def step(self, act):
@@ -157,10 +158,11 @@ class Environment(object):
                 self.item_cost += 1
                 rew += -1
                 ix,iy = new_loc
-                if (ax,ay) in self.second_sec and (ix,iy) in self.third_sec and self.agent_load==0:
-                    shaped_reward+=5
-                if (ax,ay) in self.third_sec and (ix,iy) in self.second_sec and self.agent_load==self.agent_capacity:
-                    shaped_reward+=10
+                if self.variant == 2:
+                    if (ax,ay) in self.second_sec and (ix,iy) in self.third_sec and self.agent_load==0:
+                        shaped_reward+=5
+                    if (ax,ay) in self.third_sec and (ix,iy) in self.second_sec and self.agent_load==self.agent_capacity:
+                        shaped_reward+=10
                 self.agent_heatmap[ix, iy] += 1
             else:
                 shaped_reward += -1
@@ -201,7 +203,7 @@ class Environment(object):
         self.item_locs += new_items
         self.item_times += [0] * len(new_items)
 
-        next_obs = self.get_obs_pb()
+        next_obs = self.get_obs_pb() if self.variant == 2 else self.get_obs()
         train_rew = rew + shaped_reward
 
         return train_rew, rew, next_obs, done
