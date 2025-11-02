@@ -1,5 +1,5 @@
 ## Overview
-This repository contains implementations of Reinforcement Learning (RL) agents, including DQN, SAC, and PPO, organized across the main, SAC, and PPO branches.
+This repository contains implementations of Reinforcement Learning (RL) agents, including DQN, SAC, and PPO, organized across the main, sac_env, and PPO branches.
 Each agent is integrated with its corresponding state representation and reward shaping, both defined in environment.py.
 
 ## Setup
