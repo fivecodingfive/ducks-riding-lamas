@@ -44,7 +44,7 @@ ducks-riding-lamas/
 ## Prerequisites
 
 - **Python**: 3.11.x (tested with 3.11.9)
-- **Pixi**: Package and environment manager for Python (https://pixi.sh)
+- **Pixi**: Package and environment manager (https://pixi.sh)
 
 ---
 
@@ -72,12 +72,17 @@ pixi install
 This creates a managed environment with all dependencies pinned to exact versions.
 
 ### 4. Activate the Environment
-
-**Option A: Interactive Shell**
+Launch pixi shell
 ```bash
 pixi shell
 ```
 
+**Option A: Interactive Shell**
+```bash
+pixi run train          # Run main training script
+pixi run test           # Run test policy evaluation
+pixi run greedy         # Run greedy baseline agent
+```
 **Option B: Run Commands Directly with Pixi**
 ```bash
 pixi run python main.py [arguments]
@@ -86,17 +91,6 @@ pixi run python main.py [arguments]
 ---
 
 ## Usage
-
-### Pre-configured Tasks
-
-```bash
-pixi run train          # Run main training script
-pixi run test           # Run test policy evaluation
-pixi run greedy         # Run greedy baseline agent
-```
-
----
-
 ### Training
 
 Train an agent using SAC (default):
