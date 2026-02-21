@@ -5,7 +5,6 @@ import numpy as np
 from config import args
 from .model import build_cnn_network, build_mlp_network, build_combine_network
 from .replay_buffer import ReplayBuffer, PrioritizedReplayBuffer
-from .visualizer import GridVisualizer
 
 if args.network == 'cnn':
     STATE_DIM = 100
@@ -158,7 +157,6 @@ class SACAgent:
             state = obs.numpy() if hasattr(obs, "numpy") else obs
             total_reward = 0
             done = False
-            # visualizer = GridVisualizer() if episode % PLOT_INTERVAL == (PLOT_INTERVAL-1) else None
             
             while not done:
                 action = self.act(state)
@@ -197,34 +195,12 @@ class SACAgent:
                         commit=False
                         )
 
-                # # Visualizer update
-                # if visualizer is not None:
-                #     agent, target, items, blocks, load = env.get_loc()
-                #     visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, block_locs=blocks, reward=total_reward, load=load)
-
-            # if visualizer is not None:
-            #     visualizer.close()
-
             reward_log.append(total_reward)
 
             if episode % target_update_freq == 0:
                 avg_recent = sum(reward_log[-target_update_freq:]) / target_update_freq
                 loss_recent = sum(critic_loss_log[-target_update_freq*200:]) / (target_update_freq*200)
                 print(f"[Training][Episode {episode}/{episodes}] Avg Reward: {avg_recent:.2f}; Avg Loss: {loss_recent:.3f}")
-                
-            # if episode % 9 == 0:
-            #     state_tensor = tf.convert_to_tensor([state], dtype=tf.float32)
-            #     probs = self.actor(state_tensor)[0].numpy()
-
-            #     import matplotlib.pyplot as plt
-            #     plt.figure(figsize=(6, 4))
-            #     plt.bar(range(self.action_dim), probs)
-            #     plt.xlabel("Action")
-            #     plt.ylabel("Probability")
-            #     plt.title(f"Policy Distribution (Episode {episode})")
-            #     plt.grid(True)
-            #     plt.tight_layout()
-            #     plt.show()
 
             if wandb.run:
                 wandb.log(
@@ -234,18 +210,6 @@ class SACAgent:
                     },
                     step=self.global_step
                 )
-        # import matplotlib.pyplot as plt
-
-        # plt.figure(figsize=(6, 5))
-        # plt.imshow(env.get_agent_heatmap(), cmap='hot', interpolation='nearest')
-        # plt.colorbar(label='Visit Count')
-        # plt.title('Agent Movement Heatmap')
-        # plt.xlabel('Y-axis')
-        # plt.ylabel('X-axis')
-        # plt.xticks(np.arange(env.horizontal_cell_count))
-        # plt.yticks(np.arange(env.vertical_cell_count))
-        # plt.grid(True)
-        # plt.show()
 
 
         overall_avg = sum(reward_log) / len(reward_log)
@@ -269,8 +233,6 @@ class SACAgent:
             done = False
             total_reward = 0
 
-            visualizer = GridVisualizer() if episode % PLOT_INTERVAL == (PLOT_INTERVAL - 1) else None
-
             while not done:
                 action = self.act(state, deterministic=True)
 
@@ -279,13 +241,6 @@ class SACAgent:
 
                 state = next_state
                 total_reward += reward
-
-                if visualizer is not None:
-                    agent, target, items, blocks, load = env.get_loc()
-                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, block_locs=blocks, reward=total_reward, load=load)
-
-            if visualizer is not None:
-                visualizer.close()
 
             reward_log.append(total_reward)
 
@@ -314,8 +269,6 @@ class SACAgent:
             done = False
             total_reward = 0
 
-            visualizer = GridVisualizer() if episode % PLOT_INTERVAL == (episodes-1) else None
-
             while not done:
                 action = self.act(state, deterministic=True)
 
@@ -324,13 +277,6 @@ class SACAgent:
 
                 state = next_state
                 total_reward += reward
-
-                if visualizer is not None:
-                    agent, target, items, blocks, load = env.get_loc()
-                    visualizer.update(agent_loc=agent, target_loc=target, item_locs=items, block_locs=blocks, reward=total_reward, load=load)
-
-            if visualizer is not None:
-                visualizer.close()
 
             reward_log.append(total_reward)
 
