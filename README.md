@@ -84,6 +84,16 @@ pixi run python main.py [arguments]
 
 ## Usage
 
+### Pre-configured Tasks
+
+```bash
+pixi run train          # Run main training script
+pixi run test           # Run test policy evaluation
+pixi run greedy         # Run greedy baseline agent
+```
+
+---
+
 ### Training
 
 Train an agent using SAC (default):
@@ -122,15 +132,6 @@ pixi run python main.py --mode "final testing" --modelpath models/my_model.keras
 --sweep_id INT              Hyperparameter sweep index (default: None)
 ```
 
-### Pre-configured Tasks
-
-```bash
-pixi run train          # Run main training script
-pixi run test           # Run test policy evaluation
-pixi run greedy         # Run greedy baseline agent
-```
-
----
 
 ## Monitoring Training
 
@@ -142,27 +143,6 @@ The project integrates with **Weights & Biases** for experiment tracking. Traini
 - Entropy values
 
 View results at https://wandb.ai after logging in with your W&B account.
-
----
-
-## Model Architectures
-
-### MLP (Multi-Layer Perceptron)
-- Input: 30-dimensional state vector
-- Layers: BatchNorm → Dense(128, relu) → Dense(64, relu) → Output
-
-### CNN (Convolutional Neural Network)
-- Input: 100 dimensions (reshaped to 5×5×4 grid)
-- Convolutional layers with batch normalization and max pooling
-- Flattened output processing through dense layers
-
-### Combined Network
-- Parallel CNN and MLP branches
-- CNN processes spatial features (5×5×4 grid)
-- MLP processes scalar features
-- Concatenated output for final prediction
-
----
 
 ## Notes
 
