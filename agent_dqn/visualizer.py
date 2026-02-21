@@ -1,14 +1,31 @@
+# import os
+# import matplotlib
+
+# # Set backend depending on environment
+# if os.environ.get("MPLBACKEND") == "Agg":
+#     matplotlib.use("Agg")        # For LRZ / headless
+# else:
+#     matplotlib.use("Qt5Agg")     # For local interactive use
+
+## This works on Mac/Linux dual system
 import os
 import matplotlib
 
-# Set backend depending on environment
-if os.environ.get("MPLBACKEND") == "Agg":
-    matplotlib.use("Agg")        # For LRZ / headless
+preferred = os.environ.get("MPL_BACKEND", "Qt5Agg")
+try:
+    matplotlib.use(preferred)
+except ImportError:
+    # fallback hierarchy
+    for alt in ("TkAgg", "Agg"):
+        try:
+            matplotlib.use(alt)
+            break
+        except ImportError:
+            continue
 else:
-    matplotlib.use("Qt5Agg")     # For local interactive use
+    print(f"Using matplotlib backend: {matplotlib.get_backend()!r}")
 
 import matplotlib.pyplot as plt
-
 import numpy as np
 
 class GridVisualizer:

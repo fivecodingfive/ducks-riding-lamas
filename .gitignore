@@ -1,19 +1,7 @@
-# keep course dataset out of Git
-data/
-
 # Python bytecode files
 *.pyc
 *.pyo
 __pycache__/
 
-# VS Code specific files
-.vscode/
-
-# PyCharm specific files
-.idea/
-
-# Virtual environment directory
-.venv/
-
-# Personal files with comments
-environment_with_comments.py
+# wandb files
+wandb/

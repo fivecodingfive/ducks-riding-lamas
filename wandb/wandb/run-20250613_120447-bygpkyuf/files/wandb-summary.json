@@ -1,1 +1,0 @@
-{"train/loss":0.41161325573921204,"episode":10,"_timestamp":1.7498092393417444e+09,"_step":2000,"episode/reward":58.5,"train/avg_q":5.441752910614014,"train/max_q":19.209640502929688,"train/epsilon":0.1,"_runtime":444.3523148,"_wandb":{"runtime":444}}

@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\main.py", line 116, in <module>
-    model_path = dqn_agent.train(
-                 ^^^^^^^^^^^^^^^^
-  File "C:\Users\jonas\PycharmProjects\ducks-riding-lamas\agent_dqn\dqn_agent.py", line 209, in train
-    "train/avg_q":   q_mean,
-                     ^^^^^^
-UnboundLocalError: cannot access local variable 'q_mean' where it is not associated with a value

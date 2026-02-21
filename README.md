@@ -1,7 +1,3 @@
-## Overview
-This repository contains implementations of Reinforcement Learning (RL) agents, including DQN, SAC, and PPO, organized across the main, sac_env, and PPO branches.
-Each agent is integrated with its corresponding state representation and reward shaping, both defined in environment.py.
-
 ## Setup
 
 ### Python vesion to be used
@@ -29,16 +25,25 @@ Your project structure should then look like this:
 	- ...
 
 
-### 3. Create and Activate the Virtual Environment (inside the repo)
+### 3. Install Pixi
 
-Windows
-- python -m venv venv
-- .\venv\Scripts\Activate.ps1
-
-MacOS / Linux
-- python3 -m venv venv
-- source venv/bin/activate
+Follow the installation instructions at [pixi.sh](https://pixi.sh) for your platform (Windows, macOS, or Linux).
 
 
-### 4. Install the exact package versions
-- python -m pip install -r requirements.txt
+### 4. Install Dependencies and Activate Environment
+
+Once pixi is installed, run:
+- pixi install
+
+This will create and activate a managed environment with all dependencies pinned to exact versions.
+
+
+### 5. Run Tasks
+
+Use pixi to run project tasks:
+- pixi run train          # Run main training script
+- pixi run test           # Run test policy script
+- pixi run greedy         # Run greedy agent script
+
+Or activate the environment interactively:
+- pixi shell              # Enter the pixi environment
