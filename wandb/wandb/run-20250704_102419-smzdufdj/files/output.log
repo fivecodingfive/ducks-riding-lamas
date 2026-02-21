@@ -1,0 +1,70 @@
+[W&B] run initialised
+Initial action probs: ['0.20', '0.24', '0.17', '0.17', '0.22'] Entropy: 0.10
+[5/200] Average Reward: -70.20
+Action probabilities: ['0.24', '0.21', '0.16', '0.15', '0.24'] Entropy: 0.10
+[10/200] Average Reward: -54.40
+Action probabilities: ['0.25', '0.19', '0.15', '0.13', '0.29'] Entropy: 0.09
+[15/200] Average Reward: -54.20
+Action probabilities: ['0.29', '0.15', '0.14', '0.13', '0.29'] Entropy: 0.09
+Traceback (most recent call last):
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\main_ppo.py", line 164, in <module>
+    reward_log, _, _ = agent.train_ppo(env)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\agent_ppo\ppo_agent.py", line 44, in train_ppo
+    reward_log, total_episodes = self.run_ppo(training=True, env=env, model_path=None)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\agent_ppo\ppo_agent.py", line 122, in run_ppo
+    self.store_transition(state, action, reward, value_from_critic, logprobability, step_count) # Record transition for usage in weight update
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\agent_ppo\ppo_agent.py", line 201, in store_transition
+    self.reward_buffer[time_step].assign(reward)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\ops\tensor_getitem_override.py", line 311, in _slice_helper_var
+    return _slice_helper(var.value(), slice_spec, var)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\dispatch.py", line 1260, in op_dispatch_handler
+    return dispatch_target(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\ops\tensor_getitem_override.py", line 230, in _slice_helper
+    array_ops_stack.stack(begin),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\dispatch.py", line 1260, in op_dispatch_handler
+    return dispatch_target(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\ops\array_ops_stack.py", line 74, in stack
+    return ops.convert_to_tensor(values, name=name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\profiler\trace.py", line 183, in wrapped
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\ops.py", line 736, in convert_to_tensor
+    return tensor_conversion_registry.convert(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\tensor_conversion_registry.py", line 234, in convert
+    ret = conversion_func(value, dtype=dtype, name=name, as_ref=as_ref)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\constant_tensor_conversion.py", line 29, in _constant_tensor_conversion_function
+    return constant_op.constant(v, dtype=dtype, name=name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\ops\weak_tensor_ops.py", line 142, in wrapper
+    return op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\constant_op.py", line 276, in constant
+    return _constant_impl(value, dtype, shape, name, verify_shape=False,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\constant_op.py", line 289, in _constant_impl
+    return _constant_eager_impl(ctx, value, dtype, shape, verify_shape)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\constant_op.py", line 301, in _constant_eager_impl
+    t = convert_to_eager_tensor(value, ctx, dtype)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\framework\constant_op.py", line 108, in convert_to_eager_tensor
+    return ops.EagerTensor(value, ctx.device_name, dtype)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

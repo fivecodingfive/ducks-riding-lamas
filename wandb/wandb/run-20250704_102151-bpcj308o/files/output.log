@@ -1,0 +1,50 @@
+[W&B] run initialised
+Initial action probs: ['0.20', '0.24', '0.17', '0.17', '0.22'] Entropy: 0.10
+[5/200] Average Reward: -74.30
+Action probabilities: ['0.25', '0.24', '0.16', '0.15', '0.21'] Entropy: 0.10
+[10/200] Average Reward: -56.90
+Action probabilities: ['0.28', '0.23', '0.14', '0.14', '0.20'] Entropy: 0.09
+Traceback (most recent call last):
+  File "/home/battist/projects/ducks-riding-lamas/main_ppo.py", line 164, in <module>
+    reward_log, _, _ = agent.train_ppo(env)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/projects/ducks-riding-lamas/agent_ppo/ppo_agent.py", line 44, in train_ppo
+    reward_log, total_episodes = self.run_ppo(training=True, env=env, model_path=None)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/projects/ducks-riding-lamas/agent_ppo/ppo_agent.py", line 111, in run_ppo
+    logit, action = self.action_selection(encoded_state) # logit refers to the raw, unnormalized output of the actor neural network — before applying softmax. It is input into the logorbabilities function to calculate the log-probabilities of the actions taken
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/util/traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/eager/polymorphic_function/polymorphic_function.py", line 833, in __call__
+    result = self._call(*args, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/eager/polymorphic_function/polymorphic_function.py", line 878, in _call
+    results = tracing_compilation.call_function(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/eager/polymorphic_function/tracing_compilation.py", line 132, in call_function
+    function = trace_function(
+               ^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/eager/polymorphic_function/tracing_compilation.py", line 178, in trace_function
+    concrete_function = _maybe_define_function(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/eager/polymorphic_function/tracing_compilation.py", line 230, in _maybe_define_function
+    function_type_utils.make_canonicalized_monomorphic_type(
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/eager/polymorphic_function/function_type_utils.py", line 375, in make_canonicalized_monomorphic_type
+    function_type_lib.canonicalize_to_monomorphic(
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/core/function/polymorphism/function_type.py", line 587, in canonicalize_to_monomorphic
+    _make_validated_mono_param(name, arg, poly_parameter.kind,
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/core/function/polymorphism/function_type.py", line 526, in _make_validated_mono_param
+    mono_type = trace_type.from_value(value, type_context)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/core/function/trace_type/trace_type_builder.py", line 145, in from_value
+    generated_type = value.__tf_tracing_type__(context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/framework/tensor.py", line 754, in __tf_tracing_type__
+    spec = TensorSpec(self.shape, dtype)
+                      ^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/framework/ops.py", line 527, in shape
+    self._tensor_shape = tensor_shape.TensorShape(self._shape_tuple())
+                                                  ^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

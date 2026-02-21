@@ -281,7 +281,8 @@ class DQNAgent:
         #     plt.show()
 
         
-        return self.save_model(overall_avg)
+        model_path = self.save_model(overall_avg)
+        return model_path, reward_log 
     
     def validate(self, env, model_path=str, episodes=100, mode='validation'):
         """Validate the model parameter with the given path.(No exploring)

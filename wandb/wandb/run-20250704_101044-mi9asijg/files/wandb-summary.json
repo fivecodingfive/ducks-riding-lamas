@@ -1,0 +1,1 @@
+{"overall_avg_reward":-15.9375,"_wandb":{"runtime":334},"reward":-2,"_step":399,"_runtime":334,"policy_loss":-0.1059478610754013,"entropy_coef":0.020350640787012493,"_timestamp":1.751616985734342e+09,"value_loss":0.31653193235397337,"episode":199,"episode_length":200,"entropy_bonus":1.0393285751342773}

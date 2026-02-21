@@ -1,0 +1,31 @@
+{
+  "os": "Windows-10-10.0.26100-SP0",
+  "python": "CPython 3.11.9",
+  "startedAt": "2025-07-01T15:40:42.105063Z",
+  "program": "C:\\Users\\jonas\\coding\\university\\drl\\ducks-riding-lamas\\main_ppo.py",
+  "codePath": "main_ppo.py",
+  "git": {
+    "remote": "https://github.com/fivecodingfive/ducks-riding-lamas.git",
+    "commit": "ecc6261096882af7aee0e7134b056e0200749934"
+  },
+  "email": "jonas05.coding@gmail.com",
+  "root": "./wandb",
+  "host": "JCL",
+  "executable": "C:\\Users\\jonas\\coding\\university\\drl\\ducks-riding-lamas\\venv\\Scripts\\python.exe",
+  "codePathLocal": "main_ppo.py",
+  "cpu_count": 4,
+  "cpu_count_logical": 8,
+  "disk": {
+    "/": {
+      "total": "510674333696",
+      "used": "312879259648"
+    }
+  },
+  "memory": {
+    "total": "16969424896"
+  },
+  "cpu": {
+    "count": 4,
+    "countLogical": 8
+  }
+}

@@ -1,0 +1,11 @@
+>>> [Checkpoint] Entering mode switch
+>>> [Agent] Entered train()
+>>> [Agent] Episodes: 20, Mode: training, Update freq: 5
+[Training][Episode 5/20] Avg reward: -8.00 | Epsilon: 0.100
+[Training][Episode 10/20] Avg reward: 66.80 | Epsilon: 0.100
+[Training][Episode 15/20] Avg reward: 108.40 | Epsilon: 0.100
+[Training][Episode 20/20] Avg reward: 120.40 | Epsilon: 0.100
+
+[Training Done] Overall Avg Reward: 71.90
+Model saved: model_12_reward71.90.keras in models\model_12_reward71.90.keras
+[34m[1mwandb[0m: [33mWARNING[0m Calling wandb.run.save without any arguments is deprecated.Changes to attributes are automatically persisted.

@@ -1,0 +1,1 @@
+{"_runtime":50.5360701,"_wandb":{"runtime":50},"value_loss":108.2673828125,"episode":19,"reward":-27,"episode_length":200,"_step":19,"entropy_coef":0.08847359999999999,"_timestamp":1.7516175088691158e+09,"policy_loss":-0.14362661838531493,"entropy_bonus":1.419467806816101}

@@ -1,0 +1,93 @@
+_wandb:
+    value:
+        cli_version: 0.21.0
+        code_path: code/main_ppo.py
+        e:
+            mz7s5sdxkuls829zjsydc8sqagmoy8z9:
+                args:
+                    - --seed
+                    - "20"
+                codePath: main_ppo.py
+                codePathLocal: main_ppo.py
+                cpu_count: 10
+                cpu_count_logical: 20
+                cudaVersion: "12.2"
+                disk:
+                    /:
+                        total: "1081101176832"
+                        used: "17702285312"
+                email: battist.becker@web.de
+                executable: /home/battist/miniconda3/envs/lab/bin/python
+                git:
+                    commit: 4d92611fef8f4722eab5048bad45857e192f0790
+                    remote: https://github.com/fivecodingfive/ducks-riding-lamas
+                gpu: NVIDIA GeForce RTX 4050 Laptop GPU
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ada
+                      memoryTotal: "6439305216"
+                      name: NVIDIA GeForce RTX 4050 Laptop GPU
+                      uuid: GPU-f9ac9efa-30db-a625-7ab2-551748806900
+                host: Battist-Laptop
+                memory:
+                    total: "8235892736"
+                os: Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39
+                program: /home/battist/projects/ducks-riding-lamas/main_ppo.py
+                python: CPython 3.11.9
+                root: ./wandb
+                startedAt: "2025-07-04T08:07:21.302052Z"
+                writerId: mz7s5sdxkuls829zjsydc8sqagmoy8z9
+        m:
+            - "1": episode
+              "6":
+                - 3
+              "7": []
+            - "2": '*'
+              "5": 1
+              "6":
+                - 1
+              "7": []
+        python_version: 3.11.9
+        t:
+            "1":
+                - 2
+                - 3
+            "2":
+                - 2
+                - 3
+            "3":
+                - 7
+                - 13
+                - 15
+                - 16
+                - 17
+                - 61
+                - 62
+            "4": 3.11.9
+            "5": 0.21.0
+            "12": 0.21.0
+            "13": linux-x86_64
+device:
+    value: gpu
+env_variant:
+    value: 0
+ppo_config:
+    value:
+        action_size: 5
+        clip_ratio: 0.2
+        entropy: 0.1
+        entropy_decay: 0.98
+        entropy_min: 0
+        gamma: 0.99
+        lam: 0.9
+        max_time_steps: 200
+        n_episodes: 20
+        policy_learning_rate: 0.0009
+        state_size: 10
+        train_policy_epochs: 40
+        train_value_function_epochs: 40
+        value_learning_rate: 0.002
+seed:
+    value: 20
+sweep_id:
+    value: null

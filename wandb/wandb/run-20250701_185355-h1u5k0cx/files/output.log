@@ -1,0 +1,19 @@
+Initial action probs: ['0.19', '0.17', '0.24', '0.21', '0.19'] Entropy: 0.10
+[5/20] Average Reward: -69.60
+Action probabilities: ['0.25', '0.11', '0.12', '0.31', '0.22'] Entropy: 0.10
+[10/20] Average Reward: -48.10
+Action probabilities: ['0.11', '0.10', '0.15', '0.30', '0.35'] Entropy: 0.10
+[15/20] Average Reward: -17.70
+Action probabilities: ['0.16', '0.12', '0.08', '0.24', '0.40'] Entropy: 0.09
+[20/20] Average Reward: -13.90
+Action probabilities: ['0.12', '0.08', '0.04', '0.17', '0.59'] Entropy: 0.09
+
+[Training Done] Overall Avg Reward: -37.33
+Saving model...
+PPO Agent saved: ppo_agent_17_reward-37.33.keras in models\ppo_agent_17_reward-37.33.keras
+[34m[1mwandb[0m: [33mWARNING[0m Calling wandb.run.save without any arguments is deprecated.Changes to attributes are automatically persisted.
+Traceback (most recent call last):
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\main_ppo.py", line 114, in <module>
+    print(f"Total runtime: {time.time() - start_time:.2f}s", flush=True)
+                                          ^^^^^^^^^^
+NameError: name 'start_time' is not defined

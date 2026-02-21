@@ -1,0 +1,16 @@
+{"time":"2025-06-13T15:15:38.748734+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"wandb\\wandb\\run-20250613_151538-8drv7ge1\\logs\\debug-core.log"}
+{"time":"2025-06-13T15:15:39.0608022+02:00","level":"INFO","msg":"created new stream","id":"8drv7ge1"}
+{"time":"2025-06-13T15:15:39.061424+02:00","level":"INFO","msg":"handler: started","stream_id":"8drv7ge1"}
+{"time":"2025-06-13T15:15:39.061424+02:00","level":"INFO","msg":"stream: started","id":"8drv7ge1"}
+{"time":"2025-06-13T15:15:39.061424+02:00","level":"INFO","msg":"sender: started","stream_id":"8drv7ge1"}
+{"time":"2025-06-13T15:15:39.061424+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"8drv7ge1"}
+{"time":"2025-06-13T15:15:39.4232343+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-06-13T15:15:39.4279681+02:00","level":"ERROR","msg":"git repo not found","error":"repository does not exist"}
+{"time":"2025-06-13T15:16:15.8718098+02:00","level":"INFO","msg":"stream: closing","id":"8drv7ge1"}
+{"time":"2025-06-13T15:16:15.8724004+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-06-13T15:16:15.8724004+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-06-13T15:16:16.4840721+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-06-13T15:16:16.7336154+02:00","level":"INFO","msg":"sender: closed","stream_id":"8drv7ge1"}
+{"time":"2025-06-13T15:16:16.7348107+02:00","level":"INFO","msg":"handler: closed","stream_id":"8drv7ge1"}
+{"time":"2025-06-13T15:16:16.7348107+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"8drv7ge1"}
+{"time":"2025-06-13T15:16:16.73883+02:00","level":"INFO","msg":"stream: closed","id":"8drv7ge1"}

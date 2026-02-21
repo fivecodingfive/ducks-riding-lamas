@@ -1,0 +1,39 @@
+{"time":"2025-07-04T11:12:56.9828828+02:00","level":"INFO","msg":"stream: starting","core version":"0.21.0"}
+{"time":"2025-07-04T11:12:57.288341+02:00","level":"INFO","msg":"stream: created new stream","id":"iti4yv23"}
+{"time":"2025-07-04T11:12:57.2889946+02:00","level":"INFO","msg":"stream: started","id":"iti4yv23"}
+{"time":"2025-07-04T11:12:57.2889946+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"iti4yv23"}
+{"time":"2025-07-04T11:12:57.2889946+02:00","level":"INFO","msg":"sender: started","stream_id":"iti4yv23"}
+{"time":"2025-07-04T11:12:57.2889946+02:00","level":"INFO","msg":"handler: started","stream_id":"iti4yv23"}
+{"time":"2025-07-04T11:12:57.5855032+02:00","level":"ERROR","msg":"git repo not found","error":"repository does not exist"}
+{"time":"2025-07-04T11:13:12.5901553+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:13:27.5923677+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:13:42.5916232+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:13:57.592296+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:14:12.5957055+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:14:27.5936293+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:14:42.5946184+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:14:57.5939213+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:15:12.5959562+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:15:27.6009524+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:15:42.5972348+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:15:57.591312+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:16:12.5920628+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:16:27.5933257+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:16:42.5921566+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:16:57.5935113+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:17:12.5965779+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:17:27.5936869+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:17:42.5950682+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:17:57.5968067+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:18:12.5942587+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:18:27.5931131+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:18:42.5968757+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:18:57.6011644+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:19:12.5975077+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-04T11:19:21.1238814+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-07-04T11:19:21.324309+02:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading history steps 196-398, summary, console lines 40-44","runtime_seconds":0.2004276}],"total_operations":1}}
+{"time":"2025-07-04T11:19:21.348575+02:00","level":"INFO","msg":"stream: closing","id":"iti4yv23"}
+{"time":"2025-07-04T11:19:21.348575+02:00","level":"INFO","msg":"handler: closed","stream_id":"iti4yv23"}
+{"time":"2025-07-04T11:19:21.348575+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"iti4yv23"}
+{"time":"2025-07-04T11:19:21.348575+02:00","level":"INFO","msg":"sender: closed","stream_id":"iti4yv23"}
+{"time":"2025-07-04T11:19:21.352213+02:00","level":"INFO","msg":"stream: closed","id":"iti4yv23"}

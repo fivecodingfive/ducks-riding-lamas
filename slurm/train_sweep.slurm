@@ -16,7 +16,7 @@
 # Load environment
 module load slurm_setup
 module load python/3.10.10-extended
-source ../tfvenv/bin/activate
+source ~/venvs/ppo/bin/activate
 
 # W&B and plotting config
 export MPLBACKEND=Agg

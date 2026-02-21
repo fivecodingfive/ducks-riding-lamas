@@ -1,0 +1,27 @@
+[W&B] run initialised
+[5/200] avg rew (5eps) = -80.90 | entropy 0.100
+[10/200] avg rew (5eps) = -77.00 | entropy 0.100
+Traceback (most recent call last):
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\main_ppo.py", line 164, in <module>
+    reward_log, _, _ = agent.train_ppo(env)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\agent_ppo\ppo_agent.py", line 50, in train_ppo
+    reward_log, total_episodes = self._run_ppo(env, training=True)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\agent_ppo\ppo_agent.py", line 95, in _run_ppo
+    self._update_networks_if_ready(ep)          # may trigger roll-out update
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\agent_ppo\ppo_agent.py", line 191, in _update_networks_if_ready
+    pl, ent = self._train_policy(states, actions, logp, adv)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\traceback_utils.py", line 153, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "C:\Users\jonas\AppData\Local\Temp\__autograph_generated_filexnpagvmm.py", line 21, in tf___train_policy
+    grads, _ = ag__.converted_call(ag__.ld(tf).clip_by_global_norm, (ag__.ld(grads), 0.5), None, fscope)
+                                                                             ^^^^^
+UnboundLocalError: in user code:
+
+    File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\agent_ppo\ppo_agent.py", line 232, in _train_policy  *
+        grads, _ = tf.clip_by_global_norm(grads, 0.5)
+
+    UnboundLocalError: cannot access local variable 'grads' where it is not associated with a value

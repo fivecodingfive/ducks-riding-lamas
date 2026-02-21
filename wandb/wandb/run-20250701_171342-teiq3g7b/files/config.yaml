@@ -1,0 +1,49 @@
+_wandb:
+    value:
+        cli_version: 0.19.11
+        code_path: code/main_ppo.py
+        m: []
+        python_version: 3.11.9
+        t:
+            "1":
+                - 2
+                - 3
+                - 55
+            "2":
+                - 2
+                - 3
+                - 55
+            "3":
+                - 2
+                - 13
+                - 15
+                - 16
+                - 23
+                - 55
+            "4": 3.11.9
+            "5": 0.19.11
+            "8":
+                - 3
+                - 5
+            "12": 0.19.11
+            "13": windows-amd64
+environment:
+    value:
+        data_dir: ./data
+        mode: training
+        variant: 0
+model:
+    value:
+        action_size: 5
+        state_size: 10
+seed:
+    value: 42
+training:
+    value:
+        clip_ratio: 0.2
+        entropy_start: 0.1
+        episodes: 20
+        gamma: 0.99
+        lam: 0.9
+        policy_lr: 0.0009
+        value_lr: 0.002

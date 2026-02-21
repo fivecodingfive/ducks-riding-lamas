@@ -1,0 +1,8 @@
+>>> [Checkpoint] Entering mode switch
+>>> [Agent] Entered train()
+>>> [Agent] Episodes: 10, Mode: training, Update freq: 5
+[Training][Episode 5/10] Avg reward: -9.50 | Epsilon: 0.100
+[Training][Episode 10/10] Avg reward: 89.70 | Epsilon: 0.100
+
+[Training Done] Overall Avg Reward: 40.10
+Model saved: model_11_reward40.10.keras in models\model_11_reward40.10.keras

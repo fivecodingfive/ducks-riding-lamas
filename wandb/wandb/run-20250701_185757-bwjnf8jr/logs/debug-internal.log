@@ -1,0 +1,20 @@
+{"time":"2025-07-01T18:57:57.1008334+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"wandb\\wandb\\run-20250701_185757-bwjnf8jr\\logs\\debug-core.log"}
+{"time":"2025-07-01T18:57:57.4115421+02:00","level":"INFO","msg":"created new stream","id":"bwjnf8jr"}
+{"time":"2025-07-01T18:57:57.4115421+02:00","level":"INFO","msg":"stream: started","id":"bwjnf8jr"}
+{"time":"2025-07-01T18:57:57.4115421+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"bwjnf8jr"}
+{"time":"2025-07-01T18:57:57.4115421+02:00","level":"INFO","msg":"sender: started","stream_id":"bwjnf8jr"}
+{"time":"2025-07-01T18:57:57.4115421+02:00","level":"INFO","msg":"handler: started","stream_id":"bwjnf8jr"}
+{"time":"2025-07-01T18:57:57.6944744+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-07-01T18:57:57.6999821+02:00","level":"ERROR","msg":"git repo not found","error":"repository does not exist"}
+{"time":"2025-07-01T18:58:12.7117517+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-01T18:58:27.7213188+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-01T18:58:42.7191004+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-01T18:58:57.7102952+02:00","level":"ERROR","msg":"monitor: error sampling metrics: Incorrect function."}
+{"time":"2025-07-01T18:59:04.1701872+02:00","level":"INFO","msg":"stream: closing","id":"bwjnf8jr"}
+{"time":"2025-07-01T18:59:04.1701872+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-07-01T18:59:04.1708428+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-07-01T18:59:05.1908494+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-07-01T18:59:05.443188+02:00","level":"INFO","msg":"handler: closed","stream_id":"bwjnf8jr"}
+{"time":"2025-07-01T18:59:05.443188+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"bwjnf8jr"}
+{"time":"2025-07-01T18:59:05.443188+02:00","level":"INFO","msg":"sender: closed","stream_id":"bwjnf8jr"}
+{"time":"2025-07-01T18:59:05.4483556+02:00","level":"INFO","msg":"stream: closed","id":"bwjnf8jr"}

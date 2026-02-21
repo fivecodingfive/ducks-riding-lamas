@@ -1,0 +1,86 @@
+_wandb:
+    value:
+        cli_version: 0.21.0
+        code_path: code/main_ppo.py
+        e:
+            owdwx8obk1jkf9r6go0psexl6wgnsesr:
+                args:
+                    - --seed
+                    - "25"
+                codePath: main_ppo.py
+                codePathLocal: main_ppo.py
+                cpu_count: 4
+                cpu_count_logical: 8
+                disk:
+                    /:
+                        total: "510674333696"
+                        used: "316744003584"
+                email: jonas05.coding@gmail.com
+                executable: C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Scripts\python.exe
+                git:
+                    commit: 8d93f3b403c2f62018998bfac783c139289e5584
+                    remote: https://github.com/fivecodingfive/ducks-riding-lamas.git
+                host: JCL
+                memory:
+                    total: "16969424896"
+                os: Windows-11-10.0.26100-SP0
+                program: C:\Users\jonas\coding\university\drl\ducks-riding-lamas\main_ppo.py
+                python: CPython 3.12.10
+                root: ./wandb
+                startedAt: "2025-07-04T09:38:16.104947Z"
+                writerId: owdwx8obk1jkf9r6go0psexl6wgnsesr
+        m:
+            - "1": episode
+              "6":
+                - 3
+              "7": []
+            - "2": '*'
+              "5": 1
+              "6":
+                - 1
+              "7": []
+        python_version: 3.12.10
+        t:
+            "1":
+                - 2
+                - 3
+            "2":
+                - 2
+                - 3
+            "3":
+                - 7
+                - 13
+                - 15
+                - 16
+                - 61
+            "4": 3.12.10
+            "5": 0.21.0
+            "8":
+                - 3
+            "12": 0.21.0
+            "13": windows-amd64
+device:
+    value: cpu
+env_variant:
+    value: 0
+ppo_config:
+    value:
+        action_size: 5
+        clip_ratio: 0.2
+        entropy: 0.1
+        entropy_decay: 0.9
+        entropy_min: 0
+        gamma: 0.99
+        lam: 0.925
+        max_time_steps: 200
+        n_episodes: 200
+        policy_learning_rate: 0.0003
+        rollout_steps: 2048
+        state_size: 10
+        train_policy_epochs: 5
+        train_value_function_epochs: 5
+        value_learning_rate: 0.0005
+seed:
+    value: 25
+sweep_id:
+    value: null

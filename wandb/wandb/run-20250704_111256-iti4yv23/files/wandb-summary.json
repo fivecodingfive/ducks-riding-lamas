@@ -1,0 +1,1 @@
+{"reward":-64.5,"_step":399,"_timestamp":1.751620760315605e+09,"rollout_policy_loss":-0.1289432615041733,"rollout_value_loss":206.8148193359375,"rollout_entropy":1.3906831741333008,"overall_avg_reward":-50.3725,"_runtime":382,"_wandb":{"runtime":382},"entropy_coef":0.020350640787012493,"episode_length":200,"episode":199}

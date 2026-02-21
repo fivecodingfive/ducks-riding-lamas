@@ -1,0 +1,50 @@
+[W&B] run initialised
+Initial action probs: ['0.19', '0.25', '0.20', '0.20', '0.16'] Entropy: 0.10
+[5/200] Average Reward: -99.40
+Action probabilities: ['0.25', '0.27', '0.18', '0.16', '0.14'] Entropy: 0.10
+[10/200] Average Reward: -58.30
+Action probabilities: ['0.25', '0.32', '0.17', '0.12', '0.14'] Entropy: 0.09
+[15/200] Average Reward: -43.30
+Action probabilities: ['0.26', '0.39', '0.13', '0.10', '0.13'] Entropy: 0.09
+[20/200] Average Reward: -30.50
+Action probabilities: ['0.32', '0.36', '0.11', '0.09', '0.12'] Entropy: 0.08
+[25/200] Average Reward: -23.60
+Action probabilities: ['0.34', '0.34', '0.10', '0.09', '0.13'] Entropy: 0.08
+Traceback (most recent call last):
+  File "/home/battist/projects/ducks-riding-lamas/main_ppo.py", line 164, in <module>
+    reward_log, _, _ = agent.train_ppo(env)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/projects/ducks-riding-lamas/agent_ppo/ppo_agent.py", line 44, in train_ppo
+    reward_log, total_episodes = self.run_ppo(training=True, env=env, model_path=None)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/projects/ducks-riding-lamas/agent_ppo/ppo_agent.py", line 130, in run_ppo
+    self.calc_advantage(step_count) # Calculate advantages
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/projects/ducks-riding-lamas/agent_ppo/ppo_agent.py", line 233, in calc_advantage
+    advantages = self.discounted_cumulative_sums(deltas, self.gamma * self.lam)  # shape (T,)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/projects/ducks-riding-lamas/agent_ppo/ppo_agent.py", line 256, in discounted_cumulative_sums
+    acc = x[t] + discount * acc
+          ~~~~~^~~~~~~~~~~~~~~~
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/util/traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/framework/override_binary_operator.py", line 113, in binary_op_wrapper
+    return func(x, y, name=name)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/ops/tensor_math_operator_overrides.py", line 28, in _add_dispatch_factory
+    return math_ops._add_dispatch(x, y, name=name)  # pylint: disable=protected-access
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/util/traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/util/dispatch.py", line 1260, in op_dispatch_handler
+    return dispatch_target(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/ops/math_ops.py", line 1738, in _add_dispatch
+    return gen_math_ops.add_v2(x, y, name=name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/battist/miniconda3/envs/lab/lib/python3.11/site-packages/tensorflow/python/ops/gen_math_ops.py", line 477, in add_v2
+    _result = pywrap_tfe.TFE_Py_FastPathExecute(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

@@ -1,0 +1,119 @@
+[W&B] run initialised
+[5/200] avg rew (5eps) = -80.90 | entropy 0.100
+[10/200] avg rew (5eps) = -77.00 | entropy 0.100
+[15/200] avg rew (5eps) = -58.80 | entropy 0.090
+[20/200] avg rew (5eps) = -67.90 | entropy 0.090
+[25/200] avg rew (5eps) = -73.10 | entropy 0.081
+[30/200] avg rew (5eps) = -72.60 | entropy 0.081
+[35/200] avg rew (5eps) = -79.70 | entropy 0.073
+[40/200] avg rew (5eps) = -60.00 | entropy 0.073
+[45/200] avg rew (5eps) = -56.40 | entropy 0.066
+[50/200] avg rew (5eps) = -64.50 | entropy 0.066
+[55/200] avg rew (5eps) = -65.60 | entropy 0.059
+[60/200] avg rew (5eps) = -53.70 | entropy 0.059
+[65/200] avg rew (5eps) = -54.80 | entropy 0.053
+[70/200] avg rew (5eps) = -47.00 | entropy 0.053
+[75/200] avg rew (5eps) = -47.50 | entropy 0.048
+[80/200] avg rew (5eps) = -64.50 | entropy 0.048
+[85/200] avg rew (5eps) = -43.50 | entropy 0.043
+[90/200] avg rew (5eps) = -40.30 | entropy 0.043
+[95/200] avg rew (5eps) = -57.00 | entropy 0.039
+[100/200] avg rew (5eps) = -22.00 | entropy 0.039
+[105/200] avg rew (5eps) = -33.00 | entropy 0.035
+[110/200] avg rew (5eps) = -35.10 | entropy 0.035
+[115/200] avg rew (5eps) = -28.90 | entropy 0.031
+[120/200] avg rew (5eps) = -41.80 | entropy 0.031
+[125/200] avg rew (5eps) = -46.60 | entropy 0.028
+[130/200] avg rew (5eps) = -23.70 | entropy 0.028
+[135/200] avg rew (5eps) = -38.80 | entropy 0.025
+[140/200] avg rew (5eps) = -36.70 | entropy 0.025
+[145/200] avg rew (5eps) = -37.60 | entropy 0.023
+[150/200] avg rew (5eps) = -44.90 | entropy 0.023
+[155/200] avg rew (5eps) = -43.30 | entropy 0.021
+[160/200] avg rew (5eps) = -38.30 | entropy 0.021
+Traceback (most recent call last):
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\main_ppo.py", line 164, in <module>
+    reward_log, _, _ = agent.train_ppo(env)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\agent_ppo\ppo_agent.py", line 50, in train_ppo
+    reward_log, total_episodes = self._run_ppo(env, training=True)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\agent_ppo\ppo_agent.py", line 92, in _run_ppo
+    value = self.critic_network(encoded_state)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 117, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\layers\layer.py", line 936, in __call__
+    outputs = super().__call__(*args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 117, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\ops\operation.py", line 58, in __call__
+    return call_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 156, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\models\sequential.py", line 220, in call
+    return self._functional.call(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\models\functional.py", line 183, in call
+    outputs = self._run_through_graph(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\ops\function.py", line 177, in _run_through_graph
+    outputs = op(*args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\models\functional.py", line 648, in call
+    return operation(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 117, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\layers\layer.py", line 936, in __call__
+    outputs = super().__call__(*args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 117, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\ops\operation.py", line 58, in __call__
+    return call_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\utils\traceback_utils.py", line 156, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\layers\normalization\batch_normalization.py", line 277, in call
+    outputs = ops.batch_normalization(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\ops\nn.py", line 2241, in batch_normalization
+    return backend.nn.batch_normalization(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\keras\src\backend\tensorflow\nn.py", line 879, in batch_normalization
+    return tf.nn.batch_normalization(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\dispatch.py", line 1260, in op_dispatch_handler
+    return dispatch_target(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\ops\nn_impl.py", line 1482, in batch_normalization
+    inv = math_ops.rsqrt(variance + variance_epsilon)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\ops\weak_tensor_ops.py", line 88, in wrapper
+    return op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\util\dispatch.py", line 1260, in op_dispatch_handler
+    return dispatch_target(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\ops\math_ops.py", line 5838, in rsqrt
+    return gen_math_ops.rsqrt(x, name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jonas\coding\university\drl\ducks-riding-lamas\venv\Lib\site-packages\tensorflow\python\ops\gen_math_ops.py", line 8897, in rsqrt
+    _result = pywrap_tfe.TFE_Py_FastPathExecute(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

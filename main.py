@@ -181,7 +181,7 @@ run_name = (
 
 try:
     wandb.init(
-        entity="ducks-riding-llamas", 
+        entity="ducks-riding-llamas",
         project="ride-those-llamas",
         name = run_name,
         group=f"variant{str(args.variant)}_algorithm{str(args.algorithm)}",
@@ -191,10 +191,9 @@ try:
             f"network{args.network}",
             # "replay buffer: prioritized" if dqn_agent.use_per else "replay buffer: uniform",
             "cuda" if tf.config.list_physical_devices('GPU') else "cpu",
-            f"seed{args.seed}"
         ],
-        save_code=True,
-        dir=os.getenv("WANDB_DIR", "./wandb")
+        save_code = True,
+        dir = os.getenv("WANDB_DIR", "./wandb"),
     )
     print(">>> [Checkpoint] W&B Initialized", flush=True)
 except Exception as e:
