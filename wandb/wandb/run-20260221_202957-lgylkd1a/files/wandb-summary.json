@@ -1,1 +1,0 @@
-{"_wandb":{"runtime":10},"_timestamp":1.7717022090706923e+09,"train/q_value":0.1438102275133133,"train/over_estimation":0.05173999071121216,"episode/reward":-21.5,"_step":1167,"_runtime":10.807944565,"train/q_loss":0.4883033335208893,"train/actor_loss":-1.6084424257278442,"episode":6}

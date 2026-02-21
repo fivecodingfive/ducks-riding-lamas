@@ -2,3 +2,6 @@
 *.pyc
 *.pyo
 __pycache__/
+
+# wandb files
+wandb/
