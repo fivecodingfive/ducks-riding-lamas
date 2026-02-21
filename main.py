@@ -40,7 +40,7 @@ args.learning_rate  = lr
 
 import wandb
 from datetime import datetime
-from environment import Environment
+from env.environment import Environment
 
 NETWORK_TYPE = args.network
 variant = args.variant      # specify problem variant (0 for base variant, 1 for first extension, 2 for second extension)

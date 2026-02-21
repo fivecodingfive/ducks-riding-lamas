@@ -18,10 +18,10 @@ from config import args
 
 variant = args.variant
 if variant == 2:
-    _df = pd.read_csv("item_spawn_counts_v2.csv", index_col=0)
+    _df = pd.read_csv("env/item_spawn_counts_v2.csv", index_col=0)
     # _df = pd.read_csv("item_expected_value_var2.csv", index_col=0)
 else:
-    _df = pd.read_csv("item_spawn_counts.csv", index_col=0)
+    _df = pd.read_csv("env/item_spawn_counts.csv", index_col=0)
 
 _counts = _df.to_numpy(dtype=np.float32)
 spawn_distribution = _counts / _counts.sum()
