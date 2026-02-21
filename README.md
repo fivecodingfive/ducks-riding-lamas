@@ -2,7 +2,10 @@
 
 ## Project Overview
 
-This is a reinforcement learning project that trains intelligent agents to navigate and complete tasks in a grid-based environment. The project implements multiple state-of-the-art RL algorithms (SAC, DQN, A2C) and provides comprehensive evaluation, visualization, and experiment tracking capabilities.
+This project evaluates Deep Q-Network (DQN), Proximal Policy Optimization (PPO), and Soft Actor-Critic (SAC) in a stochastic 5×5 grid-based pickup-and-delivery environment. The task involves collecting and delivering dynamically spawning items under time constraints, sparse rewards, and spatial restrictions across three environment variants. The repository includes feature-engineered state representations, reward shaping strategies, and tuned agent configurations to analyze performance, training stability, and generalization across increasingly complex settings.
+
+![Variant 0](pics/variant_0.png)
+![Variant 2](pics/variant_2.png)
 
 ### Key Features
 - **Multiple RL Algorithms**: Support for SAC (Soft Actor-Critic), DQN, and A2C agents
@@ -30,8 +33,6 @@ ducks-riding-lamas/
 ├── main.py                       # Main training/testing script
 ├── config.py                     # Command-line argument configuration
 ├── greedy.py                     # Greedy baseline agent
-├── tabular_agent.py              # Tabular Q-learning agent
-├── test_policy.py                # Policy evaluation script
 ├── pixi.toml                     # Pixi environment configuration
 └── requirements.txt              # Python dependencies
 ```
