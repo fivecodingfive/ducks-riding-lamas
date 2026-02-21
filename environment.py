@@ -46,7 +46,7 @@ class Environment(object):
         self.item_counts = np.zeros(self.vertical_cell_count * self.horizontal_cell_count, dtype=np.int32)
         self.agent_heatmap = np.zeros((self.vertical_cell_count, self.horizontal_cell_count), dtype=np.int32)
         
-        if data_dir != './final_test_episodes':
+        if data_dir != './test_data':  # don't load episodes for testing, since we want to test on unseen episodes
             self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
             self.training_episodes = self.training_episodes.training_episodes.tolist()
             self.validation_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/validation_episodes.csv')
@@ -282,7 +282,6 @@ class Environment(object):
                 obs.extend(spawn_distribution.flatten().tolist())
             else:
                 obs.extend([0.0] * 25)
-                
             return tf.convert_to_tensor(obs, dtype=tf.float32)
     
     def get_obs_pb(self):
@@ -312,7 +311,7 @@ class Environment(object):
             locs = np.array([0.269, 0.245, 0.485])
         obs.extend(locs)
         
-        
+        print("using obs_pb with nearest item and spawn distribution dummy", flush=True)
         return tf.convert_to_tensor(obs, dtype=tf.float32)
 
 import heapq

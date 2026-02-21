@@ -1,0 +1,25 @@
+>>> [Checkpoint] W&B Initialized
+>>> [Checkpoint] Entering mode switch
+Traceback (most recent call last):
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/main.py", line 213, in <module>
+    train_env = Environment(variant=variant, data_dir=data_dir)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/environment.py", line 50, in __init__
+    self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 620, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 1620, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 1880, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/pandas/io/common.py", line 873, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: './data/variant_1/training_episodes.csv'

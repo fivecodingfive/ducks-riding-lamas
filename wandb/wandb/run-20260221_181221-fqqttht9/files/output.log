@@ -1,0 +1,14 @@
+>>> [Checkpoint] W&B Initialized
+>>> [Checkpoint] Entering mode switch
+>>> [SACAgent] Entered train()
+>>> [SACAgent] Episodes: 100, Mode: training
+Traceback (most recent call last):
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/main.py", line 211, in <module>
+    agent.train(
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/agent_sac/sac_agent.py", line 157, in train
+    obs = env.reset(mode='training')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/environment.py", line 107, in reset
+    if not self.remaining_training_episodes:
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Environment' object has no attribute 'remaining_training_episodes'

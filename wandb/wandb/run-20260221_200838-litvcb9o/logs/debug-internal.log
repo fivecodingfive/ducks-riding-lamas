@@ -1,0 +1,12 @@
+{"time":"2026-02-21T20:08:38.974810251+01:00","level":"INFO","msg":"stream: starting","core version":"0.25.0"}
+{"time":"2026-02-21T20:08:39.297245038+01:00","level":"INFO","msg":"stream: created new stream","id":"litvcb9o"}
+{"time":"2026-02-21T20:08:39.297306268+01:00","level":"INFO","msg":"handler: started","stream_id":"litvcb9o"}
+{"time":"2026-02-21T20:08:39.297356991+01:00","level":"INFO","msg":"stream: started","id":"litvcb9o"}
+{"time":"2026-02-21T20:08:39.297431794+01:00","level":"INFO","msg":"writer: started","stream_id":"litvcb9o"}
+{"time":"2026-02-21T20:08:39.297451494+01:00","level":"INFO","msg":"sender: started","stream_id":"litvcb9o"}
+{"time":"2026-02-21T20:08:39.675460052+01:00","level":"ERROR","msg":"git repo not found","error":"repository does not exist"}
+{"time":"2026-02-21T20:08:39.73304137+01:00","level":"INFO","msg":"stream: closing","id":"litvcb9o"}
+{"time":"2026-02-21T20:08:40.777812982+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-02-21T20:08:41.12528491+01:00","level":"INFO","msg":"handler: closed","stream_id":"litvcb9o"}
+{"time":"2026-02-21T20:08:41.125334902+01:00","level":"INFO","msg":"sender: closed","stream_id":"litvcb9o"}
+{"time":"2026-02-21T20:08:41.125337649+01:00","level":"INFO","msg":"stream: closed","id":"litvcb9o"}

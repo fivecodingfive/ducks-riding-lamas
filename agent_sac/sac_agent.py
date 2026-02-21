@@ -32,18 +32,21 @@ class SACAgent:
         
         ## Double Q network to avoid overestimation
         if network_type == 'cnn':
+            print(f"[cnn]state_dim: {state_dim}, action_dim: {action_dim}")
             self.actor = build_cnn_network(state_dim, action_dim, output_activation='softmax')
             self.q1 = build_cnn_network(state_dim, action_dim)
             self.q2 = build_cnn_network(state_dim, action_dim)
             self.target_q1 = build_cnn_network(state_dim, action_dim)
             self.target_q2 = build_cnn_network(state_dim, action_dim)
         elif network_type == 'mlp':
+            print(f"[mlp]state_dim: {state_dim}, action_dim: {action_dim}")
             self.actor = build_mlp_network(state_dim, action_dim, output_activation='softmax')
             self.q1 = build_mlp_network(state_dim, action_dim)
             self.q2 = build_mlp_network(state_dim, action_dim)
             self.target_q1 = build_mlp_network(state_dim, action_dim)
             self.target_q2 = build_mlp_network(state_dim, action_dim)
         elif network_type == 'combine':
+            print(f"[combine]state_dim: {state_dim}, action_dim: {action_dim}")
             self.actor = build_combine_network(state_dim, action_dim, output_activation='softmax')
             self.q1 = build_combine_network(state_dim, action_dim)
             self.q2 = build_combine_network(state_dim, action_dim)
@@ -211,20 +214,6 @@ class SACAgent:
                 avg_recent = sum(reward_log[-target_update_freq:]) / target_update_freq
                 loss_recent = sum(critic_loss_log[-target_update_freq*200:]) / (target_update_freq*200)
                 print(f"[Training][Episode {episode}/{episodes}] Avg Reward: {avg_recent:.2f}; Avg Loss: {loss_recent:.3f}")
-                
-            # if episode % 9 == 0:
-            #     state_tensor = tf.convert_to_tensor([state], dtype=tf.float32)
-            #     probs = self.actor(state_tensor)[0].numpy()
-
-            #     import matplotlib.pyplot as plt
-            #     plt.figure(figsize=(6, 4))
-            #     plt.bar(range(self.action_dim), probs)
-            #     plt.xlabel("Action")
-            #     plt.ylabel("Probability")
-            #     plt.title(f"Policy Distribution (Episode {episode})")
-            #     plt.grid(True)
-            #     plt.tight_layout()
-            #     plt.show()
 
             if wandb.run:
                 wandb.log(
@@ -234,24 +223,11 @@ class SACAgent:
                     },
                     step=self.global_step
                 )
-        # import matplotlib.pyplot as plt
-
-        # plt.figure(figsize=(6, 5))
-        # plt.imshow(env.get_agent_heatmap(), cmap='hot', interpolation='nearest')
-        # plt.colorbar(label='Visit Count')
-        # plt.title('Agent Movement Heatmap')
-        # plt.xlabel('Y-axis')
-        # plt.ylabel('X-axis')
-        # plt.xticks(np.arange(env.horizontal_cell_count))
-        # plt.yticks(np.arange(env.vertical_cell_count))
-        # plt.grid(True)
-        # plt.show()
-
 
         overall_avg = sum(reward_log) / len(reward_log)
         print(f"\n[Training Done] Overall Avg Reward: {overall_avg:.2f}")
 
-    def validate(self, env, episodes=200, model_path=str):
+    def validate(self, env, episodes=200, model_path='models/model.keras'):
         print(f">>> [SACAgent] Validating over {episodes} episodes")
         # examine if the model exist
         if not os.path.exists(model_path):
@@ -296,7 +272,7 @@ class SACAgent:
         avg_reward = sum(reward_log) / len(reward_log)
         print(f"\n[Validation Done] Avg Reward: {avg_reward:.2f}")
     
-    def final_test(self, env, episodes=100, model_path=str):
+    def final_test(self, env, episodes=100, model_path='models/model.keras'):
         print(f">>> [SACAgent] Testing over {episodes} episodes")
         # examine if the model exist
         if not os.path.exists(model_path):
@@ -351,20 +327,16 @@ class SACAgent:
         print(f"\n[Final Test Done] Avg Reward: {avg_reward:.2f}")
 
         
-    def save_model(self, variant):
+    def save_model(self, variant=None):
         base_dir='models'
         os.makedirs(base_dir, exist_ok=True)
-
-        existing = [f for f in os.listdir(base_dir) if f.startswith("SACmodel_") and f.endswith(".keras")]
-
-        index = len(existing)
-        file_name = f"SACmodel_{index}_v{variant}.keras"
+        file_name = f"model_variant_{variant}.keras" if variant is not None else "model.keras"
         full_path = os.path.join(base_dir, file_name)
 
-        while os.path.exists(full_path):
-            index += 1
-            file_name = f"SACmodel_{index}_v{variant}.keras"
-            full_path = os.path.join(base_dir, file_name)
+        # Replace model if one with the same name already exists
+        if os.path.exists(full_path):
+            os.remove(full_path)
+            print(f"Replaced existing model: {file_name}")
 
         self.actor.save(full_path)
         print(f"SAC Model saved: {file_name} in {full_path}")

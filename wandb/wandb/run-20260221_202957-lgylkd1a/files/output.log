@@ -1,0 +1,30 @@
+>>> [Checkpoint] W&B Initialized
+>>> [Checkpoint] Entering mode switch
+>>> [SACAgent] Entered train()
+>>> [SACAgent] Episodes: 100, Mode: training
+[Training][Episode 5/100] Avg Reward: -29.70; Avg Loss: 0.212
+Traceback (most recent call last):
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/main.py", line 211, in <module>
+    agent.train(
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/agent_sac/sac_agent.py", line 193, in train
+    wandb.log({
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/wandb/sdk/wandb_run.py", line 399, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/wandb/sdk/wandb_run.py", line 457, in wrapper_fn
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/wandb/sdk/wandb_run.py", line 444, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/wandb/sdk/wandb_run.py", line 2038, in log
+    self._log(data=data, step=step, commit=commit)
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/wandb/sdk/wandb_run.py", line 1749, in _log
+    self._partial_history_callback(data, step, commit)
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/wandb/sdk/wandb_run.py", line 398, in wrapper
+    with wb_logging.log_to_run(run_id):
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/lib/python3.11/site-packages/wandb/sdk/lib/wb_logging.py", line 88, in log_to_run
+    yield
+KeyboardInterrupt

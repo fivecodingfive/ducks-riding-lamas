@@ -2,11 +2,8 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Train Tabular Q-learning Agent on GridWorld")
 
-parser.add_argument('--variant', type=int, default=1, choices=[0, 1, 2],
+parser.add_argument('--variant', type=int, default=0, choices=[0, 1, 2],
                     help="Environment variant: 0 (base), 1 (extension 1), 2 (extension 2)")
-
-parser.add_argument('--data_dir', type=str, default='./data',
-                    help="Path to the data directory (e.g., ./data)")
 
 parser.add_argument('--episodes', type=int, default=100,
                     help="Number of training episodes")
@@ -14,10 +11,10 @@ parser.add_argument('--episodes', type=int, default=100,
 parser.add_argument('--seed', type=int, default=42,
                     help="Random seed for reproducibility")
 
-parser.add_argument('--mode', type=str, default='final testing', choices=['training', 'validation', 'testing', 'final testing'],
+parser.add_argument('--mode', type=str, default='training', choices=['training', 'validation', 'testing', 'final testing'],
                     help="Run mode for environment")
 
-parser.add_argument('--modelpath', type=str,
+parser.add_argument('--modelpath', type=str, default='models/model.keras',
                     help="Path to model parameters")
 
 parser.add_argument('--network', type=str, default='mlp', choices=['mlp', 'cnn', 'combine'],

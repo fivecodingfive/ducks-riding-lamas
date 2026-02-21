@@ -1,0 +1,1 @@
+{"train/actor_loss":-75.69099426269531,"_runtime":158.078095875,"episode":100,"_step":19937,"train/q_loss":8.799644470214844,"train/over_estimation":0.47472572326660156,"episode/reward":228.5,"_wandb":{"runtime":158},"train/q_value":72.3099594116211,"_timestamp":1.7716941420261848e+09}

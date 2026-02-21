@@ -1,0 +1,17 @@
+{
+  "os":  "Linux-6.17.0-14-generic-x86_64-with-glibc2.39",
+  "python":  "CPython 3.11.14",
+  "startedAt":  "2026-02-21T16:37:56.178570Z",
+  "program":  "/home/barryyeh0916/repos/ducks-riding-lamas/main.py",
+  "codePath":  "main.py",
+  "codePathLocal":  "main.py",
+  "git":  {
+    "remote":  "git@github.com:fivecodingfive/ducks-riding-lamas.git",
+    "commit":  "c70a78d97aec261ea53596867bdd04731782a4f4"
+  },
+  "email":  "barryyeh0916@gmail.com",
+  "root":  "./wandb",
+  "host":  "barryyeh0916-ThinkPad-P16-Gen-1",
+  "executable":  "/home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/bin/python",
+  "writerId":  "lsmpvxbuzjrxpc98fnpy8uoa5ik0trnl"
+}

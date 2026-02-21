@@ -1,0 +1,69 @@
+_wandb:
+    value:
+        cli_version: 0.25.0
+        code_path: code/main.py
+        e:
+            u8e4amh9ijvg94l1xwvoxk2209tkdyfc:
+                codePath: main.py
+                codePathLocal: main.py
+                cpu_count: 16
+                cpu_count_logical: 24
+                cudaVersion: "13.0"
+                disk:
+                    /:
+                        total: "1005867986944"
+                        used: "129283350528"
+                email: barryyeh0916@gmail.com
+                executable: /home/barryyeh0916/repos/ducks-riding-lamas/.pixi/envs/default/bin/python
+                git:
+                    commit: 6bf8768c9bccf5c4e665f97f46b360533b40fb8d
+                    remote: git@github.com:fivecodingfive/ducks-riding-lamas.git
+                gpu: NVIDIA RTX A3000 12GB Laptop GPU
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ampere
+                      cudaCores: 4096
+                      memoryTotal: "12884901888"
+                      name: NVIDIA RTX A3000 12GB Laptop GPU
+                      uuid: GPU-69408a59-f703-99e9-d644-c76c02eb2e21
+                host: barryyeh0916-ThinkPad-P16-Gen-1
+                memory:
+                    total: "33406869504"
+                os: Linux-6.17.0-14-generic-x86_64-with-glibc2.39
+                program: /home/barryyeh0916/repos/ducks-riding-lamas/main.py
+                python: CPython 3.11.14
+                root: ./wandb
+                startedAt: "2026-02-21T17:15:49.202216Z"
+                writerId: u8e4amh9ijvg94l1xwvoxk2209tkdyfc
+        m: []
+        python_version: 3.11.14
+        t:
+            "1":
+                - 2
+                - 3
+            "2":
+                - 2
+                - 3
+            "3":
+                - 13
+                - 15
+                - 16
+                - 61
+            "4": 3.11.14
+            "5": 0.25.0
+            "12": 0.25.0
+            "13": linux-x86_64
+environment:
+    value:
+        mode: training
+        variant: 0
+model:
+    value:
+        device: cpu
+        network: mlp
+training:
+    value:
+        episodes: 100
+        gamma: 0.99
+        learning_rate: 0.001
+        seed: 42
