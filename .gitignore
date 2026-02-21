@@ -5,6 +5,7 @@ __pycache__/
 
 # wandb files
 wandb/
+wandb/**
 
 # pixi files
 .pixi/
