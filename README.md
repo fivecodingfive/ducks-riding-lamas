@@ -4,8 +4,10 @@
 
 This project evaluates Deep Q-Network (DQN), Proximal Policy Optimization (PPO), and Soft Actor-Critic (SAC) in a stochastic 5×5 grid-based pickup-and-delivery environment. The task involves collecting and delivering dynamically spawning items under time constraints, sparse rewards, and spatial restrictions across three environment variants. The repository includes feature-engineered state representations, reward shaping strategies, and tuned agent configurations to analyze performance, training stability, and generalization across increasingly complex settings.
 
-![Variant 0](pics/variant_0.png)
-![Variant 2](pics/variant_2.png)
+<p align="center">
+  <img src="pics/variant_0.png" width="45%" />
+  <img src="pics/variant_2.png" width="45%" />
+</p>
 
 ### Key Features
 - **Multiple RL Algorithms**: Support for SAC (Soft Actor-Critic), DQN, and A2C agents
