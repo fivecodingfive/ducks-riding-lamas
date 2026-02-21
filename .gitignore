@@ -9,3 +9,6 @@ wandb/**
 
 # pixi files
 .pixi/
+
+#pynb_checkpoints
+.ipynb_checkpoints/
