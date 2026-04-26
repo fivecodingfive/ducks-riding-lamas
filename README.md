@@ -1,4 +1,6 @@
-# Ducks Riding Lamas - Reinforcement Learning Project
+# Deep Reinforcement Learning for Stochastic Pickup-and-Delivery Gridworlds
+
+Comparative benchmark of DQN, PPO, and SAC in a stochastic gridworld environment with sparse rewards and increasing task complexity.
 
 ## Project Overview
 
@@ -9,13 +11,29 @@ This project evaluates Deep Q-Network (DQN), Proximal Policy Optimization (PPO),
   <img src="pics/variant_2.png" width="40%" />
 </p>
 
+## Key Results
+
+- Benchmarked **DQN, PPO, and SAC** across three stochastic environment variants
+- Evaluated **training stability, convergence behavior, and final task performance**
+- Explored the impact of **reward shaping** and **state representation design**
+- Compared **generalization** under increasing environment complexity
+
+## My Contribution
+
+This repository was developed as part of a university group project. My contributions focused on:
+- implementing and refining parts of the **training / evaluation pipeline**
+- running experiments and tuning **agent configurations**
+- analyzing **training stability and generalization** across environment variants
+- improving **reproducibility** and repository organization
+
 ### Key Features
-- **Multiple RL Algorithms**: Support for SAC (Soft Actor-Critic), DQN, and A2C agents
+- **Multiple RL Algorithms**: Support for SAC (Soft Actor-Critic), DQN, and PPO agents
 - **Flexible Network Architectures**: MLP, CNN, and combined network options
 - **Three Environment Variants**: Different difficulty levels and configurations
 - **Experiment Tracking**: Integration with Weights & Biases (W&B) for monitoring
 - **Prioritized Experience Replay**: Optional PER for improved learning efficiency
 - **Comprehensive Testing**: Training, validation, and final testing modes
+
 
 ---
 
