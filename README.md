@@ -2,7 +2,7 @@
 
 Comparative benchmark of DQN, PPO, and SAC in a stochastic gridworld environment with sparse rewards and increasing task complexity.
 
-## Project Overview
+### Project Overview
 
 This project evaluates Deep Q-Network (DQN), Proximal Policy Optimization (PPO), and Soft Actor-Critic (SAC) in a stochastic 5×5 grid-based pickup-and-delivery environment. The task involves collecting and delivering dynamically spawning items under time constraints, sparse rewards, and spatial restrictions across three environment variants. The repository includes feature-engineered state representations, reward shaping strategies, and tuned agent configurations to analyze performance, training stability, and generalization across increasingly complex settings.
 
@@ -11,14 +11,14 @@ This project evaluates Deep Q-Network (DQN), Proximal Policy Optimization (PPO),
   <img src="pics/variant_2.png" width="40%" />
 </p>
 
-## Key Results
+### Key Results
 
 - Benchmarked **DQN, PPO, and SAC** across three stochastic environment variants
 - Evaluated **training stability, convergence behavior, and final task performance**
 - Explored the impact of **reward shaping** and **state representation design**
 - Compared **generalization** under increasing environment complexity
 
-## My Contribution
+### My Contribution
 
 This repository was developed as part of a university group project. My contributions focused on:
 - implementing and refining parts of the **training / evaluation pipeline**
@@ -40,7 +40,7 @@ This repository was developed as part of a university group project. My contribu
 ## Project Structure
 
 ```
-ducks-riding-lamas/
+deep-rl-gridworld-benchmark/
 ├── agent_sac/                    # SAC agent implementation
 ├── agent_dqn/                    # DQN agent implementation
 ├── agent_ppo/                    # PPO agent implementation
@@ -71,8 +71,8 @@ ducks-riding-lamas/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/fivecodingfive/ducks-riding-lamas.git
-cd ducks-riding-lamas
+git clone https://github.com/jclotten/deep-rl-gridworld-benchmark.git
+cd deep-rl-gridworld-benchmark
 ```
 
 ### 2. Install Pixi
